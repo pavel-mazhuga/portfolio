@@ -1,0 +1,27 @@
+// Base
+@import 'base/variables';
+@import 'base/custom-properties';
+@import 'base/reset';
+@import 'base/fonts';
+
+// Utils
+@import 'utils/mixins';
+
+@import 'layout/common';
+
+// Components
+@import '../components/shared/Button/Button.scss';
+@import '../components/shared/LitPopup/LitPopup.scss';
+@import '../components/shared/Responsive/Responsive.scss';
+
+// Layout
+@import '../components/layout/Header/Header.scss';
+@import '../components/layout/Footer/Footer.scss';
+@import '../components/layout/Cursor/Cursor.scss';
+@import '../app/sections/MainSection/MainSection.scss';
+@import '../app/sections/AboutSection/AboutSection.scss';
+@import '../app/sections/PortfolioSection/PortfolioSection.scss';
+@import '../app/sections/ContactsSection/ContactsSection.scss';
+
+// Pages
+@import 'pages/index';

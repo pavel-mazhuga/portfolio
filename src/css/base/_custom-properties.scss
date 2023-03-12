@@ -1,0 +1,15 @@
+:root {
+    // Боковые оффсеты страницы
+    --offset-x: 48px;
+
+    // Сетка
+    --grid-columns: 12;
+    --grid-gap: 10px;
+    --grid-column-width: calc(
+        (100vw - var(--scrollbar-width, 0px) - var(--offset-x) * 2) / var(--grid-columns) -
+            (var(--grid-gap) * ((var(--grid-columns) - 1) / var(--grid-columns)))
+    );
+
+    // Высота хедера
+    --header-height: 94px;
+}

@@ -1,0 +1,31 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs';
+import ComponentProps from '@/../.storybook/components/ComponentProps';
+import CSSVariables from '@/../.storybook/components/CSSVariables';
+import Responsive from './Responsive';
+
+<Meta title="Components/Responsive/Overview" component={Responsive} />
+
+# Responsive
+
+Компонент, сохраняющий пропорции элемента при ресайзе. В основном используется с медиаконтентом: изображениями и видео.
+
+<Canvas withToolbar>
+    <Responsive>
+        <img src="/img/works/work-1.jpg" alt="" />
+    </Responsive>
+</Canvas>
+
+<ComponentProps component={Responsive}>
+    <p>Поддерживает все стандартные свойства HTML-тега "div".</p>
+</ComponentProps>
+
+<CSSVariables
+    data={[
+        { name: '--aspect-ratio', description: 'Соотношение сторон', default: 'calc(16 / 9)' },
+        { name: '--object-fit', description: 'Алгоритм заполнения блока (CSS object-fit)', default: 'cover' },
+    ]}
+/>
+
+## Import
+
+<Source language="ts" format={false} code={`import Responsive from '@/components/shared/Responsive';`} />

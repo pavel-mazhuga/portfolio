@@ -1,0 +1,23 @@
+@import './normalize';
+
+button {
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+
+    &:active {
+        color: inherit;
+    }
+}
+
+ul,
+ol {
+    margin-bottom: 0;
+}

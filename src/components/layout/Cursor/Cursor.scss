@@ -1,0 +1,51 @@
+.cursor {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s ease;
+
+    @media (hover: none) {
+        display: none;
+    }
+
+    &.cursor--hidden {
+        opacity: 0;
+    }
+}
+
+.cursor__inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cursor__inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        max-width: 100%;
+        max-height: 100%;
+        height: auto;
+
+        [fill]:not([fill='none']) {
+            fill: currentColor;
+        }
+
+        [stroke]:not([stroke='none']) {
+            stroke: currentColor;
+        }
+    }
+}
+
+.cursor__inner--default {
+    --size: 40px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    width: var(--size);
+    height: var(--size);
+}

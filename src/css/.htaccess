@@ -1,0 +1,57 @@
+<IfModule mod_headers.c>
+    # Enable rewrite
+    RewriteEngine On
+
+    # Serve brotli compressed CSS files if they exist and the client accepts gzip.
+    RewriteCond %{REQUEST_FILENAME} \.css$ [NC]
+    RewriteCond %{HTTP:Accept-encoding} br
+    RewriteCond %{REQUEST_FILENAME}\.br -s
+    RewriteRule ^(.*)\.css $1\.css\.br [QSA]
+    # Brotli not accepted
+    RewriteCond %{REQUEST_FILENAME} \.css\.br$ [NC]
+    RewriteCond %{HTTP:Accept-encoding} !br
+    RewriteCond %{REQUEST_FILENAME} -s
+    RewriteRule ^(.*)\.css\.br $1\.css [L,QSA]
+
+    # Serve gzip compressed CSS files if they exist and the client accepts gzip.
+    RewriteCond %{REQUEST_FILENAME} \.css$ [NC]
+    RewriteCond %{HTTP:Accept-encoding} gzip
+    RewriteCond %{REQUEST_FILENAME}\.gz -s
+    RewriteRule ^(.*)\.css $1\.css\.gz [QSA]
+    # Gzip not accepted
+    RewriteCond %{REQUEST_FILENAME} \.css\.gz$ [NC]
+    RewriteCond %{HTTP:Accept-encoding} !gzip
+    RewriteCond %{REQUEST_FILENAME} -s
+    RewriteRule ^(.*)\.css\.gz $1\.css [L,QSA]
+
+    # Serve correct content types, and prevent mod_deflate double gzip.
+    RewriteRule \.css\.gz$ - [T=text/css,E=no-gzip:1]
+    RewriteRule \.css\.br$ - [T=text/css,E=no-gzip:1]
+
+    <Files *.css.gz>
+        # fix content type
+        Header set Content-Type "text/css; charset=UTF-8"
+        AddType "text/css" .gz
+        AddEncoding gzip .gz
+        RemoveLanguage .gz
+    </Files>
+    <Files *.css.br>
+        # fix content type
+        Header set Content-Type "text/css; charset=UTF-8"
+        AddType "text/css" .br
+        AddEncoding br .br
+        RemoveLanguage .br
+    </Files>
+    <FilesMatch "(\.css\.gz)$">
+        # Serve correct encoding type.
+        Header set Content-Encoding gzip
+        # Force proxies to cache gzipped & non-gzipped css files separately.
+        Header append Vary Accept-Encoding
+    </FilesMatch>
+    <FilesMatch "(\.css\.br)$">
+        # Serve correct encoding type.
+        Header set Content-Encoding br
+        # Force proxies to cache gzipped & non-gzipped css files separately.
+        Header append Vary Accept-Encoding
+    </FilesMatch>
+</IfModule>
