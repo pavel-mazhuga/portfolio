@@ -5,10 +5,8 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import LayoutGrid from '@/components/utils/LayoutGrid';
 import Html from './Html';
-import Cursor from '@/components/layout/Cursor';
-import WebGL from '@/components/layout/WebGL';
 
-const WEBSITE_NAME = 'Next.js boilerplate';
+const WEBSITE_NAME = 'Pavel Mazhuga — creative frontend developer';
 const WEBSITE_DESCRIPTION = '[DESCRIPTION]';
 const WEBSITE_OG_IMAGE = '/img/og-image.jpg';
 
@@ -54,12 +52,10 @@ function RootLayout({ children }: { children: React.ReactNode }) {
         <Providers>
             <Html>
                 <body>
-                    <WebGL />
                     <Header />
                     <main className="main">{children}</main>
                     <Footer />
                     <div id="modal-root"></div>
-                    <Cursor />
                     {process.env.NODE_ENV === 'development' && <LayoutGrid />}
                 </body>
             </Html>
