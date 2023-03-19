@@ -2,6 +2,7 @@
 
 import { WebGLRenderer } from 'three';
 import { Canvas } from '@react-three/fiber';
+import Works from './Works';
 
 const WebGL = () => {
     return (
@@ -14,13 +15,9 @@ const WebGL = () => {
                     near: 1,
                     far: 1000,
                 }}
-                gl={(canvas) => new WebGLRenderer({ canvas })}
+                gl={(canvas) => new WebGLRenderer({ canvas, alpha: true })}
             >
-                <mesh>
-                    <circleGeometry />
-                    <meshBasicMaterial />
-                </mesh>
-                {/* <Model isWebGLOpen={isOpen} setIsWebGLOpen={setIsOpen} /> */}
+                <Works />
             </Canvas>
         </div>
     );

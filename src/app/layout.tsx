@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import LayoutGrid from '@/components/utils/LayoutGrid';
 import Html from './Html';
+import WebGL from '@/components/layout/WebGL';
 
 const WEBSITE_NAME = 'Pavel Mazhuga — creative frontend developer';
 const WEBSITE_DESCRIPTION = '[DESCRIPTION]';
@@ -52,6 +53,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
         <Providers>
             <Html>
                 <body>
+                    <WebGL />
                     <Header />
                     <main className="main">{children}</main>
                     <Footer />
