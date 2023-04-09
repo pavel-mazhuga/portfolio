@@ -46,7 +46,7 @@
     overflow: hidden;
 }
 
-@mixin scrollbar($color: $primary) {
+@mixin scrollbar($color: #fff) {
     scrollbar-color: $color transparent;
 
     &::-webkit-scrollbar {

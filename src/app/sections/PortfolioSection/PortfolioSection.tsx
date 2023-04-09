@@ -1,6 +1,6 @@
 const PortfolioSection = () => {
     return (
-        <section className="wrapper">
+        <section id="portfolio" className="wrapper">
             <h2>Портфолио</h2>
         </section>
     );

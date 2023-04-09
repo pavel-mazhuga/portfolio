@@ -64,7 +64,7 @@ const Html = ({ children }: { children: ReactNode }) => {
     }, [setMediaQueryDeviceState]);
 
     return (
-        <html lang="ru" className={pathnameClassMap.get(deleteGetParams(pathname))}>
+        <html lang="en" className={pathnameClassMap.get(deleteGetParams(pathname))}>
             {children}
         </html>
     );
