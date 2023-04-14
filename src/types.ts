@@ -1,1 +1,5 @@
-export type MapCoords = [number, number];
+export interface ImageShape {
+    src: string;
+    width: number;
+    height: number;
+}

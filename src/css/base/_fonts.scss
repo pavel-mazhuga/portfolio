@@ -39,4 +39,6 @@
 
 /* stylelint-enable */
 
-// @include font-face(Samplinoff, '../fonts/Samplinoff', null, null, woff2);
+@include font-face('Inter', '/fonts/Inter-Regular', null, null, woff2);
+@include font-face('Inter', '/fonts/Inter-Bold', 700, null, woff2);
+@include font-face('Roboto', '/fonts/Roboto-Bold', 700, null, woff2);

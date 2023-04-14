@@ -10,28 +10,24 @@ const Ground = () => {
 
     return (
         <mesh position={[0, -2, -10]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
-            <planeGeometry args={[50, 60]} />
+            <planeGeometry args={[100, 100]} />
             <MeshReflectorMaterial
                 resolution={1024}
-                mirror={0.8}
+                mirror={0.99}
                 mixBlur={5}
-                mixStrength={2}
+                mixStrength={1}
                 blur={[0, 0]}
                 minDepthThreshold={0.8}
                 maxDepthThreshold={1.2}
                 depthScale={0}
                 depthToBlurRatioBias={0.2}
                 distortion={0}
-                // distortionMap={distortionMap}
                 color="#a0a0a0"
-                // color="#000"
-                // color="#bbb"
-                // color="#fff"
-                envMapIntensity={0.05}
+                envMapIntensity={0.03}
                 metalness={0}
                 roughnessMap={floor}
                 roughness={1}
-                // normalMap={normal}
+                normalMap={normal}
             />
         </mesh>
     );

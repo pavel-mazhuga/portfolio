@@ -5,6 +5,7 @@
 html {
     background-color: $body-bg;
     color: $body-color;
+    overflow: hidden;
 
     &.no-scroll {
         overflow: hidden;
@@ -109,5 +110,4 @@ body:not(.sb-show-main) {
     width: 100%;
     height: 100%;
     user-select: none;
-    z-index: -1;
 }

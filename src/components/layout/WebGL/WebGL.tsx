@@ -10,7 +10,7 @@ const WebGL = () => {
             <Canvas
                 dpr={[1, 1.5]}
                 camera={{
-                    position: [0, 1.6, 15],
+                    position: [0, 0, 15],
                     fov: 35,
                     near: 1,
                     far: 1000,

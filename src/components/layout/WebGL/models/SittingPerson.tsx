@@ -46,4 +46,4 @@ function SittingPerson(props: JSX.IntrinsicElements['group']) {
 
 export default SittingPerson;
 
-useGLTF.preload('/sitting-person-transformed.glb');
+useGLTF.preload('/gltf/sitting-person-transformed.glb');

@@ -8,6 +8,7 @@
 @import 'utils/mixins';
 
 @import 'layout/common';
+@import 'layout/typography';
 
 // Components
 @import '../components/shared/Button/Button.scss';
@@ -19,9 +20,6 @@
 @import '../components/layout/Footer/Footer.scss';
 @import '../components/layout/Cursor/Cursor.scss';
 @import '../app/sections/MainSection/MainSection.scss';
-@import '../app/sections/AboutSection/AboutSection.scss';
-@import '../app/sections/PortfolioSection/PortfolioSection.scss';
-@import '../app/sections/ContactsSection/ContactsSection.scss';
 
 // Pages
 @import 'pages/index';
