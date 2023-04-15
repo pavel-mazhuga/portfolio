@@ -48,7 +48,7 @@ const MainScene = () => {
     useEffect(() => {
         const onWheel = (event: WheelEvent) => {
             const delta = event.deltaY === 0 ? event.deltaX : event.deltaY;
-            wheelX.current = clamp(wheelX.current + delta, 0, 2900 * portfolio.length);
+            wheelX.current = clamp(wheelX.current + delta, 0, 2860 * portfolio.length);
         };
 
         window.addEventListener('wheel', onWheel);

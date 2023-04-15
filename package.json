@@ -87,7 +87,6 @@
         "cssnano": "^5.1.15",
         "eslint-config-prettier": "^8.7.0",
         "eslint-plugin-storybook": "^0.6.11",
-        "flex-gap-polyfill": "^4.1.2",
         "glslify-loader": "^2.0.0",
         "html-validator": "^6.0.1",
         "husky": "^8.0.3",
