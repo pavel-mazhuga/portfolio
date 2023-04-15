@@ -12,20 +12,32 @@ import Stand from './Stand';
 
 const portfolio = [
     {
-        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        href: 'https://chipsa.ru',
+        videoUrl: '/zagranitsa_9x16.mp4',
+        href: 'https://zagranitsa.chipsa.ru',
     },
     {
-        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        href: 'https://chipsa.ru',
+        videoUrl: '/chipsa_9x16.mp4',
+        href: 'https://chipsa.design',
     },
     {
-        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        href: 'https://chipsa.ru',
+        videoUrl: '/control_9x16.mp4',
+        href: 'https://control.chipsa.ru/',
     },
     {
-        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        href: 'https://chipsa.ru',
+        videoUrl: '/biotech_9x16.mp4',
+        href: 'https://biotech.artlife.ru/',
+    },
+    {
+        videoUrl: '/sportex_9x16.mp4',
+        href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
+    },
+    {
+        videoUrl: '/malinovka_9x16.mp4',
+        href: 'https://24fermer.ru/',
+    },
+    {
+        videoUrl: '/asap_9x16.mp4',
+        href: 'https://asap.digital/',
     },
 ];
 
@@ -36,7 +48,7 @@ const MainScene = () => {
     useEffect(() => {
         const onWheel = (event: WheelEvent) => {
             const delta = event.deltaY === 0 ? event.deltaX : event.deltaY;
-            wheelX.current = clamp(wheelX.current + delta, 0, 1550 * portfolio.length);
+            wheelX.current = clamp(wheelX.current + delta, 0, 2900 * portfolio.length);
         };
 
         window.addEventListener('wheel', onWheel);
@@ -55,16 +67,20 @@ const MainScene = () => {
                     ref={projectStandRefs.current[i]}
                     key={i}
                     videoUrl={project.videoUrl}
-                    position={[6 * i, 1.4, -10]}
-                    onPointerEnter={() => {}}
-                    onPointerLeave={() => {}}
+                    position={[10 * i, 2.5, -10]}
+                    onPointerEnter={() => {
+                        document.documentElement.style.cursor = 'pointer';
+                    }}
+                    onPointerLeave={() => {
+                        document.documentElement.style.cursor = '';
+                    }}
                     onClick={() => window.open(project.href, '_blank')}
                 />
             ))}
 
             <Ground />
-            <fog attach="fog" args={['#000', 20, 40]} />
-            <ambientLight intensity={0.2} />
+            <fog attach="fog" args={['#090909', 25, 60]} />
+            <ambientLight intensity={0.3} />
             <Environment preset="sunset" />
         </>
     );
