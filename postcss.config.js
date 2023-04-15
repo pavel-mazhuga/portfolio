@@ -8,7 +8,6 @@ module.exports = {
        'postcss-easings',
        'postcss-focus-within',
        'postcss-focus-visible',
-       ['flex-gap-polyfill', { only: true }],
         ...(process.env.NODE_ENV === 'production'
             ? [
                   'postcss-clamp',
