@@ -1,13 +1,10 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { pathnameClassMap } from './pathname-class-map';
 import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import useIsomorphicLayoutEffect from '@/hooks/use-isomorphic-layout-effect';
 import { calculateScrollbarWidth } from '@/utils/calculate-scrollbar-width';
 import vhMobileFix from '@/utils/vh-mobile-fix';
-import { deleteGetParams } from '@/utils/strings';
 
 if (typeof window !== 'undefined') {
     vhMobileFix();
@@ -15,22 +12,7 @@ if (typeof window !== 'undefined') {
 }
 
 const Html = ({ children }: { children: ReactNode }) => {
-    const pathname = usePathname();
     const [_, setMediaQueryDeviceState] = useMediaQueryDeviceState();
-
-    useEffect(() => {
-        const pageClass = pathnameClassMap.get(deleteGetParams(pathname));
-
-        if (pageClass) {
-            document.documentElement.classList.add(pageClass);
-        }
-
-        return () => {
-            if (pageClass) {
-                document.documentElement.classList.remove(pageClass);
-            }
-        };
-    }, [pathname]);
 
     useIsomorphicLayoutEffect(() => {
         const setDevice = () => {
@@ -63,11 +45,7 @@ const Html = ({ children }: { children: ReactNode }) => {
         return () => window.removeEventListener('resize', setDevice);
     }, [setMediaQueryDeviceState]);
 
-    return (
-        <html lang="en" className={pathnameClassMap.get(deleteGetParams(pathname))}>
-            {children}
-        </html>
-    );
+    return <html lang="en">{children}</html>;
 };
 
 export default Html;

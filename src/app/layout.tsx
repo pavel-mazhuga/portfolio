@@ -8,7 +8,8 @@ import Html from './Html';
 import WebGL from '@/components/layout/WebGL';
 
 const WEBSITE_NAME = 'Pavel Mazhuga — creative frontend developer';
-const WEBSITE_DESCRIPTION = '[DESCRIPTION]';
+const WEBSITE_DESCRIPTION =
+    'Creative frontend developer. Passionate about WebGL and related stuff, stunning motion and animations.';
 const WEBSITE_OG_IMAGE = '/img/og-image.jpg';
 
 export const metadata: Metadata = {
@@ -20,10 +21,9 @@ export const metadata: Metadata = {
     viewport: {
         width: 'device-width',
         initialScale: 1,
-        maximumScale: 1,
     },
     icons: {
-        icon: '/img/favicon/favicon.ico',
+        icon: '/favicon.png',
         // apple: '/apple-touch-icon.png',
     },
     openGraph: {
@@ -45,7 +45,6 @@ export const metadata: Metadata = {
         description: WEBSITE_DESCRIPTION,
         images: [WEBSITE_OG_IMAGE],
     },
-    // manifest: '/img/favicon/site.webmanifest',
 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +56,6 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                     <Header />
                     <main className="main">{children}</main>
                     <Footer />
-                    <div id="modal-root"></div>
                     {process.env.NODE_ENV === 'development' && <LayoutGrid />}
                 </body>
             </Html>
