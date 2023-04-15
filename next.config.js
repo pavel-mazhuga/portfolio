@@ -4,6 +4,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withBundleAnalyzer({
+    output: 'export',
     reactStrictMode: true,
     // typescript: {
     //     // !! WARN !!
@@ -52,10 +53,7 @@ const nextConfig = withBundleAnalyzer({
 
         config.module.rules.push({
             test: /\.(glsl|frag|vert)$/,
-            use: [
-                require.resolve('raw-loader'),
-                require.resolve('glslify-loader'),
-            ],
+            use: [require.resolve('raw-loader'), require.resolve('glslify-loader')],
         });
 
         return config;

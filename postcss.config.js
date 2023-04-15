@@ -13,7 +13,6 @@ module.exports = {
                   'postcss-clamp',
                  ['postcss-font-display', { display: 'swap' }],
                   'postcss-flexbugs-fixes',
-                  ['css-mqpacker', { sort: sortCSSmq.desktopFirst }],
                   ['autoprefixer', { browsers: browserslist.browsers }],
                   // this is always last
                   ['cssnano', {
