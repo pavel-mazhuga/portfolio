@@ -71,27 +71,6 @@ jobs:
               uses: actions/upload-pages-artifact@v1
               with:
                   path: ./out
-            # - name: Deploy to Server
-            #   id: deployment
-            #   uses: easingthemes/ssh-deploy@main
-            #   env:
-            #       SSH_PRIVATE_KEY: ${{ vars.SSH_PRIVATE_KEY }}
-            #       # ARGS: '-rlgoDzvc -i --delete'
-            #       ARGS: '-zarvh -av'
-            #       SOURCE: 'out/'
-            #       REMOTE_HOST: ${{ vars.REMOTE_HOST }}
-            #       REMOTE_USER: ${{ vars.REMOTE_USER }}
-            #       TARGET: ${{ vars.TARGET }}
-            #       EXCLUDE: '/dist/, /node_modules/'
-
-    # Deployment job
-    deploy:
-        environment:
-            name: remote_server
-            url: ${{ steps.deployment.outputs.page_url }}
-        runs-on: ubuntu-latest
-        needs: build
-        steps:
             - name: Deploy to Server
               id: deployment
               uses: easingthemes/ssh-deploy@main
@@ -104,3 +83,24 @@ jobs:
                   REMOTE_USER: ${{ vars.REMOTE_USER }}
                   TARGET: ${{ vars.TARGET }}
                   EXCLUDE: '/dist/, /node_modules/'
+
+    # # Deployment job
+    # deploy:
+    #     environment:
+    #         name: remote_server
+    #         url: ${{ steps.deployment.outputs.page_url }}
+    #     runs-on: ubuntu-latest
+    #     needs: build
+    #     steps:
+    #         - name: Deploy to Server
+    #           id: deployment
+    #           uses: easingthemes/ssh-deploy@main
+    #           env:
+    #               SSH_PRIVATE_KEY: ${{ vars.SSH_PRIVATE_KEY }}
+    #               # ARGS: '-rlgoDzvc -i --delete'
+    #               ARGS: '-zarvh -av'
+    #               SOURCE: 'out/'
+    #               REMOTE_HOST: ${{ vars.REMOTE_HOST }}
+    #               REMOTE_USER: ${{ vars.REMOTE_USER }}
+    #               TARGET: ${{ vars.TARGET }}
+    #               EXCLUDE: '/dist/, /node_modules/'
