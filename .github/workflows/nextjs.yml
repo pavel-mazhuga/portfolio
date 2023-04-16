@@ -53,14 +53,6 @@ jobs:
               with:
                   node-version: '18'
                   cache: ${{ steps.detect-package-manager.outputs.manager }}
-            # - name: Setup Pages
-            #   uses: actions/configure-pages@v3
-            #   with:
-            #       # Automatically inject basePath in your Next.js configuration file and disable
-            #       # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
-            #       #
-            #       # You may remove this line if you want to manage the configuration yourself.
-            #       static_site_generator: next
             - name: Restore cache
               uses: actions/cache@v3
               with:
@@ -94,7 +86,7 @@ jobs:
               env:
                   SSH_PRIVATE_KEY: ${{ vars.SSH_PRIVATE_KEY }}
                   ARGS: '-rlgoDzvc -i --delete'
-                  SOURCE: '.out/'
+                  SOURCE: 'out/'
                   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
                   REMOTE_USER: ${{ vars.REMOTE_USER }}
                   TARGET: ${{ vars.REMOTE_TARGET }}
