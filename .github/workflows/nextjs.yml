@@ -94,7 +94,7 @@ jobs:
               env:
                   SSH_PRIVATE_KEY: ${{ vars.SSH_PRIVATE_KEY }}
                   ARGS: '-rlgoDzvc -i --delete'
-                  SOURCE: 'out/'
+                  SOURCE: '.out/'
                   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
                   REMOTE_USER: ${{ vars.REMOTE_USER }}
                   TARGET: ${{ vars.REMOTE_TARGET }}
