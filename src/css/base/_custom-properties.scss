@@ -12,4 +12,13 @@
 
     // Высота хедера
     --header-height: 60px;
+
+    @media screen and (max-width: 1366px) {
+        --offset-x: 32px;
+    }
+
+    @include mobile {
+        --offset-x: 16px;
+        --header-height: 52px;
+    }
 }

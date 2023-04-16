@@ -1,11 +1,9 @@
 // Base
 @import 'base/variables';
+@import 'utils/mixins';
 @import 'base/custom-properties';
 @import 'base/reset';
 @import 'base/fonts';
-
-// Utils
-@import 'utils/mixins';
 
 @import 'layout/common';
 @import 'layout/typography';

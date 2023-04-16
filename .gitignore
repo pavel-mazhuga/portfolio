@@ -45,3 +45,4 @@ test-results
 # !tests/screenshot/**/*-snapshots
 storybook
 public/robots.txt
+bsync.sh

@@ -8,14 +8,38 @@
     text-transform: uppercase;
     width: 100%;
     font-size: 12px;
+
+    @include mobile {
+        font-size: 10px;
+    }
+
+    @media screen and (max-width: 576px) {
+        display: block;
+    }
+}
+
+.footer-availability {
+    opacity: 0.8;
 }
 
 .footer-soc-list {
     margin-left: auto;
+
+    @media screen and (max-width: 576px) {
+        margin-left: 0;
+    }
 }
 
 .soc-list {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+
+    @include mobile {
+        gap: 16px;
+    }
+
+    @media screen and (max-width: 576px) {
+        margin-top: 20px;
+    }
 }
