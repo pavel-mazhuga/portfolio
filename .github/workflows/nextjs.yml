@@ -81,7 +81,7 @@ jobs:
                   SOURCE: 'out/'
                   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
                   REMOTE_USER: ${{ vars.REMOTE_USER }}
-                  TARGET: ${{ vars.REMOTE_TARGET }}
+                  TARGET: ${{ vars.TARGET }}
                   EXCLUDE: '/dist/, /node_modules/'
 
     # # Deployment job
