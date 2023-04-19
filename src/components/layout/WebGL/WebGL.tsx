@@ -8,16 +8,18 @@ const WebGL = () => {
     return (
         <div className="canvas-wrapper">
             <Canvas
-                dpr={[1, 2]}
+                dpr={[1, 1.5]}
                 camera={{
-                    position: [0, 0, 20],
+                    position: [0, 2, 20],
                     fov: 35,
                     near: 1,
-                    far: 1000,
+                    far: 100,
                 }}
-                gl={(canvas) => new WebGLRenderer({ canvas, antialias: false })}
+                gl={(canvas) => {
+                    const renderer = new WebGLRenderer({ canvas, antialias: false });
+                    return renderer;
+                }}
             >
-                <color attach="background" args={['#090909']} />
                 <MainScene />
             </Canvas>
         </div>

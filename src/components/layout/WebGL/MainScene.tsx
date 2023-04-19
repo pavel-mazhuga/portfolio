@@ -3,10 +3,10 @@
 import { useMapRefs } from '@/hooks/use-map-refs';
 import { clamp } from '@/utils/clamp';
 import { lerp } from '@/utils/lerp';
-import { Environment } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
-import { Mesh } from 'three';
+import { useEffect, useRef, useState } from 'react';
+import { BackSide, Group, Object3D, PointLight, Vector3 } from 'three';
 import Ground from './Ground';
 import Stand from './Stand';
 
@@ -14,30 +14,37 @@ const portfolio = [
     {
         videoUrl: '/zagranitsa_9x16.mp4',
         href: 'https://zagranitsa.chipsa.ru',
+        color: '#444',
     },
     {
         videoUrl: '/chipsa_9x16.mp4',
         href: 'https://chipsa.design',
+        color: '#f2f5f7',
     },
     {
         videoUrl: '/control_9x16.mp4',
         href: 'https://control.chipsa.ru/',
+        color: '#f2f5f7',
     },
     {
         videoUrl: '/biotech_9x16.mp4',
         href: 'https://biotech.artlife.ru/',
+        color: '#f5f5f5',
     },
     {
         videoUrl: '/sportex_9x16.mp4',
         href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
+        color: '#444',
     },
     {
         videoUrl: '/malinovka_9x16.mp4',
         href: 'https://24fermer.ru/',
+        color: '#c5c5c5',
     },
     {
         videoUrl: '/asap_9x16.mp4',
         href: 'https://asap.digital/',
+        color: '#222',
     },
 ];
 
@@ -108,35 +115,76 @@ const useWheel = () => {
 };
 
 const MainScene = () => {
-    const projectStandRefs = useMapRefs<Mesh>(portfolio);
+    const projectStandRefs = useMapRefs<Group>(portfolio);
     const { wheelX } = useWheel();
+    const [hoveredStandIndex, setHoveredStandIndex] = useState<number | null>(null);
+    const [floor, normal] = useTexture([
+        '/img/34TX-SurfaceImperfections003_1K_var1.jpg',
+        '/img/Soy5-SurfaceImperfections003_1K_Normal.jpg',
+    ]);
+    const pointLight = useRef<PointLight>(null);
+    const cameraLookAtObject = useRef<Object3D>(null);
+    const cameraLookAtObjectPosition = useRef(new Vector3());
 
-    useFrame(({ camera }) => {
+    useFrame(({ camera, pointer }) => {
         camera.position.x = lerp(camera.position.x, wheelX.current * 0.003, 0.07);
+
+        // if (
+        //     typeof hoveredStandIndex === 'number' &&
+        //     projectStandRefs.current[hoveredStandIndex].current instanceof Mesh
+        // ) {
+        //     cameraLookAtObjectPosition.current.x = projectStandRefs.current[hoveredStandIndex].current!.position.x;
+        // } else {
+        cameraLookAtObjectPosition.current.x = camera.position.x;
+        cameraLookAtObjectPosition.current.y = 2;
+        cameraLookAtObjectPosition.current.z = 0;
+        // }
+
+        if (cameraLookAtObject.current) {
+            cameraLookAtObject.current.position.lerp(cameraLookAtObjectPosition.current, 0.08);
+            camera.lookAt(cameraLookAtObject.current.position);
+        }
+
+        if (pointLight.current) {
+            pointLight.current.position.x = lerp(pointLight.current.position.x, camera.position.x, 0.02);
+        }
+
+        // camera.position.z = lerp(camera.position.z, typeof hoveredStandIndex === 'number' ? 15 : 20, 0.02);
+        // camera.rotation.y = lerp(camera.rotation.y, typeof hoveredStandIndex === 'number' ? 0.1 : 0, 0.02);
     });
 
     return (
         <>
+            <mesh position={[30, 22, 0]}>
+                <boxGeometry args={[90, 50, 50]} />
+                <meshStandardMaterial color="lightblue" side={BackSide} normalMap={normal} roughnessMap={floor} />
+            </mesh>
+
             {portfolio.map((project, i) => (
                 <Stand
                     ref={projectStandRefs.current[i]}
                     key={i}
                     videoUrl={project.videoUrl}
-                    position={[10 * i, 2.5, -10]}
+                    position={[10 * i, 2.1, -10]}
                     onPointerEnter={() => {
                         document.documentElement.style.cursor = 'pointer';
+                        setHoveredStandIndex(i);
                     }}
                     onPointerLeave={() => {
                         document.documentElement.style.cursor = '';
+                        setHoveredStandIndex(null);
                     }}
+                    dimmed={hoveredStandIndex !== i}
+                    color={project.color}
                     onClick={() => window.open(project.href, '_blank')}
                 />
             ))}
 
             <Ground />
-            <fog attach="fog" args={['#090909', 25, 60]} />
-            <ambientLight intensity={0.3} />
-            <Environment preset="sunset" />
+
+            <object3D ref={cameraLookAtObject} />
+
+            <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
         </>
     );
 };
