@@ -21,7 +21,10 @@ const portfolio = [
         color: '#444',
     },
     {
-        videoUrls: [{ src: '/chipsa_9x16.mp4', type: 'video/mp4' }],
+        videoUrls: [
+            { src: '/chipsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/chipsa_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://chipsa.design',
         color: '#f2f5f7',
     },
@@ -34,7 +37,10 @@ const portfolio = [
         color: '#f2f5f7',
     },
     {
-        videoUrls: [{ src: '/biotech_9x16.mp4', type: 'video/mp4' }],
+        videoUrls: [
+            { src: '/biotech_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/biotech_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://biotech.artlife.ru/',
         color: '#f5f5f5',
     },
