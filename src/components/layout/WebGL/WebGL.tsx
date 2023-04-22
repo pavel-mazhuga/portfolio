@@ -3,6 +3,7 @@
 import { WebGLRenderer } from 'three';
 import { Canvas } from '@react-three/fiber';
 import MainScene from './MainScene';
+import { Suspense } from 'react';
 
 const WebGL = () => {
     return (
@@ -20,7 +21,9 @@ const WebGL = () => {
                     return renderer;
                 }}
             >
-                <MainScene />
+                <Suspense>
+                    <MainScene />
+                </Suspense>
             </Canvas>
         </div>
     );

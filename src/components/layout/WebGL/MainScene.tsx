@@ -1,48 +1,51 @@
 'use client';
 
+import { useFrame } from '@react-three/fiber';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { Group, Object3D, PointLight, Vector3 } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
 import { clamp } from '@/utils/clamp';
 import { lerp } from '@/utils/lerp';
-import { useTexture } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
-import { useEffect, useRef, useState } from 'react';
-import { BackSide, Group, Object3D, PointLight, Vector3 } from 'three';
 import Ground from './Ground';
 import Stand from './Stand';
+import Walls from './Walls';
 
 const portfolio = [
     {
-        videoUrl: '/zagranitsa_9x16.mp4',
+        videoUrls: [
+            { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://zagranitsa.chipsa.ru',
         color: '#444',
     },
     {
-        videoUrl: '/chipsa_9x16.mp4',
+        videoUrls: [{ src: '/chipsa_9x16.mp4', type: 'video/mp4' }],
         href: 'https://chipsa.design',
         color: '#f2f5f7',
     },
     {
-        videoUrl: '/control_9x16.mp4',
+        videoUrls: [{ src: '/control_9x16.mp4', type: 'video/mp4' }],
         href: 'https://control.chipsa.ru/',
         color: '#f2f5f7',
     },
     {
-        videoUrl: '/biotech_9x16.mp4',
+        videoUrls: [{ src: '/biotech_9x16.mp4', type: 'video/mp4' }],
         href: 'https://biotech.artlife.ru/',
         color: '#f5f5f5',
     },
     {
-        videoUrl: '/sportex_9x16.mp4',
+        videoUrls: [{ src: '/sportex_9x16.mp4', type: 'video/mp4' }],
         href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
         color: '#444',
     },
     {
-        videoUrl: '/malinovka_9x16.mp4',
+        videoUrls: [{ src: '/malinovka_9x16.mp4', type: 'video/mp4' }],
         href: 'https://24fermer.ru/',
         color: '#c5c5c5',
     },
     {
-        videoUrl: '/asap_9x16.mp4',
+        videoUrls: [{ src: '/asap_9x16.mp4', type: 'video/mp4' }],
         href: 'https://asap.digital/',
         color: '#222',
     },
@@ -118,10 +121,7 @@ const MainScene = () => {
     const projectStandRefs = useMapRefs<Group>(portfolio);
     const { wheelX } = useWheel();
     const [hoveredStandIndex, setHoveredStandIndex] = useState<number | null>(null);
-    const [floor, normal] = useTexture([
-        '/img/34TX-SurfaceImperfections003_1K_var1.jpg',
-        '/img/Soy5-SurfaceImperfections003_1K_Normal.jpg',
-    ]);
+
     const pointLight = useRef<PointLight>(null);
     const cameraLookAtObject = useRef<Object3D>(null);
     const cameraLookAtObjectPosition = useRef(new Vector3());
@@ -155,35 +155,33 @@ const MainScene = () => {
 
     return (
         <>
-            <mesh position={[30, 22, 0]}>
-                <boxGeometry args={[90, 50, 50]} />
-                <meshStandardMaterial color="lightblue" side={BackSide} normalMap={normal} roughnessMap={floor} />
-            </mesh>
+            <Suspense>
+                <Walls />
+                <Ground />
+            </Suspense>
 
             {portfolio.map((project, i) => (
-                <Stand
-                    ref={projectStandRefs.current[i]}
-                    key={i}
-                    videoUrl={project.videoUrl}
-                    position={[10 * i, 2.1, -10]}
-                    onPointerEnter={() => {
-                        document.documentElement.style.cursor = 'pointer';
-                        setHoveredStandIndex(i);
-                    }}
-                    onPointerLeave={() => {
-                        document.documentElement.style.cursor = '';
-                        setHoveredStandIndex(null);
-                    }}
-                    dimmed={hoveredStandIndex !== i}
-                    color={project.color}
-                    onClick={() => window.open(project.href, '_blank')}
-                />
+                <Suspense key={i}>
+                    <Stand
+                        ref={projectStandRefs.current[i]}
+                        videoUrls={project.videoUrls}
+                        position={[10 * i, 2.1, -10]}
+                        onPointerEnter={() => {
+                            document.documentElement.style.cursor = 'pointer';
+                            setHoveredStandIndex(i);
+                        }}
+                        onPointerLeave={() => {
+                            document.documentElement.style.cursor = '';
+                            setHoveredStandIndex(null);
+                        }}
+                        dimmed={hoveredStandIndex !== i}
+                        color={project.color}
+                        onClick={() => window.open(project.href, '_blank')}
+                    />
+                </Suspense>
             ))}
 
-            <Ground />
-
             <object3D ref={cameraLookAtObject} />
-
             <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
         </>
     );

@@ -6,15 +6,29 @@ import { Color, Group, sRGBEncoding } from 'three';
 
 interface Props extends GroupProps {
     dimmed?: boolean;
-    videoUrl: string;
+    videoUrls: { src: string; type: string }[];
     color?: Color | string;
 }
 
-const Stand = forwardRef<Group, Props>(({ videoUrl, dimmed = false, color = '#fff', ...props }, ref) => {
+const getVideoSrc = (sources: { src: string; type: string }[]) => {
+    const video = document.createElement('video');
+
+    for (let i = 0; i < sources.length; i++) {
+        const source = sources[i];
+
+        if (video.canPlayType(source.type)) {
+            return source.src;
+        }
+    }
+
+    return sources[sources.length - 1].src;
+};
+
+const Stand = forwardRef<Group, Props>(({ videoUrls, dimmed = false, color = '#fff', ...props }, ref) => {
     const width = 4.5;
     const height = 8;
     const meshRef = useRef<Group>(null);
-    const videoTexture = useVideoTexture(videoUrl, {
+    const videoTexture = useVideoTexture(getVideoSrc(videoUrls), {
         loop: true,
         muted: true,
         autoplay: true,
