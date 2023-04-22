@@ -21,7 +21,6 @@ const Ground = () => {
                 depthScale={0}
                 depthToBlurRatioBias={0.2}
                 distortion={0}
-                // color="#a0a0a0"
                 color="lightblue"
                 metalness={0}
                 roughnessMap={floor}

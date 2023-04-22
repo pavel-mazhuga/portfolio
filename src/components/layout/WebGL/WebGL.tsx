@@ -2,8 +2,9 @@
 
 import { WebGLRenderer } from 'three';
 import { Canvas } from '@react-three/fiber';
-import MainScene from './MainScene';
 import { Suspense } from 'react';
+import { Preload } from '@react-three/drei';
+import MainScene from './MainScene';
 
 const WebGL = () => {
     return (
@@ -23,6 +24,7 @@ const WebGL = () => {
             >
                 <Suspense>
                     <MainScene />
+                    <Preload all />
                 </Suspense>
             </Canvas>
         </div>

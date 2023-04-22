@@ -161,24 +161,23 @@ const MainScene = () => {
             </Suspense>
 
             {portfolio.map((project, i) => (
-                <Suspense key={i}>
-                    <Stand
-                        ref={projectStandRefs.current[i]}
-                        videoUrls={project.videoUrls}
-                        position={[10 * i, 2.1, -10]}
-                        onPointerEnter={() => {
-                            document.documentElement.style.cursor = 'pointer';
-                            setHoveredStandIndex(i);
-                        }}
-                        onPointerLeave={() => {
-                            document.documentElement.style.cursor = '';
-                            setHoveredStandIndex(null);
-                        }}
-                        dimmed={hoveredStandIndex !== i}
-                        color={project.color}
-                        onClick={() => window.open(project.href, '_blank')}
-                    />
-                </Suspense>
+                <Stand
+                    key={i}
+                    ref={projectStandRefs.current[i]}
+                    videoUrls={project.videoUrls}
+                    position={[10 * i, 2.1, -10]}
+                    onPointerEnter={() => {
+                        document.documentElement.style.cursor = 'pointer';
+                        setHoveredStandIndex(i);
+                    }}
+                    onPointerLeave={() => {
+                        document.documentElement.style.cursor = '';
+                        setHoveredStandIndex(null);
+                    }}
+                    dimmed={hoveredStandIndex !== i}
+                    color={project.color}
+                    onClick={() => window.open(project.href, '_blank')}
+                />
             ))}
 
             <object3D ref={cameraLookAtObject} />
