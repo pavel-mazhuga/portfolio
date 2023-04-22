@@ -9,6 +9,7 @@ import { lerp } from '@/utils/lerp';
 import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
+import { Preload } from '@react-three/drei';
 
 const portfolio = [
     {
@@ -25,7 +26,10 @@ const portfolio = [
         color: '#f2f5f7',
     },
     {
-        videoUrls: [{ src: '/control_9x16.mp4', type: 'video/mp4' }],
+        videoUrls: [
+            { src: '/control_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/control_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://control.chipsa.ru/',
         color: '#f2f5f7',
     },
@@ -45,7 +49,10 @@ const portfolio = [
         color: '#c5c5c5',
     },
     {
-        videoUrls: [{ src: '/asap_9x16.mp4', type: 'video/mp4' }],
+        videoUrls: [
+            { src: '/asap_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/asap_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://asap.digital/',
         color: '#222',
     },
@@ -62,7 +69,7 @@ const useWheel = () => {
 
     useEffect(() => {
         const onWheel = (event: WheelEvent) => {
-            const delta = event.deltaY === 0 ? event.deltaX : event.deltaY;
+            const delta = (event.deltaY === 0 ? event.deltaX : event.deltaY) * 2;
             wheelX.current = clamp(wheelX.current + delta, 0, ONE_STAND_SCROLL_LENGTH * portfolio.length);
         };
 
@@ -89,7 +96,6 @@ const useWheel = () => {
 
         const onTouchmove = (event: TouchEvent) => {
             let deltaX = startTouchX.current - event.touches[0].clientX;
-            console.log({ deltaX });
             let deltaY = startTouchY.current - event.touches[0].clientY;
 
             if (hasScrollDirectionChanged(prevDeltaY.current, deltaY)) {
@@ -182,6 +188,8 @@ const MainScene = () => {
 
             <object3D ref={cameraLookAtObject} />
             <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
+
+            <Preload all />
         </>
     );
 };

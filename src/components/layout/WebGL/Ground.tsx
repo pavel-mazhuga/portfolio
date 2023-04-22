@@ -4,7 +4,6 @@ const Ground = () => {
     const [floor, normal] = useTexture([
         '/img/34TX-SurfaceImperfections003_1K_var1.jpg',
         '/img/Soy5-SurfaceImperfections003_1K_Normal.jpg',
-        // '/img/aryd-SurfaceImperfections003_1K_Normal.jpg',
     ]);
 
     return (

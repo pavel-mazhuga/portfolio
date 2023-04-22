@@ -2,15 +2,22 @@
 
 import { WebGLRenderer } from 'three';
 import { Canvas } from '@react-three/fiber';
-import { Suspense } from 'react';
-import { Preload } from '@react-three/drei';
+// import { Canvas } from '@react-three/offscreen';
+import { lazy, useMemo } from 'react';
 import MainScene from './MainScene';
 
+// const MainScene = lazy(() => import('./MainScene'));
+
 const WebGL = () => {
+    // const worker = useMemo(
+    //     () => (typeof window !== 'undefined' ? new Worker(new URL('./worker.tsx', import.meta.url)) : null),
+    //     [],
+    // );
+
     return (
         <div className="canvas-wrapper">
             <Canvas
-                dpr={[1, 1.5]}
+                // dpr={[1, 2]}
                 camera={{
                     position: [0, 2, 20],
                     fov: 35,
@@ -21,11 +28,10 @@ const WebGL = () => {
                     const renderer = new WebGLRenderer({ canvas, antialias: false });
                     return renderer;
                 }}
+                // worker={worker!}
+                // fallback={<MainScene />}
             >
-                <Suspense>
-                    <MainScene />
-                    <Preload all />
-                </Suspense>
+                <MainScene />
             </Canvas>
         </div>
     );
