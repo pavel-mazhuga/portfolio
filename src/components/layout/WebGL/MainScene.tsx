@@ -1,15 +1,15 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { Suspense, useEffect, useRef, useState } from 'react';
-import { Group, Object3D, PointLight, Vector3 } from 'three';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { BoxGeometry, Group, MeshBasicMaterial, Object3D, PointLight, Vector3 } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
 import { clamp } from '@/utils/clamp';
 import { lerp } from '@/utils/lerp';
 import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
-import { Preload } from '@react-three/drei';
+import { Preload, usePerformanceMonitor } from '@react-three/drei';
 
 const portfolio = [
     {
@@ -45,7 +45,10 @@ const portfolio = [
         color: '#f5f5f5',
     },
     {
-        videoUrls: [{ src: '/sportex_9x16.mp4', type: 'video/mp4' }],
+        videoUrls: [
+            { src: '/sportex_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/sportex_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
         color: '#444',
     },
@@ -111,7 +114,7 @@ const useWheel = () => {
                 startTouchY.current = event.touches[0].clientY;
             }
 
-            const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+            const delta = (Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY) * 2;
             wheelX.current = clamp(wheelX.current + delta, 0, ONE_STAND_SCROLL_LENGTH * portfolio.length);
             prevDeltaX.current = deltaX;
             prevDeltaY.current = deltaY;
@@ -133,10 +136,22 @@ const MainScene = () => {
     const projectStandRefs = useMapRefs<Group>(portfolio);
     const { wheelX } = useWheel();
     const [hoveredStandIndex, setHoveredStandIndex] = useState<number | null>(null);
+    const standWidth = 4.5;
+    const standHeight = 8;
+    const standGeometry = useMemo(() => new BoxGeometry(standWidth + 0.2, standHeight + 0.2, 0.3), []);
+    const standMaterial = useMemo(() => new MeshBasicMaterial({ color: '#111' }), []);
+    // const standMaterial = useMemo(() => new MeshStandardMaterial({ color: '#cbcbcb' }), []);
 
     const pointLight = useRef<PointLight>(null);
     const cameraLookAtObject = useRef<Object3D>(null);
     const cameraLookAtObjectPosition = useRef(new Vector3());
+    const [groundHidden, setGroundHidden] = useState(false);
+
+    usePerformanceMonitor({
+        onChange: ({ factor }) => {
+            setGroundHidden(factor < 0.4);
+        },
+    });
 
     useFrame(({ camera, pointer }) => {
         camera.position.x = lerp(camera.position.x, wheelX.current * 0.003, 0.07);
@@ -168,14 +183,24 @@ const MainScene = () => {
     return (
         <>
             <Suspense>
-                <Walls />
-                <Ground />
+                <Suspense>
+                    <Walls />
+                </Suspense>
+                {!groundHidden && (
+                    <Suspense>
+                        <Ground />
+                    </Suspense>
+                )}
             </Suspense>
 
             {portfolio.map((project, i) => (
                 <Stand
                     key={i}
                     ref={projectStandRefs.current[i]}
+                    width={standWidth}
+                    height={standHeight}
+                    geometry={standGeometry}
+                    material={standMaterial}
                     videoUrls={project.videoUrls}
                     position={[10 * i, 2.1, -10]}
                     onPointerEnter={() => {

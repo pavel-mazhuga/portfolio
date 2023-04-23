@@ -1,13 +1,14 @@
 import { MeshReflectorMaterial, useTexture } from '@react-three/drei';
+import { MeshProps } from '@react-three/fiber';
 
-const Ground = () => {
+const Ground = (props: MeshProps) => {
     const [floor, normal] = useTexture([
         '/img/34TX-SurfaceImperfections003_1K_var1.jpg',
         '/img/Soy5-SurfaceImperfections003_1K_Normal.jpg',
     ]);
 
     return (
-        <mesh position={[25, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh {...props} position={[25, -2, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={undefined}>
             <planeGeometry args={[100, 100]} />
             <MeshReflectorMaterial
                 resolution={1024}

@@ -33,7 +33,7 @@ const StandScreen = ({ videoUrls, width = 1, height = 1, color = '#fff', ...prop
     });
 
     return (
-        <mesh {...props}>
+        <mesh {...props} raycast={undefined}>
             <planeGeometry args={[width, height]} />
             <meshBasicMaterial map={videoTexture} />
             <rectAreaLight
