@@ -53,7 +53,10 @@ const portfolio = [
         color: '#444',
     },
     {
-        videoUrls: [{ src: '/malinovka_9x16.mp4', type: 'video/mp4' }],
+        videoUrls: [
+            { src: '/malinovka_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/malinovka_9x16.mp4', type: 'video/mp4' },
+        ],
         href: 'https://24fermer.ru/',
         color: '#c5c5c5',
     },
