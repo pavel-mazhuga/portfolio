@@ -10,6 +10,7 @@ import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
 import { Preload, usePerformanceMonitor } from '@react-three/drei';
+import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 
 const portfolio = [
     {
@@ -149,6 +150,7 @@ const MainScene = () => {
     const cameraLookAtObject = useRef<Object3D>(null);
     const cameraLookAtObjectPosition = useRef(new Vector3());
     const [groundHidden, setGroundHidden] = useState(false);
+    const [mediaQueryDevice] = useMediaQueryDeviceState();
 
     usePerformanceMonitor({
         onChange: ({ factor }) => {
@@ -189,7 +191,7 @@ const MainScene = () => {
                 <Suspense>
                     <Walls />
                 </Suspense>
-                {!groundHidden && (
+                {!groundHidden && mediaQueryDevice === 'desktop' && (
                     <Suspense>
                         <Ground />
                     </Suspense>
