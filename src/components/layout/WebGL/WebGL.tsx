@@ -15,7 +15,8 @@ const WebGL = () => {
     //     () => (typeof window !== 'undefined' ? new Worker(new URL('./worker.tsx', import.meta.url)) : null),
     //     [],
     // );
-    const [dpr, setDpr] = useState(1.5);
+    const maxDpr = 1.5;
+    const [dpr, setDpr] = useState(maxDpr);
 
     return (
         <div className="canvas-wrapper">
@@ -34,7 +35,7 @@ const WebGL = () => {
                 // worker={worker!}
                 // fallback={<MainScene />}
             >
-                <PerformanceMonitor onChange={({ factor }) => setDpr(round(1 + factor, 1))}>
+                <PerformanceMonitor onChange={({ factor }) => setDpr(Math.min(round(1 + factor, 1), maxDpr))}>
                     <MainScene />
                 </PerformanceMonitor>
             </Canvas>
