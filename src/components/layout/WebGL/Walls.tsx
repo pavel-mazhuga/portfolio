@@ -8,7 +8,7 @@ const Walls = () => {
     ]);
 
     return (
-        <mesh position={[30, 23.1, 0]} raycast={undefined}>
+        <mesh position={[30, 22.9, 0]} raycast={undefined}>
             <boxGeometry args={[90, 50, 50]} />
             <meshStandardMaterial color="lightblue" side={BackSide} normalMap={normal} roughnessMap={floor} />
         </mesh>
