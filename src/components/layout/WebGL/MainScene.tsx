@@ -18,7 +18,7 @@ const portfolio = [
             { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },
         ],
-        href: 'https://zagranitsa.chipsa.ru',
+        href: 'https://new.bosfor.pictures/',
         color: '#444',
     },
     {
