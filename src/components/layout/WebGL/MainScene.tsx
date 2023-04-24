@@ -223,7 +223,10 @@ const MainScene = () => {
             ))}
 
             <object3D ref={cameraLookAtObject} />
-            <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
+
+            {mediaQueryDevice === 'desktop' && (
+                <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
+            )}
 
             <Preload all />
         </>
