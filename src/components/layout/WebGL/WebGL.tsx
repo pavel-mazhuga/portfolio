@@ -27,10 +27,10 @@ const WebGL = () => {
                     near: 1,
                     far: 100,
                 }}
-                gl={(canvas) => {
-                    const renderer = new WebGLRenderer({ canvas, antialias: false });
-                    return renderer;
-                }}
+                // gl={(canvas) => {
+                //     const renderer = new WebGLRenderer({ canvas, antialias: false });
+                //     return renderer;
+                // }}
                 // worker={worker!}
                 // fallback={<MainScene />}
             >
