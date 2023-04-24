@@ -1,7 +1,9 @@
+import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import { GroupProps } from '@react-three/fiber';
 import { forwardRef, Suspense, useRef } from 'react';
 import { mergeRefs } from 'react-merge-refs';
 import { BoxGeometry, Color, Group, Material, MeshBasicMaterial } from 'three';
+import StandImageScreen from './StandImageScreen';
 import StandScreen from './StandScreen';
 
 interface Props extends GroupProps {
@@ -29,6 +31,7 @@ const Stand = forwardRef<Group, Props>(
         ref,
     ) => {
         const meshRef = useRef<Group>(null);
+        const [mediaQueryDevice] = useMediaQueryDeviceState();
 
         return (
             <group ref={mergeRefs([ref, meshRef])} {...props}>
@@ -37,13 +40,23 @@ const Stand = forwardRef<Group, Props>(
                     {/* <meshStandardMaterial color="#cbcbcb" /> */}
                 </mesh>
                 <Suspense>
-                    <StandScreen
-                        position={[0, 0, 0.3]}
-                        width={width}
-                        height={height}
-                        videoUrls={videoUrls}
-                        color={color}
-                    />
+                    {mediaQueryDevice === 'desktop' ? (
+                        <StandScreen
+                            position={[0, 0, 0.3]}
+                            width={width}
+                            height={height}
+                            videoUrls={videoUrls}
+                            color={color}
+                        />
+                    ) : (
+                        <StandImageScreen
+                            position={[0, 0, 0.3]}
+                            width={width}
+                            height={height}
+                            imgSrc="/img/works/chipsa.png"
+                            color={color}
+                        />
+                    )}
                 </Suspense>
             </group>
         );
