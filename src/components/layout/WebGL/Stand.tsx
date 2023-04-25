@@ -13,6 +13,7 @@ interface Props extends GroupProps {
     material?: Material;
     dimmed?: boolean;
     videoUrls: { src: string; type: string }[];
+    imgSrc: string;
     color?: Color | string;
 }
 
@@ -24,6 +25,7 @@ const Stand = forwardRef<Group, Props>(
             geometry = new BoxGeometry(),
             material = new MeshBasicMaterial({ color: '#000' }),
             videoUrls,
+            imgSrc,
             dimmed = false,
             color = '#fff',
             ...props
@@ -53,7 +55,7 @@ const Stand = forwardRef<Group, Props>(
                             position={[0, 0, 0.3]}
                             width={width}
                             height={height}
-                            imgSrc="/img/works/chipsa.png"
+                            imgSrc={imgSrc}
                             color={color}
                         />
                     )}

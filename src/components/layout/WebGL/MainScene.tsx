@@ -18,6 +18,7 @@ const portfolio = [
             { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/zagranitsa.webp',
         href: 'https://new.bosfor.pictures/',
         color: '#444',
     },
@@ -26,6 +27,7 @@ const portfolio = [
             { src: '/chipsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/chipsa_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/chipsa.webp',
         href: 'https://chipsa.design',
         color: '#f2f5f7',
     },
@@ -34,6 +36,7 @@ const portfolio = [
             { src: '/control_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/control_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/control.webp',
         href: 'https://control.chipsa.ru/',
         color: '#f2f5f7',
     },
@@ -42,6 +45,7 @@ const portfolio = [
             { src: '/biotech_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/biotech_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/biotech.webp',
         href: 'https://biotech.artlife.ru/',
         color: '#f5f5f5',
     },
@@ -50,6 +54,7 @@ const portfolio = [
             { src: '/sportex_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/sportex_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/sportex.webp',
         href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
         color: '#444',
     },
@@ -58,6 +63,7 @@ const portfolio = [
             { src: '/malinovka_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/malinovka_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/malinovka.webp',
         href: 'https://24fermer.ru/',
         color: '#c5c5c5',
     },
@@ -66,6 +72,7 @@ const portfolio = [
             { src: '/asap_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/asap_9x16.mp4', type: 'video/mp4' },
         ],
+        imgSrc: '/asap.webp',
         href: 'https://asap.digital/',
         color: '#222',
     },
@@ -207,6 +214,7 @@ const MainScene = () => {
                     geometry={standGeometry}
                     material={standMaterial}
                     videoUrls={project.videoUrls}
+                    imgSrc={project.imgSrc}
                     position={[10 * i, 2.1, -10]}
                     onPointerEnter={() => {
                         document.documentElement.style.cursor = 'pointer';

@@ -3,8 +3,8 @@ import { MeshProps } from '@react-three/fiber';
 
 const Ground = (props: MeshProps) => {
     const [floor, normal] = useTexture([
-        '/img/34TX-SurfaceImperfections003_1K_var1.jpg',
-        '/img/Soy5-SurfaceImperfections003_1K_Normal.jpg',
+        '/img/34TX-SurfaceImperfections003_1K_var1.webp',
+        '/img/Soy5-SurfaceImperfections003_1K_Normal.webp',
     ]);
 
     return (
