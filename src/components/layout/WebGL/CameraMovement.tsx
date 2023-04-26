@@ -14,7 +14,8 @@ const CameraMovement = ({ light }: Props) => {
     const scroll = useScroll();
 
     useFrame(({ camera }) => {
-        camera.position.x = lerp(camera.position.x, scroll.offset * scroll.pages * 8.5, 0.07);
+        const isTouch = matchMedia('(hover: none)').matches;
+        camera.position.x = lerp(camera.position.x, scroll.offset * scroll.pages * 8.5, isTouch ? 0.1 : 0.07);
 
         cameraLookAtObjectPosition.current.x = camera.position.x;
         cameraLookAtObjectPosition.current.y = 2;
@@ -26,7 +27,7 @@ const CameraMovement = ({ light }: Props) => {
         }
 
         if (light.current) {
-            light.current.position.x = lerp(light.current.position.x, camera.position.x, 0.02);
+            light.current.position.x = lerp(light.current.position.x, camera.position.x, isTouch ? 0.06 : 0.02);
         }
     });
 

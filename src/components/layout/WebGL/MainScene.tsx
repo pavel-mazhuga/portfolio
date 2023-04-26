@@ -100,7 +100,7 @@ const MainScene = () => {
                     </Suspense>
                 )}
             </Suspense>
-            <ScrollControls horizontal damping={0} pages={portfolio.length} distance={0.45}>
+            <ScrollControls horizontal damping={0} pages={portfolio.length} distance={0.5}>
                 <CameraMovement light={pointLight} />
             </ScrollControls>
 
