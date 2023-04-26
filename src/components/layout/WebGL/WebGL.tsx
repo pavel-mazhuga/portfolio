@@ -15,7 +15,7 @@ const WebGL = () => {
     //     () => (typeof window !== 'undefined' ? new Worker(new URL('./worker.tsx', import.meta.url)) : null),
     //     [],
     // );
-    const maxDpr = 2;
+    const maxDpr = 1.5;
     const [dpr, setDpr] = useState(maxDpr);
 
     return (
