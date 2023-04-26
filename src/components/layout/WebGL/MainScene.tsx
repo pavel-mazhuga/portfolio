@@ -6,7 +6,7 @@ import { useMapRefs } from '@/hooks/use-map-refs';
 import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
-import { Preload, ScrollControls } from '@react-three/drei';
+import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
 import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import CameraMovement from './CameraMovement';
 
@@ -131,6 +131,7 @@ const MainScene = () => {
 
             <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
             <Preload all />
+            <AdaptiveDpr pixelated />
         </>
     );
 };
