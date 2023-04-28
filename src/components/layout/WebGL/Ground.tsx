@@ -26,6 +26,7 @@ const Ground = (props: MeshProps) => {
                 roughnessMap={floor}
                 roughness={1}
                 normalMap={normal}
+                reflectorOffset={0.4}
             />
         </mesh>
     );

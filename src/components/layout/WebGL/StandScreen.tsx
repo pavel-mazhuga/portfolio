@@ -23,7 +23,7 @@ const getVideoSrc = (sources: { src: string; type: string }[]) => {
     return sources[sources.length - 1].src;
 };
 
-const StandScreen = ({ videoUrls, width = 1, height = 1, color = '#fff', ...props }: Props) => {
+const StandScreen = ({ videoUrls, width = 1, height = 1, color, ...props }: Props) => {
     const videoTexture = useVideoTexture(getVideoSrc(videoUrls), {
         loop: true,
         muted: true,
@@ -36,14 +36,16 @@ const StandScreen = ({ videoUrls, width = 1, height = 1, color = '#fff', ...prop
         <mesh {...props} raycast={undefined}>
             <planeGeometry args={[width, height]} />
             <meshBasicMaterial map={videoTexture} />
-            <rectAreaLight
-                color={color}
-                position={[0, 0, 0.05]}
-                rotation={[0, Math.PI, 0]}
-                width={width}
-                height={height}
-                intensity={0.8}
-            />
+            {color && (
+                <rectAreaLight
+                    color={color}
+                    position={[0, 0, 0.05]}
+                    rotation={[0, Math.PI, 0]}
+                    width={width}
+                    height={height}
+                    intensity={0.8}
+                />
+            )}
         </mesh>
     );
 };

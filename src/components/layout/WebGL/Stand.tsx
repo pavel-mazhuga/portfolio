@@ -11,7 +11,6 @@ interface Props extends GroupProps {
     height?: number;
     geometry?: BoxGeometry;
     material?: Material;
-    dimmed?: boolean;
     videoUrls: { src: string; type: string }[];
     imgSrc: string;
     color?: Color | string;
@@ -26,8 +25,7 @@ const Stand = forwardRef<Group, Props>(
             material = new MeshBasicMaterial({ color: '#000' }),
             videoUrls,
             imgSrc,
-            dimmed = false,
-            color = '#fff',
+            color,
             ...props
         },
         ref,
@@ -37,10 +35,7 @@ const Stand = forwardRef<Group, Props>(
 
         return (
             <group ref={mergeRefs([ref, meshRef])} {...props}>
-                <mesh geometry={geometry} material={material}>
-                    {/* <boxGeometry args={[width + 0.2, height + 0.2, 0.3]} /> */}
-                    {/* <meshStandardMaterial color="#cbcbcb" /> */}
-                </mesh>
+                <mesh geometry={geometry} material={material}></mesh>
                 <Suspense>
                     {mediaQueryDevice === 'desktop' ? (
                         <StandScreen

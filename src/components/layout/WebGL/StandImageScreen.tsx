@@ -9,21 +9,23 @@ interface Props extends MeshProps {
     height?: number;
 }
 
-const StandImageScreen = ({ imgSrc, width = 1, height = 1, color = '#fff', ...props }: Props) => {
+const StandImageScreen = ({ imgSrc, width = 1, height = 1, color, ...props }: Props) => {
     const texture = useTexture(imgSrc);
 
     return (
         <mesh {...props} raycast={undefined}>
             <planeGeometry args={[width, height]} />
             <meshBasicMaterial map={texture} />
-            <rectAreaLight
-                color={color}
-                position={[0, 0, 0.05]}
-                rotation={[0, Math.PI, 0]}
-                width={width}
-                height={height}
-                intensity={0.8}
-            />
+            {color && (
+                <rectAreaLight
+                    color={color}
+                    position={[0, 0, 0.05]}
+                    rotation={[0, Math.PI, 0]}
+                    width={width}
+                    height={height}
+                    intensity={0.8}
+                />
+            )}
         </mesh>
     );
 };

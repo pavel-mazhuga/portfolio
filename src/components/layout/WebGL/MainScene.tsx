@@ -1,13 +1,13 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { BoxGeometry, Group, MeshBasicMaterial, Object3D, PointLight } from 'three';
+import { Suspense, useMemo, useRef, useState } from 'react';
+import { BoxGeometry, Group, MeshBasicMaterial, PointLight } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
 import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
 import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
-import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
+// import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import CameraMovement from './CameraMovement';
 
 const portfolio = [
@@ -54,7 +54,7 @@ const portfolio = [
         ],
         imgSrc: '/sportex.webp',
         href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
-        color: '#444',
+        color: '#666',
     },
     {
         videoUrls: [
@@ -72,7 +72,7 @@ const portfolio = [
         ],
         imgSrc: '/asap.webp',
         href: 'https://asap.digital/',
-        color: '#222',
+        color: '#555',
     },
 ];
 
@@ -86,7 +86,7 @@ const MainScene = () => {
     // const standMaterial = useMemo(() => new MeshStandardMaterial({ color: '#cbcbcb' }), []);
 
     const pointLight = useRef<PointLight>(null);
-    const [mediaQueryDevice] = useMediaQueryDeviceState();
+    // const [mediaQueryDevice] = useMediaQueryDeviceState();
 
     return (
         <>
@@ -94,11 +94,11 @@ const MainScene = () => {
                 <Suspense>
                     <Walls />
                 </Suspense>
-                {mediaQueryDevice === 'desktop' && (
+                {/* {mediaQueryDevice === 'desktop' && (
                     <Suspense>
                         <Ground />
                     </Suspense>
-                )}
+                )} */}
             </Suspense>
             <ScrollControls horizontal damping={0} pages={portfolio.length} distance={0.5}>
                 <CameraMovement light={pointLight} />
@@ -123,7 +123,6 @@ const MainScene = () => {
                         document.documentElement.style.cursor = '';
                         setHoveredStandIndex(null);
                     }}
-                    dimmed={hoveredStandIndex !== i}
                     color={project.color}
                     onClick={() => window.open(project.href, '_blank')}
                 />
