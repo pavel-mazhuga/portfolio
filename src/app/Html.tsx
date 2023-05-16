@@ -1,11 +1,12 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import Script from 'next/script';
 import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import useIsomorphicLayoutEffect from '@/hooks/use-isomorphic-layout-effect';
 import { calculateScrollbarWidth } from '@/utils/calculate-scrollbar-width';
 import vhMobileFix from '@/utils/vh-mobile-fix';
+import { useRouter } from 'next/router';
 
 if (typeof window !== 'undefined') {
     vhMobileFix();
@@ -16,6 +17,7 @@ const YM_ID = 93587310;
 
 const Html = ({ children }: { children: ReactNode }) => {
     const [_, setMediaQueryDeviceState] = useMediaQueryDeviceState();
+    const router = useRouter();
 
     useIsomorphicLayoutEffect(() => {
         const setDevice = () => {
@@ -48,6 +50,10 @@ const Html = ({ children }: { children: ReactNode }) => {
         return () => window.removeEventListener('resize', setDevice);
     }, [setMediaQueryDeviceState]);
 
+    useEffect(() => {
+        (window as any)?.ym(YM_ID, 'hit', window.location.href);
+    }, [router.pathname]);
+
     return (
         <html lang="en">
             {process.env.NODE_ENV === 'production' && (
@@ -65,6 +71,7 @@ const Html = ({ children }: { children: ReactNode }) => {
                        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
                     
                        ym(${YM_ID}, "init", {
+                            defer: true,
                             clickmap:true,
                             trackLinks:true,
                             accurateTrackBounce:true
@@ -72,9 +79,7 @@ const Html = ({ children }: { children: ReactNode }) => {
                     </script>
                     <noscript><div><img src="https://mc.yandex.ru/watch/93587310" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
                     <!-- /Yandex.Metrika counter -->
-                `
-                            .split('\n')
-                            .join(),
+                `.replace('\n', ''),
                     }}
                 />
             )}
