@@ -64,8 +64,8 @@ jobs:
               uses: easingthemes/ssh-deploy@main
               env:
                   SSH_PRIVATE_KEY: ${{ vars.SSH_PRIVATE_KEY }}
-                  ARGS: '-zarvhlgo --delete-during'
-                  SOURCE: 'out/'
+                  ARGS: '-arvhlgo --inplace --delete-during'
+                  SOURCE: 'out'
                   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
                   REMOTE_USER: ${{ vars.REMOTE_USER }}
                   TARGET: ${{ vars.TARGET }}
