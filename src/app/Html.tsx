@@ -49,7 +49,7 @@ const Html = ({ children }: { children: ReactNode }) => {
     }, [setMediaQueryDeviceState]);
 
     useEffect(() => {
-        (window as any)?.ym(YM_ID, 'hit', window.location.href);
+        (window as any).ym?.(YM_ID, 'hit', window.location.href);
     }, []);
 
     return (
