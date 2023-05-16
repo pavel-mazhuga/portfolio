@@ -6,7 +6,6 @@ import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import useIsomorphicLayoutEffect from '@/hooks/use-isomorphic-layout-effect';
 import { calculateScrollbarWidth } from '@/utils/calculate-scrollbar-width';
 import vhMobileFix from '@/utils/vh-mobile-fix';
-import { useRouter } from 'next/router';
 
 if (typeof window !== 'undefined') {
     vhMobileFix();
@@ -17,7 +16,6 @@ const YM_ID = 93587310;
 
 const Html = ({ children }: { children: ReactNode }) => {
     const [_, setMediaQueryDeviceState] = useMediaQueryDeviceState();
-    const router = useRouter();
 
     useIsomorphicLayoutEffect(() => {
         const setDevice = () => {
@@ -52,7 +50,7 @@ const Html = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         (window as any)?.ym(YM_ID, 'hit', window.location.href);
-    }, [router.pathname]);
+    }, []);
 
     return (
         <html lang="en">
