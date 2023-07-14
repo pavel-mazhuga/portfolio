@@ -1,9 +1,9 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import PlaneWaveExperiment from './experiment';
 import { Suspense } from 'react';
 import { Html } from '@react-three/drei';
+import PlaneWaveExperiment from './experiment';
 
 const PlaneWaveExperimentPage = () => {
     return (

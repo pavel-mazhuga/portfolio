@@ -22,7 +22,6 @@ html {
 body:not(.sb-show-main) {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     min-height: calc(var(--vh, 1vh) * 100);
-    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     font-family: $font-family;
@@ -120,4 +119,9 @@ body:not(.sb-show-main) {
     canvas + div {
         @include hidden-scrollbar();
     }
+}
+
+.loading {
+    margin: auto;
+    text-align: center;
 }
