@@ -3,7 +3,7 @@
 import { Suspense, useMemo, useRef, useState } from 'react';
 import { BoxGeometry, Group, MeshBasicMaterial, PointLight } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
-import Ground from './Ground';
+// import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
 import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
