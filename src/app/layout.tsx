@@ -52,7 +52,6 @@ function RootLayout({ children }: { children: React.ReactNode }) {
         <Providers>
             <Html>
                 <body>
-                    <WebGL />
                     <Header />
                     <main className="main">{children}</main>
                     <Footer />
