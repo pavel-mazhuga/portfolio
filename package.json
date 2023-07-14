@@ -46,13 +46,15 @@
         "sharp": "^0.32.3",
         "three": "^0.154.0",
         "typescript": "^5.1.6",
-        "typograf": "^7.1.0"
+        "typograf": "^7.1.0",
+        "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@next/bundle-analyzer": "^13.4.10",
         "@svgr/webpack": "^8.0.1",
         "@types/lodash.debounce": "^4.0.7",
         "@types/lodash.round": "^4.0.7",
+        "@types/uuid": "^9.0.2",
         "autoprefixer": "^10.4.14",
         "cssnano": "^6.0.1",
         "eslint-config-prettier": "^8.8.0",

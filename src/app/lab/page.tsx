@@ -1,9 +1,24 @@
-interface Props {}
+import Link from 'next/link';
+import { experiments } from './experiments';
 
-const LabPage = (props: Props) => {
+const LabPage = () => {
     return (
         <div>
-            <h1>Lab</h1>
+            <h1 className="lab-page-title">Lab</h1>
+
+            {experiments.length > 0 ? (
+                <ul className="list-unstyled experiments-list">
+                    {experiments.map((experiment, i) => (
+                        <li key={i} className="experiments-list__item">
+                            <Link href={`/lab`}>
+                                <div>{experiment.name}</div>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <div>Nothing here yet, but stay tuned!</div>
+            )}
         </div>
     );
 };
