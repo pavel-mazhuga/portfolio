@@ -1,6 +1,4 @@
-interface Props {}
-
-const Loading = (props: Props) => {
+const Loading = () => {
     return <div className="loading">Loading...</div>;
 };
 
