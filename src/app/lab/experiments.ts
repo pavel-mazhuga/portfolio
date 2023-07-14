@@ -1,1 +1,1 @@
-export const experiments = [{ name: 'Plane wave', component: null }];
+export const experiments = [{ name: 'Plane wave', slug: 'plane-wave' }];

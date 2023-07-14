@@ -10,7 +10,7 @@ const LabPage = () => {
                 <ul className="list-unstyled experiments-list">
                     {experiments.map((experiment, i) => (
                         <li key={i} className="experiments-list__item">
-                            <Link href={`/lab`}>
+                            <Link href={`/lab/${experiment.slug}`}>
                                 <div>{experiment.name}</div>
                             </Link>
                         </li>
