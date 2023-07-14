@@ -3,7 +3,7 @@
 import { Suspense, useMemo, useRef, useState } from 'react';
 import { BoxGeometry, Group, MeshBasicMaterial, PointLight } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
-import Ground from './Ground';
+// import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
 import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
@@ -11,15 +11,15 @@ import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
 import CameraMovement from './CameraMovement';
 
 const portfolio = [
-    // {
-    //     videoUrls: [
-    //         { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
-    //         { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },
-    //     ],
-    //     imgSrc: '/zagranitsa.webp',
-    //     href: 'https://new.bosfor.pictures/',
-    //     color: '#444',
-    // },
+    {
+        videoUrls: [
+            { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+            { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },
+        ],
+        imgSrc: '/zagranitsa.webp',
+        href: 'https://zagranitsa.pro',
+        color: '#444',
+    },
     {
         videoUrls: [
             { src: '/chipsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
