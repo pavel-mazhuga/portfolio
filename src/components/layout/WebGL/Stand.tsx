@@ -1,7 +1,7 @@
 import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import { GroupProps } from '@react-three/fiber';
 import { forwardRef, Suspense, useRef } from 'react';
-import { mergeRefs } from 'react-merge-refs';
+import { mergeRefs } from '@/utils/merge-refs';
 import { BoxGeometry, Color, Group, Material, MeshBasicMaterial } from 'three';
 import StandImageScreen from './StandImageScreen';
 import StandScreen from './StandScreen';
