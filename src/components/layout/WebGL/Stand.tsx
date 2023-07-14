@@ -37,7 +37,7 @@ const Stand = forwardRef<Group, Props>(
             <group ref={mergeRefs([ref, meshRef])} {...props}>
                 <mesh geometry={geometry} material={material}></mesh>
                 <Suspense>
-                    {mediaQueryDevice === 'desktop' ? (
+                    {/* {mediaQueryDevice === 'desktop' ? (
                         <StandScreen
                             position={[0, 0, 0.3]}
                             width={width}
@@ -53,7 +53,14 @@ const Stand = forwardRef<Group, Props>(
                             imgSrc={imgSrc}
                             color={color}
                         />
-                    )}
+                    )} */}
+                    <StandImageScreen
+                        position={[0, 0, 0.3]}
+                        width={width}
+                        height={height}
+                        imgSrc={imgSrc}
+                        color={color}
+                    />
                 </Suspense>
             </group>
         );
