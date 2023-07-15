@@ -7,7 +7,7 @@
         "watch": "next dev",
         "build": "next build",
         "ba": "ANALYZE=true next build",
-        "start": "next start",
+        "start": "next start -p 3000",
         "lint": "next lint",
         "format": "prettier --ignore-unknown --write \"src/**/*\"",
         "subsetting": "node ./subset-fonts.js",
