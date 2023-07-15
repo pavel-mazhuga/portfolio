@@ -3,7 +3,7 @@ import { experiments } from './experiments';
 
 const LabPage = () => {
     return (
-        <div>
+        <div className="wrapper">
             <h1 className="lab-page-title">Lab</h1>
 
             {experiments.length > 0 ? (

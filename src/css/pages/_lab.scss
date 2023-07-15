@@ -1,0 +1,30 @@
+.lab-page-title {
+    margin-bottom: 60px;
+}
+
+.experiments-list {
+    --columns: 4;
+    display: grid;
+    grid-gap: 30px;
+    grid-template-columns: repeat(var(--columns), 1fr);
+
+    @media screen and (max-width: 1024px) {
+        --columns: 2;
+    }
+
+    @media screen and (max-width: 576px) {
+        --columns: 1;
+    }
+}
+
+.experiment {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.experiment__top {
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 1;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { BoxGeometry, Group, MeshBasicMaterial, PointLight } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
 // import Ground from './Ground';
@@ -87,6 +87,12 @@ const MainScene = () => {
 
     const pointLight = useRef<PointLight>(null);
     // const [mediaQueryDevice] = useMediaQueryDeviceState();
+
+    useEffect(() => {
+        return () => {
+            document.documentElement.style.cursor = '';
+        };
+    }, []);
 
     return (
         <>

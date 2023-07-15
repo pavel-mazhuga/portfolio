@@ -53,6 +53,7 @@ body:not(.sb-show-main) {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    padding-top: calc(var(--header-height) + 50px);
 }
 
 .page {
