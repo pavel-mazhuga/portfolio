@@ -65,8 +65,17 @@ jobs:
               env:
                   SSH_PRIVATE_KEY: ${{ vars.SSH_PRIVATE_KEY }}
                   ARGS: '-arvhlgo --inplace --delete'
-                  SOURCE: 'out'
+                  SOURCE: '.next'
                   REMOTE_HOST: ${{ vars.REMOTE_HOST }}
                   REMOTE_USER: ${{ vars.REMOTE_USER }}
                   TARGET: ${{ vars.TARGET }}
                   EXCLUDE: '/dist/, /node_modules/'
+                  SCRIPT_AFTER: |
+                      exec bash \-l
+                      sudo ln -sf "/root/.nvm/versions/node/v18.16.0/bin/node" "/usr/local/bin/node"
+                      sudo ln -sf "/root/.nvm/versions/node/v18.16.0/bin/npm" "/usr/local/bin/npm"
+                      sudo ln -sf "/root/.nvm/versions/node/v18.16.0/bin/pm2" "/usr/local/bin/pm2"
+                      cd "${{ vars.TARGET }}"
+                      git pull origin main --force
+                      sleep 2
+                      pm2 restart portfolio
