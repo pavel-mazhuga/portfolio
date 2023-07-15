@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PropsWithChildren } from 'react';
+import ErrorBoundary from '@/components/layout/ErrorBoundary';
 
 const ExperimentLayout = ({ children }: PropsWithChildren) => {
     return (
@@ -7,7 +8,21 @@ const ExperimentLayout = ({ children }: PropsWithChildren) => {
             <div className="wrapper experiment__top">
                 <Link href="/lab">Back</Link>
             </div>
-            {children}
+            <ErrorBoundary
+                fallback={
+                    <div className="experiment-error">
+                        <div>Seems that this experiment is broken.</div>
+                        <div>
+                            See{' '}
+                            <Link href="/lab" className="link link--underlined">
+                                other experiments
+                            </Link>
+                        </div>
+                    </div>
+                }
+            >
+                {children}
+            </ErrorBoundary>
         </div>
     );
 };
