@@ -77,5 +77,4 @@ jobs:
                       sudo ln -sf "/root/.nvm/versions/node/v18.16.0/bin/pm2" "/usr/local/bin/pm2"
                       cd "${{ vars.TARGET }}"
                       git pull origin main --force
-                      sleep 2
                       pm2 restart portfolio
