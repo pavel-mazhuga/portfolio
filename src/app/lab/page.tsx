@@ -1,5 +1,9 @@
 import Link from 'next/link';
-import { experiments } from './experiments';
+
+const experiments = [
+    { name: 'Plane wave', slug: 'plane-wave' },
+    { name: 'Displaced Torus', slug: 'displaced-torus' },
+];
 
 const LabPage = () => {
     return (

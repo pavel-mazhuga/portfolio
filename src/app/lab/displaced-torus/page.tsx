@@ -1,0 +1,54 @@
+'use client';
+
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { useRef } from 'react';
+import { Mesh, PlaneGeometry, ShaderMaterial } from 'three';
+import { v4 as uuidv4 } from 'uuid';
+import ExperimentLayout from '../ExperimentLayout';
+import vertexShader from './shaders/vertex.glsl';
+import fragmentShader from './shaders/fragment.glsl';
+
+const Experiment = () => {
+    const mesh = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);
+
+    useFrame(({ clock }) => {
+        mesh.current!.material.uniforms.uTime.value = clock.getElapsedTime();
+    });
+
+    return (
+        <mesh ref={mesh}>
+            <torusGeometry args={[1, 0.3, 1000, 1000]} />
+            <shaderMaterial
+                key={uuidv4()}
+                uniforms={{
+                    uTime: { value: 0 },
+                }}
+                vertexShader={vertexShader}
+                fragmentShader={fragmentShader}
+            />
+        </mesh>
+    );
+};
+
+const DisplacedTorusExperimentPage = () => {
+    return (
+        <ExperimentLayout>
+            <div className="canvas-wrapper">
+                <Canvas
+                    camera={{
+                        position: [0, 0, 5],
+                        fov: 45,
+                        near: 0.1,
+                        far: 1000,
+                    }}
+                >
+                    <Experiment />
+                    <OrbitControls />
+                </Canvas>
+            </div>
+        </ExperimentLayout>
+    );
+};
+
+export default DisplacedTorusExperimentPage;
