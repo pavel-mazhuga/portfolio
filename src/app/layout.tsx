@@ -5,7 +5,6 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import LayoutGrid from '@/components/utils/LayoutGrid';
 import Html from './Html';
-import WebGL from '@/components/layout/WebGL';
 
 const WEBSITE_NAME = 'Pavel Mazhuga — creative frontend developer';
 const WEBSITE_DESCRIPTION =
@@ -15,7 +14,7 @@ const WEBSITE_OG_IMAGE = '/img/og-image.jpg';
 export const metadata: Metadata = {
     title: {
         default: WEBSITE_NAME,
-        template: `%s - ${WEBSITE_NAME}`,
+        template: `%s — ${WEBSITE_NAME}`,
     },
     description: WEBSITE_DESCRIPTION,
     viewport: {

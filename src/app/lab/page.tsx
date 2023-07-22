@@ -1,5 +1,11 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { experiments } from './data';
+
+export const metadata: Metadata = {
+    title: 'Lab',
+    description: 'Creative demos and concepts: WebGL, Canvas2D, SVG, you name it.',
+};
 
 const LabPage = () => {
     return (
