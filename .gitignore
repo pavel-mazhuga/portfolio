@@ -28,6 +28,7 @@ yarn-error.log*
 # eslint
 .eslintcache
 
+.env
 # local env files
 .env*.local
 
