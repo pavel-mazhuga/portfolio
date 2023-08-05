@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import LayoutGrid from '@/components/utils/LayoutGrid';
 import Html from './Html';
+import HideInterface from './HideInterface';
 
 const WEBSITE_NAME = 'Pavel Mazhuga — creative frontend developer';
 const WEBSITE_DESCRIPTION =
@@ -54,7 +55,12 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                     <Header />
                     <main className="main">{children}</main>
                     <Footer />
-                    {process.env.NODE_ENV === 'development' && <LayoutGrid />}
+                    {process.env.NODE_ENV === 'development' && (
+                        <>
+                            <LayoutGrid />
+                            <HideInterface />
+                        </>
+                    )}
                 </body>
             </Html>
         </Providers>
