@@ -1,7 +1,9 @@
 const Footer = () => {
     return (
         <footer className="footer wrapper">
-            <div className="footer-availability">Available for work</div>
+            <a href="https://t.me/pavelmazhuga" target="_blank" rel="noreferrer" className="link footer-availability">
+                Available for work
+            </a>
             <ul className="list-unstyled soc-list footer-soc-list">
                 <li className="soc-list__item">
                     <a href="mailto:pavelmazhuga.gl@gmail.com" target="_blank" rel="noreferrer" className="link">
