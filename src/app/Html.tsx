@@ -72,7 +72,7 @@ const Html = ({ children }: { children: ReactNode }) => {
                          accurateTrackBounce:true
                     });
                  </script>
-                 <noscript><div><img src="https://mc.yandex.ru/watch/93587310" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+                 <noscript><div><img src="https://mc.yandex.ru/watch/${YM_ID}" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
                     `,
                     }}
                 ></div>
