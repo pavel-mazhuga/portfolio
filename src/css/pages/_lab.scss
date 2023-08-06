@@ -25,6 +25,31 @@
     }
 }
 
+.experiments-list-item {
+    --filter-value: 0;
+    display: flex;
+    flex-direction: column;
+    filter: sepia(var(--filter-value));
+    transition: filter 0.3s ease;
+
+    @include hover {
+        --filter-value: 1;
+    }
+}
+
+.experiments-list-item__img-wrapper {
+    --aspect-ratio: 1;
+    margin-bottom: 25px;
+    background-color: #171717;
+}
+
+.experiments-list-item__name {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    @include responsive-font-size(16px, 20px, 1280px, 1920px);
+}
+
 .experiment {
     flex: 1 1 auto;
     display: flex;

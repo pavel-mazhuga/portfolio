@@ -6,7 +6,9 @@ const ExperimentLayout = ({ children }: PropsWithChildren) => {
     return (
         <div className="experiment">
             <div className="wrapper experiment__top">
-                <Link href="/lab">Back</Link>
+                <Link href="/lab" className="link">
+                    Back
+                </Link>
             </div>
             <ErrorBoundary
                 fallback={
