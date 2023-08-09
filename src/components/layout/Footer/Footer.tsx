@@ -16,7 +16,7 @@ const Footer = () => {
                     </a>
                 </li>
                 <li className="soc-list__item">
-                    <a href="https://t.me/pavelmazhuga" target="_blank" rel="noreferrer" className="link">
+                    <a href="https://t.me/mazhugagl" target="_blank" rel="noreferrer" className="link">
                         Telegram
                     </a>
                 </li>
