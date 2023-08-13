@@ -4,7 +4,7 @@ import ErrorBoundary from '@/components/layout/ErrorBoundary';
 
 const ExperimentLayout = ({ children }: PropsWithChildren) => {
     return (
-        <div className="experiment">
+        <div className="experiment-page experiment">
             <div className="wrapper experiment__top">
                 <Link href="/lab" className="link">
                     Back
