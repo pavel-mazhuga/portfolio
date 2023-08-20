@@ -3,7 +3,7 @@ import planeWavePreview from '@/app/lab/plane-wave/preview.jpeg';
 import displacedTorusPreview from '@/app/lab/displaced-torus/preview.jpeg';
 import animatedBlobPreview from '@/app/lab/animated-blob/preview.jpeg';
 import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/preview.jpeg';
-import flowerishPreview from '@/app/lab/flowerish/preview.jpeg';
+import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     {
