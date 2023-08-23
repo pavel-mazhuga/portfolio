@@ -2,7 +2,7 @@ const Footer = () => {
     return (
         <footer className="footer wrapper">
             <a href="https://t.me/pavelmazhuga" target="_blank" rel="noreferrer" className="link footer-availability">
-                Available for work
+                Available for work from december 2023
             </a>
             <ul className="list-unstyled soc-list footer-soc-list">
                 <li className="soc-list__item">
