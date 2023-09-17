@@ -13,11 +13,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
         {
             url: `${HOST}/lab`,
-            lastModified,
+            lastModified: lastModified.toISOString(),
         },
         ...experiments.map((experiment) => ({
             url: `${HOST}/lab/${experiment.slug}`,
-            lastModified,
+            lastModified: lastModified.toISOString(),
         })),
     ];
 }
