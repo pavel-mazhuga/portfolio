@@ -22,4 +22,5 @@ void main() {
 
     gl_FragColor = coverTexture(image, sizeImage, uv);
     gl_FragColor.rgb *= 1.0 - smoothstep(1.0, -4.0, vPosZ);
+    #include <colorspace_fragment>
 }
