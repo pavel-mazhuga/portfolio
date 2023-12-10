@@ -1,13 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { BoxGeometry, Group, MeshBasicMaterial, PointLight } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
-// import Ground from './Ground';
 import Stand from './Stand';
 import Walls from './Walls';
 import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
-// import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import CameraMovement from './CameraMovement';
 
 const portfolio = [
@@ -78,15 +76,12 @@ const portfolio = [
 
 const MainScene = () => {
     const projectStandRefs = useMapRefs<Group>(portfolio);
-    const [hoveredStandIndex, setHoveredStandIndex] = useState<number | null>(null);
     const standWidth = 4.5;
     const standHeight = 8;
     const standGeometry = useMemo(() => new BoxGeometry(standWidth + 0.2, standHeight + 0.2, 0.3), []);
     const standMaterial = useMemo(() => new MeshBasicMaterial({ color: '#111' }), []);
-    // const standMaterial = useMemo(() => new MeshStandardMaterial({ color: '#cbcbcb' }), []);
 
     const pointLight = useRef<PointLight>(null);
-    // const [mediaQueryDevice] = useMediaQueryDeviceState();
 
     useEffect(() => {
         return () => {
@@ -100,42 +95,35 @@ const MainScene = () => {
                 <Suspense>
                     <Walls />
                 </Suspense>
-                {/* {mediaQueryDevice === 'desktop' && (
-                    <Suspense>
-                        <Ground />
-                    </Suspense>
-                )} */}
+                {portfolio.map((project, i) => (
+                    <Stand
+                        key={i}
+                        ref={projectStandRefs.current[i]}
+                        width={standWidth}
+                        height={standHeight}
+                        geometry={standGeometry}
+                        material={standMaterial}
+                        videoUrls={project.videoUrls}
+                        imgSrc={project.imgSrc}
+                        position={[10 * i, 2.1, -10]}
+                        onPointerEnter={() => {
+                            document.documentElement.style.cursor = 'pointer';
+                        }}
+                        onPointerLeave={() => {
+                            document.documentElement.style.cursor = '';
+                        }}
+                        color={project.color}
+                        onClick={() => window.open(project.href, '_blank')}
+                    />
+                ))}
+                <Preload all />
             </Suspense>
             <ScrollControls horizontal damping={0} pages={portfolio.length} distance={0.5}>
                 <CameraMovement light={pointLight} />
             </ScrollControls>
 
-            {portfolio.map((project, i) => (
-                <Stand
-                    key={i}
-                    ref={projectStandRefs.current[i]}
-                    width={standWidth}
-                    height={standHeight}
-                    geometry={standGeometry}
-                    material={standMaterial}
-                    videoUrls={project.videoUrls}
-                    imgSrc={project.imgSrc}
-                    position={[10 * i, 2.1, -10]}
-                    onPointerEnter={() => {
-                        document.documentElement.style.cursor = 'pointer';
-                        setHoveredStandIndex(i);
-                    }}
-                    onPointerLeave={() => {
-                        document.documentElement.style.cursor = '';
-                        setHoveredStandIndex(null);
-                    }}
-                    color={project.color}
-                    onClick={() => window.open(project.href, '_blank')}
-                />
-            ))}
+            <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={3} decay={0.8} power={30} />
 
-            <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
-            <Preload all />
             <AdaptiveDpr pixelated />
         </>
     );
