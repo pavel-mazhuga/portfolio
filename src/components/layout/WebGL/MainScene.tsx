@@ -12,6 +12,16 @@ import CameraMovement from './CameraMovement';
 
 const portfolio = [
     {
+        // videoUrls: [
+        //     { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
+        //     { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },
+        // ],
+        videoUrls: [],
+        imgSrc: '/samokat-museum.webp',
+        href: 'https://museum.samokat.ru',
+        color: '#f2f5f7',
+    },
+    {
         videoUrls: [
             { src: '/zagranitsa_9x16.av1.mp4', type: 'video/mp4; codecs=av01.0.05M.08,opus' },
             { src: '/zagranitsa_9x16.mp4', type: 'video/mp4' },

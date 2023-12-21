@@ -1,6 +1,6 @@
-import { useTexture } from '@react-three/drei';
+import { Image, useTexture } from '@react-three/drei';
 import { MeshProps } from '@react-three/fiber';
-import { Color } from 'three';
+import { Color, SRGBColorSpace } from 'three';
 
 interface Props extends MeshProps {
     imgSrc: string;
@@ -10,12 +10,11 @@ interface Props extends MeshProps {
 }
 
 const StandImageScreen = ({ imgSrc, width = 1, height = 1, color, ...props }: Props) => {
-    const texture = useTexture(imgSrc);
+    // const texture = useTexture(imgSrc);
+    // texture.colorSpace = SRGBColorSpace;
 
     return (
-        <mesh {...props} raycast={undefined}>
-            <planeGeometry args={[width, height]} />
-            <meshBasicMaterial map={texture} />
+        <Image {...props} url={imgSrc} scale={[width, height]}>
             {color && (
                 <rectAreaLight
                     color={color}
@@ -26,8 +25,25 @@ const StandImageScreen = ({ imgSrc, width = 1, height = 1, color, ...props }: Pr
                     intensity={0.8}
                 />
             )}
-        </mesh>
+        </Image>
     );
+
+    // return (
+    //     <mesh {...props}>
+    //         <planeGeometry args={[width, height]} />
+    //         <meshBasicMaterial map={texture} />
+    //         {color && (
+    //             <rectAreaLight
+    //                 color={color}
+    //                 position={[0, 0, 0.05]}
+    //                 rotation={[0, Math.PI, 0]}
+    //                 width={width}
+    //                 height={height}
+    //                 intensity={0.8}
+    //             />
+    //         )}
+    //     </mesh>
+    // );
 };
 
 export default StandImageScreen;
