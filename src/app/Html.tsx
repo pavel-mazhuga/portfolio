@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
-import Script from 'next/script';
+import { useRouter } from 'next/router';
 import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import useIsomorphicLayoutEffect from '@/hooks/use-isomorphic-layout-effect';
 import { calculateScrollbarWidth } from '@/utils/calculate-scrollbar-width';
@@ -16,6 +16,7 @@ const YM_ID = 93587310;
 
 const Html = ({ children }: { children: ReactNode }) => {
     const [_, setMediaQueryDeviceState] = useMediaQueryDeviceState();
+    const router = useRouter();
 
     useIsomorphicLayoutEffect(() => {
         const setDevice = () => {
@@ -49,8 +50,8 @@ const Html = ({ children }: { children: ReactNode }) => {
     }, [setMediaQueryDeviceState]);
 
     useEffect(() => {
-        (window as any).ym?.(YM_ID, 'hit', window.location.href);
-    }, []);
+        (window as any).ym?.(YM_ID, 'hit', router.pathname);
+    }, [router.pathname]);
 
     return (
         <html lang="en">
