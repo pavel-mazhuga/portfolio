@@ -24,8 +24,8 @@
         "last 2 Opera versions"
     ],
     "dependencies": {
-        "@react-three/drei": "^9.80.2",
-        "@react-three/fiber": "^8.13.6",
+        "@react-three/drei": "^9.92.7",
+        "@react-three/fiber": "^8.15.12",
         "@react-three/offscreen": "^0.0.8",
         "@react-three/postprocessing": "^2.15.0",
         "@types/node": "^20.4.9",
