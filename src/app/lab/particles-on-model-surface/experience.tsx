@@ -87,7 +87,7 @@ const SampledGeometry = ({
 };
 
 const ParticledShoe = (props: GroupProps) => {
-    const { nodes } = useGLTF('/gltf/shoe.gltf') as GLTFResult;
+    const { nodes } = useGLTF('/gltf/shoe.gltf') as any;
     const material = useMemo(
         () =>
             new ShaderMaterial({
