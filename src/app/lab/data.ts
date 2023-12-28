@@ -6,6 +6,7 @@ import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/
 import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
 import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
+import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     // {
@@ -14,6 +15,12 @@ export const experiments: { name: string; slug: string; tags: string[]; preview?
     //     tags: ['webgl', 'shaders', 'marquee'],
     //     preview: particlesOnModelSurfacePreview,
     // },
+    {
+        name: 'Endless',
+        slug: 'endless-1',
+        tags: ['webgl', 'shaders'],
+        preview: endless1Preview,
+    },
     {
         name: 'Infinite UV animation',
         slug: 'sphere-infinite-uv',
