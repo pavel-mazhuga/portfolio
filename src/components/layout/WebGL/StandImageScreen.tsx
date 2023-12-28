@@ -1,6 +1,6 @@
-import { Image, useTexture } from '@react-three/drei';
+import { Image as ThreeImage } from '@react-three/drei';
 import { MeshProps } from '@react-three/fiber';
-import { Color, SRGBColorSpace } from 'three';
+import { Color } from 'three';
 
 interface Props extends MeshProps {
     imgSrc: string;
@@ -10,11 +10,8 @@ interface Props extends MeshProps {
 }
 
 const StandImageScreen = ({ imgSrc, width = 1, height = 1, color, ...props }: Props) => {
-    // const texture = useTexture(imgSrc);
-    // texture.colorSpace = SRGBColorSpace;
-
     return (
-        <Image {...props} url={imgSrc} scale={[width, height]}>
+        <ThreeImage {...props} url={imgSrc} scale={[width, height]}>
             {color && (
                 <rectAreaLight
                     color={color}
@@ -25,7 +22,7 @@ const StandImageScreen = ({ imgSrc, width = 1, height = 1, color, ...props }: Pr
                     intensity={0.8}
                 />
             )}
-        </Image>
+        </ThreeImage>
     );
 
     // return (
