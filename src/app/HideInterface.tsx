@@ -18,7 +18,7 @@ const HideInterface = () => {
     }, []);
 
     useEffect(() => {
-        [...document.querySelectorAll<HTMLElement>('.header, .footer, .experiment__top')].forEach((el) => {
+        [...document.querySelectorAll<HTMLElement>('.header, .footer, .experiment__top, #leva__root')].forEach((el) => {
             if (el) {
                 el.hidden = hidden;
             }
