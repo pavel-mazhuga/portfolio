@@ -5,7 +5,7 @@ uniform vec2 sizeImage;
 uniform sampler2D image;
 
 varying vec2 vUv;
-varying float vPosZ;  
+varying float vPosZ;   
 
 void main() {
     vec2 uv = vUv;

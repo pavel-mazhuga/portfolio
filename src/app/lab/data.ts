@@ -7,6 +7,7 @@ import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
 import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
 import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
+import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     // {
@@ -15,6 +16,12 @@ export const experiments: { name: string; slug: string; tags: string[]; preview?
     //     tags: ['webgl', 'shaders', 'marquee'],
     //     preview: particlesOnModelSurfacePreview,
     // },
+    {
+        name: 'Vertex wave animation',
+        slug: 'vertex-wave-animation',
+        tags: ['webgl', 'shaders', 'displacement'],
+        preview: vertexWavePreview,
+    },
     {
         name: 'Endless',
         slug: 'endless-1',
