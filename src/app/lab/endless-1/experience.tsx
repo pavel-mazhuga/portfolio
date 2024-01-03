@@ -48,7 +48,7 @@ const Experience = () => {
                         near: 0.1,
                         far: 100,
                     }}
-                    gl={{ antialias: true, alpha: false }}
+                    gl={{ alpha: false }}
                 >
                     <Suspense
                         fallback={
