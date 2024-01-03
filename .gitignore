@@ -47,3 +47,4 @@ test-results
 storybook
 public/robots.txt
 bsync.sh
+get_preview.sh
