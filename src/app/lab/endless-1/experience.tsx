@@ -2,12 +2,13 @@
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useRef } from 'react';
-import { Html, ScreenQuad } from '@react-three/drei';
+import { ScreenQuad } from '@react-three/drei';
 import { Mesh, PlaneGeometry, ShaderMaterial, Vector2 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import ExperimentLayout from '../ExperimentLayout';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
+import PageLoading from '@/components/shared/PageLoading';
 
 const Experiment = () => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);
@@ -50,13 +51,7 @@ const Experience = () => {
                     }}
                     gl={{ alpha: false }}
                 >
-                    <Suspense
-                        fallback={
-                            <Html center>
-                                <p>Loading...</p>
-                            </Html>
-                        }
-                    >
+                    <Suspense fallback={<PageLoading />}>
                         <Experiment />
                     </Suspense>
                 </Canvas>
