@@ -3,7 +3,7 @@
 uniform float uTime;
 uniform vec2 uResolution;
 
-vec3 palette2(float t) {
+vec3 experimentPalette(float t) {
     vec3 a = vec3(0.5);
     vec3 b = vec3(0.5);
     vec3 c = vec3(1.);
@@ -19,8 +19,7 @@ void main() {
 
     uv = fract(uv * 2.) - 0.5;
 
-    vec3 finalColor = vec3(0.);
-    vec3 col = palette2(length(uv0 * 0.9) + uTime * 0.4);
+    vec3 col = experimentPalette(length(uv0 * 0.9) + uTime * 0.4);
 
     float d = length(uv);
     d = sin(d * 8. + uTime) / 8.;
