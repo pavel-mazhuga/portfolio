@@ -10,12 +10,6 @@ import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
-    // {
-    //     name: 'Marquee',
-    //     slug: 'marquee',
-    //     tags: ['webgl', 'shaders', 'marquee'],
-    //     preview: particlesOnModelSurfacePreview,
-    // },
     {
         name: 'Vertex wave animation',
         slug: 'vertex-wave-animation',
