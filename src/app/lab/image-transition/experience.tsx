@@ -37,8 +37,12 @@ const Experiment = () => {
     const [activeIndex] = useState(0);
     const nextIndex = activeIndex === 0 ? 1 : 0;
 
-    const { progress } = useControls({
+    const { progress, waveSpeed, rippleStrength, fadeOffset, innerRippleSpeed } = useControls({
         progress: { value: 0, min: 0, max: 1, step: 0.001 },
+        waveSpeed: { value: 4, min: 0, max: 20, step: 0.001 },
+        rippleStrength: { value: 2, min: 0, max: 3, step: 0.001 },
+        fadeOffset: { value: 0.2, min: 0, max: 0.5, step: 0.001 },
+        innerRippleSpeed: { value: 2, min: 0, max: 20, step: 0.001 },
     });
 
     useEffect(() => {
@@ -55,6 +59,9 @@ const Experiment = () => {
         if (plane.current) {
             plane.current.material.uniforms.uTime.value = clock.getElapsedTime();
             plane.current.material.uniforms.uProgress.value = progress;
+            plane.current.material.uniforms.uWaveSpeed.value = waveSpeed;
+            plane.current.material.uniforms.uFadeOffset.value = fadeOffset;
+            plane.current.material.uniforms.uInnerRippleSpeed.value = innerRippleSpeed;
         }
     });
 
@@ -67,18 +74,16 @@ const Experiment = () => {
                     key={uuidv4()}
                     uniforms={{
                         uCurrentImage: { value: slides[activeIndex].texture },
-                        uCurrentImageSize: {
-                            value: slides[activeIndex].size,
-                        },
+                        uCurrentImageSize: { value: slides[activeIndex].size },
                         uNextImage: { value: slides[nextIndex].texture },
-                        uNextImageSize: {
-                            value: slides[nextIndex].size,
-                        },
-                        uPlaneSize: {
-                            value: planeSize,
-                        },
+                        uNextImageSize: { value: slides[nextIndex].size },
+                        uPlaneSize: { value: planeSize },
                         uTime: { value: 0 },
-                        uProgress: { value: 0 },
+                        uProgress: { value: progress },
+                        uWaveSpeed: { value: waveSpeed },
+                        uRippleStrength: { value: rippleStrength },
+                        uFadeOffset: { value: fadeOffset },
+                        uInnerRippleSpeed: { value: innerRippleSpeed },
                     }}
                     vertexShader={vertexShader}
                     fragmentShader={fragmentShader}

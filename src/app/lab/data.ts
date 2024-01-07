@@ -8,8 +8,15 @@ import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
 import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
+import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Image transition',
+        slug: 'image-transition',
+        tags: ['webgl', 'shaders', 'transition', 'displacement'],
+        preview: imageTransitionPreview,
+    },
     {
         name: 'Vertex wave animation',
         slug: 'vertex-wave-animation',
