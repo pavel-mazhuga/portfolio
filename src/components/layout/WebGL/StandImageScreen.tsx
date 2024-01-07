@@ -24,23 +24,6 @@ const StandImageScreen = ({ imgSrc, width = 1, height = 1, color, ...props }: Pr
             )}
         </ThreeImage>
     );
-
-    // return (
-    //     <mesh {...props}>
-    //         <planeGeometry args={[width, height]} />
-    //         <meshBasicMaterial map={texture} />
-    //         {color && (
-    //             <rectAreaLight
-    //                 color={color}
-    //                 position={[0, 0, 0.05]}
-    //                 rotation={[0, Math.PI, 0]}
-    //                 width={width}
-    //                 height={height}
-    //                 intensity={0.8}
-    //             />
-    //         )}
-    //     </mesh>
-    // );
 };
 
 export default StandImageScreen;
