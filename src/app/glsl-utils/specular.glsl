@@ -1,8 +1,7 @@
-float specular(vec3 light, float shininess, float diffuseness) {
-    vec3 normal = vNormal;
-    vec3 eyeVector = vEyeVector;
+float specular(vec3 light, vec3 normal, vec3 eyeVector, float shininess, float diffuseness) {
     vec3 lightVector = normalize(-light);
     vec3 halfVector = normalize(eyeVector + lightVector);
+    // vec3 halfVector = normalize(eyeVector - lightVector); ???
 
     float NdotL = dot(normal, lightVector);
     float NdotH = dot(normal, halfVector);
