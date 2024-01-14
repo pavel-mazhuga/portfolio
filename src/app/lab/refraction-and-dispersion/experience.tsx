@@ -1,10 +1,10 @@
 'use client';
 
-import { Image as WebglImage, OrbitControls, useFBO, useTexture, MeshTransmissionMaterial } from '@react-three/drei';
-import { Canvas, MeshProps, extend, useFrame, useThree } from '@react-three/fiber';
+import { Image as WebglImage, OrbitControls, useFBO, useTexture } from '@react-three/drei';
+import { Canvas, MeshProps, useFrame } from '@react-three/fiber';
 import { v4 as uuidv4 } from 'uuid';
 import { useMemo, useRef } from 'react';
-import { BackSide, BufferGeometry, FrontSide, Mesh, ShaderMaterial, Vector2, Vector3 } from 'three';
+import { BufferGeometry, FrontSide, Mesh, ShaderMaterial, Vector2, Vector3 } from 'three';
 import ExperimentLayout from '../ExperimentLayout';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
@@ -76,7 +76,6 @@ const Dispersion = (props: MeshProps) => {
 
     return (
         <mesh {...props} ref={mesh}>
-            {/* <icosahedronGeometry args={[1, 16]} /> */}
             <torusGeometry args={[1.2, 0.5, 256, 80]} />
             <shaderMaterial
                 key={uuidv4()}
@@ -84,30 +83,13 @@ const Dispersion = (props: MeshProps) => {
                 vertexShader={vertexShader}
                 fragmentShader={fragmentShader}
             />
-            {/* <MeshTransmissionMaterial
-                color="#fff"
-                attenuationColor="#fff"
-                toneMapped={true}
-                backside
-                backsideThickness={1}
-                samples={4}
-                resolution={1024}
-                backsideResolution={1024}
-                transmission={1}
-                roughness={0}
-                ior={1.2}
-                thickness={0.1}
-                chromaticAberration={0.1}
-                anisotropy={0.3}
-                distortion={0.02}
-            /> */}
         </mesh>
     );
 };
 
 const Experience = () => {
     return (
-        <ExperimentLayout>
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/refraction-and-dispersion">
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{

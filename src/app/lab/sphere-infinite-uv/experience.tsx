@@ -41,7 +41,7 @@ const Experiment = () => {
 
 const Experience = () => {
     return (
-        <ExperimentLayout>
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/sphere-infinite-uv">
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{

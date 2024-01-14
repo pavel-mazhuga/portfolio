@@ -40,7 +40,7 @@ const Experiment = () => {
 
 const Experience = () => {
     return (
-        <ExperimentLayout>
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/endless-1">
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{

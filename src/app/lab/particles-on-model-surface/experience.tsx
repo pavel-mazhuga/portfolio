@@ -101,10 +101,10 @@ const ParticledShoe = (props: GroupProps) => {
         [],
     );
 
-    useFrame(({ clock, mouse }) => {
+    useFrame(({ clock, pointer }) => {
         material.uniforms.uTime.value = clock.getElapsedTime();
-        material.uniforms.uMouse.value.x = mouse.x;
-        material.uniforms.uMouse.value.y = mouse.y;
+        material.uniforms.uMouse.value.x = pointer.x;
+        material.uniforms.uMouse.value.y = pointer.y;
     });
 
     return (
@@ -123,7 +123,7 @@ const ParticledShoe = (props: GroupProps) => {
 
 const Experience = () => {
     return (
-        <ExperimentLayout>
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/particles-on-model-surface">
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{

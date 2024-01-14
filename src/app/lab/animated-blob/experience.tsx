@@ -44,7 +44,7 @@ const Experience = () => {
     const radius = 1;
 
     return (
-        <ExperimentLayout>
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/animated-blob">
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
