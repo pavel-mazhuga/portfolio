@@ -58,6 +58,10 @@ body:not(.sb-show-main) {
     display: flex;
     flex-direction: column;
     padding-top: calc(var(--header-height) + 50px);
+
+    @include mobile {
+        padding-top: calc(var(--header-height) + 20px);
+    }
 }
 
 .page {

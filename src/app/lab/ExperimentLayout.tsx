@@ -18,6 +18,8 @@ const ExperimentLayout = ({ children, sourceLink }: Props) => {
                     href={sourceLink}
                     className="round-btn round-btn-white experiment-src-code-link"
                     aria-label="Source code"
+                    target="_blank"
+                    rel="noreferrer"
                 >
                     <CodeSVG />
                 </a>

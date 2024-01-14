@@ -62,9 +62,15 @@
     position: relative;
     z-index: 1;
     mix-blend-mode: difference;
+    display: flex;
+    align-items: center;
 }
 
 .experiment-src-code-link {
     @include clickable();
     margin-left: auto;
+
+    svg {
+        fill: currentColor;
+    }
 }
