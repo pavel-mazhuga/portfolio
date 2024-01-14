@@ -7,10 +7,10 @@ import { Mesh, PlaneGeometry, SRGBColorSpace, ShaderMaterial, Vector2 } from 'th
 import { useControls } from 'leva';
 import { v4 as uuidv4 } from 'uuid';
 import ExperimentLayout from '../ExperimentLayout';
-import PageLoading from '@/components/shared/PageLoading';
+import PageLoading from '@/app/components/shared/PageLoading';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
-import ExperimentBackground from '@/components/layout/WebGL/ExperimentBackground';
+import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
 
 const Experiment = () => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);

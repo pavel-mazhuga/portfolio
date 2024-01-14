@@ -1,5 +1,4 @@
-import WebGLLayout from '@/components/layout/WebGL/layout';
-import MainSection from './sections/MainSection';
+import WebGLLayout from '@/app/components/layout/WebGL/layout';
 
 const IndexPage = () => {
     return (

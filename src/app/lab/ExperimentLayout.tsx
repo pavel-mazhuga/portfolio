@@ -1,14 +1,26 @@
 import Link from 'next/link';
 import { PropsWithChildren } from 'react';
-import ErrorBoundary from '@/components/layout/ErrorBoundary';
+import ErrorBoundary from '@/app/components/layout/ErrorBoundary';
+import CodeSVG from '@/svg/code.svg';
 
-const ExperimentLayout = ({ children }: PropsWithChildren) => {
+type Props = PropsWithChildren & {
+    sourceLink?: string;
+};
+
+const ExperimentLayout = ({ children, sourceLink }: Props) => {
     return (
         <div className="experiment-page experiment">
             <div className="wrapper experiment__top">
                 <Link href="/lab" className="link">
                     Back
                 </Link>
+                <a
+                    href={sourceLink}
+                    className="round-btn round-btn-white experiment-src-code-link"
+                    aria-label="Source code"
+                >
+                    <CodeSVG />
+                </a>
             </div>
             <ErrorBoundary
                 fallback={

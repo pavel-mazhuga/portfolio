@@ -1,9 +1,9 @@
 import '../css/app.scss';
 import type { Metadata } from 'next';
-import Providers from '@/components/layout/Providers';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import LayoutGrid from '@/components/utils/LayoutGrid';
+import Providers from '@/app/components/layout/Providers';
+import Header from '@/app/components/layout/Header';
+import Footer from '@/app/components/layout/Footer';
+import LayoutGrid from '@/app/components/utils/LayoutGrid';
 import Html from './Html';
 import HideInterface from './HideInterface';
 import Metrics from './Metrics';

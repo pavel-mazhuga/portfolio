@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ExperimentLayout from '../ExperimentLayout';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
-import PageLoading from '@/components/shared/PageLoading';
+import PageLoading from '@/app/components/shared/PageLoading';
 
 const Experiment = () => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);

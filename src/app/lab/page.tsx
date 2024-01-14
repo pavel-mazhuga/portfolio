@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { experiments } from './data';
 import Image from 'next/image';
-import Responsive from '@/components/shared/Responsive/Responsive';
+import Responsive from '@/app/components/shared/Responsive/Responsive';
 
 export const metadata: Metadata = {
     title: 'Lab',
