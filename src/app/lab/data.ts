@@ -9,8 +9,15 @@ import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
 import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
+// import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Displaced sphere',
+        slug: 'displaced-sphere',
+        tags: ['webgl', 'shaders', 'displacement'],
+        // preview: displacedSpherePreview,
+    },
     {
         name: 'Image transition',
         slug: 'image-transition',
@@ -53,7 +60,22 @@ export const experiments: { name: string; slug: string; tags: string[]; preview?
         tags: ['webgl', 'shaders', 'refraction'],
         preview: refractionAndDispersionPreview,
     },
-    { name: 'Animated blob', slug: 'animated-blob', tags: ['webgl', 'shaders'], preview: animatedBlobPreview },
-    { name: 'Displaced torus', slug: 'displaced-torus', tags: ['webgl', 'shaders'], preview: displacedTorusPreview },
-    { name: 'Plane wave', slug: 'plane-wave', tags: ['webgl', 'shaders'], preview: planeWavePreview },
+    {
+        name: 'Animated blob',
+        slug: 'animated-blob',
+        tags: ['webgl', 'shaders'],
+        preview: animatedBlobPreview,
+    },
+    {
+        name: 'Displaced torus',
+        slug: 'displaced-torus',
+        tags: ['webgl', 'shaders'],
+        preview: displacedTorusPreview,
+    },
+    {
+        name: 'Plane wave',
+        slug: 'plane-wave',
+        tags: ['webgl', 'shaders'],
+        preview: planeWavePreview,
+    },
 ];
