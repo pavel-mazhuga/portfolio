@@ -9,8 +9,15 @@ import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
 import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
+import distortedScrollerPreview from '@/app/lab/distorted-scroller/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Distorted scroller',
+        slug: 'distorted-scroller',
+        tags: ['webgl', 'shaders', 'slider'],
+        preview: distortedScrollerPreview,
+    },
     {
         name: 'Image transition',
         slug: 'image-transition',
