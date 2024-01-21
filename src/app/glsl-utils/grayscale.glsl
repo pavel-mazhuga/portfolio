@@ -3,4 +3,4 @@ vec3 grayscale(vec3 color, float str) {
     return mix(color, vec3(g), str);
 }
 
-#pragma glsl: export(grayscale)
+#pragma glslify: export(grayscale)
