@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useThree } from '@react-three/fiber';
-import { Scroll, ScrollControls, Stats } from '@react-three/drei';
+import { Scroll, ScrollControls } from '@react-three/drei';
 import { Vector2 } from 'three';
 import { useMemo } from 'react';
 import ExperimentLayout from '../ExperimentLayout';
@@ -56,7 +56,6 @@ const Experience = () => {
                     }}
                 >
                     <Experiment />
-                    {process.env.NODE_ENV === 'development' && <Stats showPanel={2} />}
                 </Canvas>
             </div>
         </ExperimentLayout>
