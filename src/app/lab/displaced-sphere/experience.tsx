@@ -27,6 +27,7 @@ const Experiment = () => {
                 }}
                 vertexShader={vertexShader}
                 fragmentShader={fragmentShader}
+                toneMapped={false}
             />
         </mesh>
     );
