@@ -11,8 +11,15 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
 import distortedScrollerPreview from '@/app/lab/distorted-scroller/preview.jpeg';
 import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
+// import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'GPU particles',
+        slug: 'gpu-particles',
+        tags: ['webgl', 'shaders', 'particles'],
+        // preview: gpuParticlesPreview,
+    },
     {
         name: 'Displaced sphere',
         slug: 'displaced-sphere',
