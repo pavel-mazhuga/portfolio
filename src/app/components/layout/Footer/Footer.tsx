@@ -1,10 +1,15 @@
 const Footer = () => {
     return (
-        <footer className="footer wrapper">
-            <a href="https://t.me/pavelmazhuga" target="_blank" rel="noreferrer" className="link footer-availability">
+        <footer className="footer wrapper pointer-events-none">
+            <a
+                href="https://t.me/pavelmazhuga"
+                target="_blank"
+                rel="noreferrer"
+                className="link footer-availability pointer-events-auto"
+            >
                 Available for work
             </a>
-            <ul className="list-unstyled soc-list footer-soc-list">
+            <ul className="list-unstyled soc-list footer-soc-list pointer-events-auto">
                 <li className="soc-list__item">
                     <a href="mailto:pavelmazhuga.gl@gmail.com" target="_blank" rel="noreferrer" className="link">
                         Email

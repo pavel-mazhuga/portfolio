@@ -10,13 +10,13 @@ type Props = PropsWithChildren & {
 const ExperimentLayout = ({ children, sourceLink }: Props) => {
     return (
         <div className="experiment-page experiment">
-            <div className="wrapper experiment__top">
-                <Link href="/lab" className="link">
+            <div className="wrapper experiment__top pointer-events-none">
+                <Link href="/lab" className="link pointer-events-auto">
                     Back
                 </Link>
                 <a
                     href={sourceLink}
-                    className="round-btn round-btn-white experiment-src-code-link"
+                    className="round-btn round-btn-white experiment-src-code-link pointer-events-auto"
                     aria-label="Source code"
                     target="_blank"
                     rel="noreferrer"

@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 const Header = () => {
     return (
-        <header className="header">
+        <header className="header pointer-events-none">
             <div className="wrapper header-wrapper">
-                <Link href="/" className="header-logo">
+                <Link href="/" className="header-logo pointer-events-auto">
                     P.M.
                 </Link>
                 <div className="header-nav">
@@ -15,7 +15,7 @@ const Header = () => {
                             </Link>
                         </li> */}
                         <li>
-                            <Link href="/lab" className="link">
+                            <Link href="/lab" className="link pointer-events-auto">
                                 Lab
                             </Link>
                         </li>
