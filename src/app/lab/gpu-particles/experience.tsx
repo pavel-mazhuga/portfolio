@@ -107,7 +107,7 @@ const Experiment = () => {
 
 const Experience = () => {
     return (
-        <ExperimentLayout>
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/gpu-particles">
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
