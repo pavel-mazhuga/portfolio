@@ -11,6 +11,7 @@ import PageLoading from '@/app/components/shared/PageLoading';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
+import LevaWrapper from '../LevaWrapper';
 
 const Experiment = () => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);
@@ -97,6 +98,7 @@ const Experiment = () => {
 const Experience = () => {
     return (
         <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/image-transition">
+            <LevaWrapper />
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{

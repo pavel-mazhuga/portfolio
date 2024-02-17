@@ -10,6 +10,7 @@ import ExperimentLayout from '../ExperimentLayout';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 import PageLoading from '@/app/components/shared/PageLoading';
+import LevaWrapper from '../LevaWrapper';
 
 const Experiment = () => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);
@@ -57,6 +58,7 @@ const Experiment = () => {
 const Experience = () => {
     return (
         <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/vertex-wave-animation">
+            <LevaWrapper />
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
