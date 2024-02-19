@@ -37,7 +37,7 @@ const Experiment = () => {
         color,
     } = useControls({
         count: {
-            value: 1000,
+            value: 800,
             min: 0,
             max: 1000,
             step: 1,
@@ -54,7 +54,7 @@ const Experiment = () => {
             max: 1,
             step: 0.001,
         },
-        color: '#020407',
+        color: '#04080d',
     });
 
     const scene = new Scene();
