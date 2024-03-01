@@ -1,6 +1,6 @@
 'use client';
 
-import { Canvas, createPortal, extend, useFrame } from '@react-three/fiber';
+import { Canvas, createPortal, extend, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import {
     AdditiveBlending,
@@ -32,6 +32,7 @@ const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
     const simulationMaterialRef = useRef<SimulationMaterial>(null);
     const progress = useRef(0);
+    const canvas = useThree((state) => state.gl.domElement);
 
     const {
         count: size,
@@ -107,12 +108,12 @@ const Experiment = () => {
             done.current = !done.current;
         };
 
-        document.addEventListener('click', onClick);
+        canvas.addEventListener('click', onClick);
 
         return () => {
-            document.removeEventListener('click', onClick);
+            canvas.removeEventListener('click', onClick);
         };
-    }, []);
+    }, [canvas]);
 
     useFrame(({ gl, clock }) => {
         const time = clock.getElapsedTime();
