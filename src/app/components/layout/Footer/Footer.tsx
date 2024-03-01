@@ -5,9 +5,9 @@ const Footer = () => {
                 href="https://t.me/pavelmazhuga"
                 target="_blank"
                 rel="noreferrer"
-                className="link footer-availability pointer-events-auto"
+                className="link link--underlined footer-availability pointer-events-auto"
             >
-                Available for work
+                Available for work from June 2024
             </a>
             <ul className="list-unstyled soc-list footer-soc-list pointer-events-auto">
                 <li className="soc-list__item">
