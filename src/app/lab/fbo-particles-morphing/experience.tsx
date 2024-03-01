@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, createPortal, extend, useFrame } from '@react-three/fiber';
-import { Suspense, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import {
     AdditiveBlending,
     BufferGeometry,
@@ -23,30 +23,27 @@ import fragmentShader from './shaders/fragment.glsl';
 import PageLoading from '@/app/components/shared/PageLoading';
 import LevaWrapper from '../LevaWrapper';
 import { SimulationMaterial } from './SimulationMaterial';
+import { animate } from 'framer-motion';
+import { easeInOutQuart } from '@/easings';
 
 extend({ SimulationMaterial });
 
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
     const simulationMaterialRef = useRef<SimulationMaterial>(null);
+    const progress = useRef(0);
 
     const {
         count: size,
-        frequency,
         speed,
-        color,
+        colorA,
+        colorB,
     } = useControls({
         count: {
-            value: 800,
+            value: 400,
             min: 0,
-            max: 1000,
+            max: 500,
             step: 1,
-        },
-        frequency: {
-            value: 0.2,
-            min: 0,
-            max: 1,
-            step: 0.001,
         },
         speed: {
             value: 0.07,
@@ -54,7 +51,8 @@ const Experiment = () => {
             max: 1,
             step: 0.001,
         },
-        color: '#04080d',
+        colorA: '#9a441f',
+        colorB: '#802974',
     });
 
     const scene = new Scene();
@@ -87,10 +85,34 @@ const Experiment = () => {
         () => ({
             uPositions: { value: null },
             uTime: { value: 0 },
-            uColor: { value: new Color(color) },
+            uProgress: { value: 0 },
+            uColorA: { value: new Color(colorA) },
+            uColorB: { value: new Color(colorB) },
         }),
-        [color],
+        [colorA, colorB],
     );
+
+    const done = useRef<boolean>(false);
+
+    useEffect(() => {
+        const onClick = () => {
+            animate(progress.current, done.current ? 0 : 1, {
+                duration: 2,
+                ease: easeInOutQuart,
+                onUpdate: (val) => {
+                    progress.current = val;
+                },
+            });
+
+            done.current = !done.current;
+        };
+
+        document.addEventListener('click', onClick);
+
+        return () => {
+            document.removeEventListener('click', onClick);
+        };
+    }, []);
 
     useFrame(({ gl, clock }) => {
         const time = clock.getElapsedTime();
@@ -102,15 +124,17 @@ const Experiment = () => {
 
         meshRef.current!.material.uniforms.uPositions.value = renderTarget.texture;
         meshRef.current!.material.uniforms.uTime.value = time;
+        meshRef.current!.material.uniforms.uProgress.value = progress.current;
 
         simulationMaterialRef.current!.uniforms.uTime.value = time;
+        simulationMaterialRef.current!.uniforms.uProgress.value = progress.current;
     });
 
     return (
         <>
             {createPortal(
                 <mesh>
-                    <simulationMaterial ref={simulationMaterialRef} args={[size, frequency, speed]} />
+                    <simulationMaterial ref={simulationMaterialRef} args={[size, speed, progress.current]} />
                     <bufferGeometry>
                         <bufferAttribute
                             attach="attributes-position"
@@ -123,7 +147,7 @@ const Experiment = () => {
                 </mesh>,
                 scene,
             )}
-            <points ref={meshRef}>
+            <points ref={meshRef} rotation={[0.2, -Math.PI * 0.42, 0]}>
                 <bufferGeometry>
                     <bufferAttribute
                         key={particlesPosition.length}
@@ -148,12 +172,12 @@ const Experiment = () => {
 
 const Experience = () => {
     return (
-        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/fbo-particles">
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/fbo-particles-morphing">
             <LevaWrapper />
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
-                        position: [0, 0, 3],
+                        position: [0, 0, 5],
                         fov: 45,
                         near: 0.1,
                         far: 100,

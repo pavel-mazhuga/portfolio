@@ -13,8 +13,15 @@ import distortedScrollerPreview from '@/app/lab/distorted-scroller/preview.jpeg'
 import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
 import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 import fboParticlesPreview from '@/app/lab/fbo-particles/preview.jpeg';
+import fboParticlesMorphingPreview from '@/app/lab/fbo-particles-morphing/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'FBO particles morphing',
+        slug: 'fbo-particles-morphing',
+        tags: ['webgl', 'shaders', 'particles'],
+        preview: fboParticlesMorphingPreview,
+    },
     {
         name: 'FBO particles',
         slug: 'fbo-particles',
