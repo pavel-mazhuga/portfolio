@@ -22,15 +22,15 @@ import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 import PageLoading from '@/app/components/shared/PageLoading';
 import LevaWrapper from '../LevaWrapper';
-import { SimulationMaterial } from './SimulationMaterial';
+import { SimulationMaterial as SMaterial } from './SimulationMaterial';
 import { animate } from 'framer-motion';
 import { easeInOutQuart } from '@/easings';
 
-extend({ SimulationMaterial });
+extend({ SMaterial });
 
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
-    const simulationMaterialRef = useRef<SimulationMaterial>(null);
+    const simulationMaterialRef = useRef<SMaterial>(null);
     const progress = useRef(0);
     const canvas = useThree((state) => state.gl.domElement);
 
@@ -135,7 +135,7 @@ const Experiment = () => {
         <>
             {createPortal(
                 <mesh>
-                    <simulationMaterial ref={simulationMaterialRef} args={[size, speed, progress.current]} />
+                    <sMaterial ref={simulationMaterialRef} args={[size, speed, progress.current]} />
                     <bufferGeometry>
                         <bufferAttribute
                             attach="attributes-position"
