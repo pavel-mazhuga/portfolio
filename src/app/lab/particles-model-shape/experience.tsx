@@ -35,7 +35,7 @@ extend({ SimulationMaterial });
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
     const simulationMaterialRef = useRef<SimulationMaterial>(null);
-    const { nodes } = useGLTF('/gltf/face.glb') as any;
+    const { nodes } = useGLTF('/gltf/face2.glb') as any;
 
     const { gl, size, raycaster, camera } = useThree(({ gl, size, raycaster, camera }) => ({
         gl,

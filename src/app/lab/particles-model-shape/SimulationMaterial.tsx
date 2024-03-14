@@ -59,4 +59,8 @@ export class SimulationMaterial extends ShaderMaterial {
             fragmentShader: simulationFragmentShader,
         });
     }
+
+    dispose() {
+        super.dispose();
+    }
 }
