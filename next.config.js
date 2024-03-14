@@ -19,9 +19,14 @@ const nextConfig = withBundleAnalyzer({
     },
     webpack: (config) => {
         config.module.rules.push({
-            test: /\.(png|jpg|gif|svg)$/i,
+            test: /\.(png|jpg|gif|svg|glb|gltf)$/i,
             type: 'asset',
             resourceQuery: /url/, // *.svg?url
+        });
+
+        config.module.rules.push({
+            test: /\.(glb|gltf|ktx2|wav|mp3)$/i,
+            type: 'asset/resource',
         });
 
         config.module.rules.push({
