@@ -156,16 +156,19 @@ const Experiment = () => {
 
             if (intersects.length > 0) {
                 const { x, y } = intersects[0].point;
-                simulationMaterialRef.current!.uniforms.uMouse.value.x = lerp(
-                    simulationMaterialRef.current!.uniforms.uMouse.value.x,
-                    x,
-                    0.15,
-                );
-                simulationMaterialRef.current!.uniforms.uMouse.value.y = lerp(
-                    simulationMaterialRef.current!.uniforms.uMouse.value.y,
-                    y,
-                    0.15,
-                );
+
+                if (simulationMaterialRef.current!.uniforms.uMouse) {
+                    simulationMaterialRef.current!.uniforms.uMouse.value.x = lerp(
+                        simulationMaterialRef.current!.uniforms.uMouse.value.x,
+                        x,
+                        0.15,
+                    );
+                    simulationMaterialRef.current!.uniforms.uMouse.value.y = lerp(
+                        simulationMaterialRef.current!.uniforms.uMouse.value.y,
+                        y,
+                        0.15,
+                    );
+                }
             }
         }
 
