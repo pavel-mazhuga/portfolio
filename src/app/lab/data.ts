@@ -14,14 +14,14 @@ import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
 import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 import fboParticlesPreview from '@/app/lab/fbo-particles/preview.jpeg';
 import fboParticlesMorphingPreview from '@/app/lab/fbo-particles-morphing/preview.jpeg';
-// import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
+import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     {
         name: 'Particles model shape',
         slug: 'particles-model-shape',
         tags: ['webgl', 'shaders', 'particles'],
-        // preview: particlesModelShapePreview,
+        preview: particlesModelShapePreview,
     },
     {
         name: 'FBO particles morphing',
