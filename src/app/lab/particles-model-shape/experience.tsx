@@ -27,14 +27,14 @@ import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 import PageLoading from '@/app/components/shared/PageLoading';
 import LevaWrapper from '../LevaWrapper';
-import { SimulationMaterial } from './SimulationMaterial';
+import { SimulationMaterial as SMat } from './SimulationMaterial';
 import { lerp } from '@/utils/lerp';
 
-extend({ SimulationMaterial });
+extend({ SMat });
 
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
-    const simulationMaterialRef = useRef<SimulationMaterial>(null);
+    const simulationMaterialRef = useRef<SMat>(null);
     const { nodes } = useGLTF('/gltf/face2.glb') as any;
 
     const { gl, size, raycaster, camera } = useThree(({ gl, size, raycaster, camera }) => ({
@@ -184,7 +184,7 @@ const Experiment = () => {
         <>
             {createPortal(
                 <mesh>
-                    <simulationMaterial
+                    <sMat
                         ref={simulationMaterialRef}
                         args={[nodes.Object_2.geometry, count, speed, power, distribution]}
                     />

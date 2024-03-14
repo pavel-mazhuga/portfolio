@@ -14,6 +14,9 @@ declare global {
             simulationMaterial: ExtendedColors<
                 Overwrite<Partial<SimulationMaterial>, NodeProps<SimulationMaterial, [ShaderMaterialParameters]>>
             >;
+            sMat: ExtendedColors<
+                Overwrite<Partial<SimulationMaterial>, NodeProps<SimulationMaterial, [ShaderMaterialParameters]>>
+            >;
         }
     }
 }
