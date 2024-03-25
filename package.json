@@ -41,6 +41,7 @@
         "lodash.debounce": "^4.0.8",
         "lodash.round": "^4.0.4",
         "next": "^13.4.13",
+        "postprocessing": "^6.35.2",
         "raw-loader": "^4.0.2",
         "react": "18.2.0",
         "react-dom": "18.2.0",

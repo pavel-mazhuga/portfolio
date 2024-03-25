@@ -7,7 +7,7 @@ vec4 coverTexture(sampler2D tex, vec2 imgSize, vec2 planeSize, vec2 ouv) {
     vec2 offset = (rs < ri ? vec2((new.x - s.x) / 2.0, 0.0) : vec2(0.0, (new.y - s.y) / 2.0)) / new;
     vec2 uv = ouv * s / new + offset;
 
-    return texture2D(tex, uv);
+    return texture(tex, uv);
 }
 
 #pragma glslify: export(coverTexture)

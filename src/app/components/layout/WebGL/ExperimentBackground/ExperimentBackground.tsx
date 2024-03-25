@@ -1,11 +1,15 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { BackSide, ShaderMaterial } from 'three';
+import { BackSide, Color, ColorRepresentation, ShaderMaterial } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 
-const ExperimentBackground = () => {
+type Props = {
+    color?: ColorRepresentation;
+};
+
+const ExperimentBackground = ({ color = '#a6a6a6' }: Props) => {
     const scale = 100;
     const material = useRef<ShaderMaterial>(null);
 
@@ -21,7 +25,10 @@ const ExperimentBackground = () => {
             <shaderMaterial
                 ref={material}
                 key={uuidv4()}
-                uniforms={{ uTime: { value: 0 } }}
+                uniforms={{
+                    uTime: { value: 0 },
+                    uColor: { value: new Color(color) },
+                }}
                 vertexShader={vertexShader}
                 fragmentShader={fragmentShader}
                 side={BackSide}
