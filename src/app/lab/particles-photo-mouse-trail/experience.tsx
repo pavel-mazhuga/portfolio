@@ -44,55 +44,67 @@ const Experiment = () => {
     };
 
     const texture = useTexture(
-        'https://images.unsplash.com/photo-1525786210598-d527194d3e9a?q=80&w=3355&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        'https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=3386&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     );
     texture.colorSpace = SRGBColorSpace;
 
-    const { trailSize, trailSpeed, displacementIntensity, noisePower, noiseStrength, noiseSpeed, grayscale, sickMode } =
-        useControls({
-            trailSize: {
-                value: 0.3,
-                min: 0,
-                max: 1,
-                step: 0.001,
-            },
-            trailSpeed: {
-                value: 0.03,
-                min: 0.02,
-                max: 0.1,
-                step: 0.001,
-            },
-            displacementIntensity: {
-                value: 3,
-                min: 0,
-                max: 7,
-                step: 0.001,
-            },
-            noisePower: {
-                value: 1,
-                min: 1,
-                max: 4,
-                step: 0.001,
-            },
-            noiseStrength: {
-                value: 0.1,
-                min: 0,
-                max: 1,
-                step: 0.001,
-            },
-            noiseSpeed: {
-                value: 0.1,
-                min: 0,
-                max: 1,
-                step: 0.001,
-            },
-            grayscale: {
-                value: false,
-            },
-            sickMode: {
-                value: false,
-            },
-        });
+    const {
+        trailSize,
+        trailSpeed,
+        displacementIntensity,
+        noisePower,
+        noiseStrength,
+        noiseSpeed,
+        particleSizeDependsOnBrightness,
+        grayscale,
+        sickMode,
+    } = useControls({
+        trailSize: {
+            value: 0.3,
+            min: 0,
+            max: 1,
+            step: 0.001,
+        },
+        trailSpeed: {
+            value: 0.03,
+            min: 0.02,
+            max: 0.1,
+            step: 0.001,
+        },
+        displacementIntensity: {
+            value: 3,
+            min: 0,
+            max: 7,
+            step: 0.001,
+        },
+        noisePower: {
+            value: 1,
+            min: 1,
+            max: 4,
+            step: 0.001,
+        },
+        noiseStrength: {
+            value: 0.1,
+            min: 0,
+            max: 1,
+            step: 0.001,
+        },
+        noiseSpeed: {
+            value: 0.1,
+            min: 0,
+            max: 1,
+            step: 0.001,
+        },
+        grayscale: {
+            value: false,
+        },
+        sickMode: {
+            value: false,
+        },
+        particleSizeDependsOnBrightness: {
+            value: false,
+        },
+    });
 
     const amount = 512;
 
@@ -179,6 +191,7 @@ const Experiment = () => {
             plane.current.material.uniforms.uNoisePower.value = noisePower;
             plane.current.material.uniforms.uNoiseStrength.value = noiseStrength;
             plane.current.material.uniforms.uNoiseSpeed.value = noiseSpeed;
+            plane.current.material.uniforms.uDependParticleSizeOnBrightness.value = particleSizeDependsOnBrightness;
             plane.current.material.uniforms.uGrayscale.value = grayscale;
             plane.current.material.uniforms.uSickMode.value = sickMode;
         }
@@ -201,6 +214,7 @@ const Experiment = () => {
                     uNoiseSpeed: new Uniform(0.1),
                     uSickMode: new Uniform(false),
                     uGrayscale: new Uniform(false),
+                    uDependParticleSizeOnBrightness: new Uniform(false),
                 }}
                 vertexShader={vertexShader}
                 fragmentShader={fragmentShader}

@@ -13,6 +13,7 @@ uniform float uNoiseStrength;
 uniform float uNoiseSpeed;
 uniform bool uSickMode;
 uniform bool uGrayscale;
+uniform bool uDependParticleSizeOnBrightness;
 
 attribute float aIntensity;
 attribute float aAngle;
@@ -44,6 +45,11 @@ void main() {
     float pictureIntensity = picture.r;
 
     gl_PointSize = 0.04 * uResolution.y;
+
+    if (uDependParticleSizeOnBrightness) {
+        gl_PointSize *= pictureIntensity * 3.;
+    }
+
     gl_PointSize *= (1.0 / -viewPosition.z);
 
     vColor = uGrayscale ? vec3(pictureIntensity) : picture.rgb;
