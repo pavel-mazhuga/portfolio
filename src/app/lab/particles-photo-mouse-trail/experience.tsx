@@ -44,7 +44,7 @@ const Experiment = () => {
     };
 
     const texture = useTexture(
-        'https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=3386&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        'https://images.unsplash.com/photo-1649706796644-c507eb2835bb?q=80&w=3121&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     );
     texture.colorSpace = SRGBColorSpace;
 
@@ -60,7 +60,7 @@ const Experiment = () => {
         sickMode,
     } = useControls({
         trailSize: {
-            value: 0.3,
+            value: 0.45,
             min: 0,
             max: 1,
             step: 0.001,
@@ -231,7 +231,7 @@ const Experience = () => {
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
-                        position: [0, 0, 20],
+                        position: [0, 0, 18],
                         fov: 35,
                         near: 0.1,
                         far: 1000,
