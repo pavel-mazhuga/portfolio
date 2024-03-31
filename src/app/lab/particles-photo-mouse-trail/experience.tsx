@@ -141,6 +141,8 @@ const Experiment = () => {
         [planeSize.width, planeSize.height],
     );
 
+    const prevCursorDistance = useRef(0);
+
     useFrame(({ clock, pointer, camera, raycaster }) => {
         raycaster.setFromCamera(pointer, camera);
         const intersections = raycaster.intersectObject(interactivePlane);
@@ -165,7 +167,13 @@ const Experiment = () => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Speed alpha
-            const cursorDistance = canvasCursorPrevious.current.distanceTo(canvasCursor.current);
+            let cursorDistance = canvasCursorPrevious.current.distanceTo(canvasCursor.current);
+            if (cursorDistance > 10 && prevCursorDistance.current === 0) {
+                // When we enter the canvas, the value is large and we need to reduce it
+                cursorDistance = 1;
+            }
+
+            prevCursorDistance.current = cursorDistance;
             canvasCursorPrevious.current.copy(canvasCursor.current);
             const alpha = Math.min(cursorDistance * 0.05, 1);
 
