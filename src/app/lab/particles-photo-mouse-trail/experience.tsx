@@ -37,7 +37,6 @@ const createDisplacementCanvas = (width: number, height: number) => {
 const Experiment = () => {
     const plane = useRef<Points<PlaneGeometry, ShaderMaterial>>(null);
     const size = useThree((state) => state.size);
-    // const dpr = useThree(state => state.)
     const planeSize = {
         width: 10,
         height: 10,
@@ -170,7 +169,7 @@ const Experiment = () => {
             let cursorDistance = canvasCursorPrevious.current.distanceTo(canvasCursor.current);
             if (cursorDistance > 10 && prevCursorDistance.current === 0) {
                 // When we enter the canvas, the value is large and we need to reduce it
-                cursorDistance = 1;
+                cursorDistance = 0;
             }
 
             prevCursorDistance.current = cursorDistance;
