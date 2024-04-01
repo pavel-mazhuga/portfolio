@@ -244,7 +244,8 @@ const Experience = () => {
                         near: 0.1,
                         far: 1000,
                     }}
-                    gl={{ alpha: false }}
+                    gl={{ alpha: false, antialias: false }}
+                    dpr={[1, 1.5]}
                     flat
                 >
                     <Suspense fallback={<PageLoading />}>
