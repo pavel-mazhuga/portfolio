@@ -167,12 +167,13 @@ const Experiment = () => {
 
             // Speed alpha
             let cursorDistance = canvasCursorPrevious.current.distanceTo(canvasCursor.current);
+            const savedCursorDistance = cursorDistance;
             if (cursorDistance > 10 && prevCursorDistance.current === 0) {
                 // When we enter the canvas, the value is large and we need to reduce it
                 cursorDistance = 0;
             }
+            prevCursorDistance.current = savedCursorDistance;
 
-            prevCursorDistance.current = cursorDistance;
             canvasCursorPrevious.current.copy(canvasCursor.current);
             const alpha = Math.min(cursorDistance * 0.05, 1);
 
