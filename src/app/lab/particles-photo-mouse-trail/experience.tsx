@@ -15,7 +15,7 @@ import {
     Vector2,
 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import { useTexture } from '@react-three/drei';
+import { useDetectGPU, useTexture } from '@react-three/drei';
 import { useControls } from 'leva';
 import ExperimentLayout from '../ExperimentLayout';
 import PageLoading from '@/app/components/shared/PageLoading';
@@ -41,6 +41,7 @@ const Experiment = () => {
         width: 10,
         height: 10,
     };
+    const gpu = useDetectGPU();
 
     const texture = useTexture(
         'https://images.unsplash.com/photo-1649706796644-c507eb2835bb?q=80&w=3121&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -105,7 +106,7 @@ const Experiment = () => {
         },
     });
 
-    const amount = 512;
+    const amount = Number(gpu.fps) >= 60 ? 300 : 128;
 
     const { canvas, ctx, glowImage } = createDisplacementCanvas(amount, amount);
     const canvasTexture = useMemo(() => new CanvasTexture(canvas), [canvas]);
@@ -115,7 +116,7 @@ const Experiment = () => {
         geometry.setIndex(null);
         geometry.deleteAttribute('normal');
         return geometry;
-    }, [planeSize.width, planeSize.height]);
+    }, [planeSize.width, planeSize.height, amount]);
 
     useEffect(() => {
         const intensitiesArray = new Float32Array(particlesGeometry.attributes.position.count);
