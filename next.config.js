@@ -57,7 +57,7 @@ const nextConfig = withBundleAnalyzer({
 
         config.module.rules.push({
             test: /\.(glsl|frag|vert)$/,
-            use: [require.resolve('raw-loader'), require.resolve('glslify-loader')],
+            use: [require.resolve('@davcri/webpack-glsl-loader'), require.resolve('glslify-loader')],
         });
 
         return config;
