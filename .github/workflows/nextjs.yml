@@ -31,7 +31,6 @@ jobs:
                     echo "manager=npm" >> $GITHUB_OUTPUT
                     echo "command=ci" >> $GITHUB_OUTPUT
                     echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-                    echo "submodules=recursive" >> $GITHUB_OUTPUT
                     exit 0
                   else
                     echo "Unable to determine package manager"
@@ -53,7 +52,7 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
             - name: Install dependencies
-              run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+              run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }} --recursive
             - name: Build with Next.js
               run: ${{ steps.detect-package-manager.outputs.runner }} next build
             # - name: Upload artifact
