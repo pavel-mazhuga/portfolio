@@ -11,7 +11,7 @@
         "lint": "next lint",
         "format": "prettier --ignore-unknown --write \"src/**/*\"",
         "subsetting": "node ./subset-fonts.js",
-        "prepare": "cd .. && husky install frontend/.husky",
+        "prepare": "husky install .husky",
         "postinstall": "cd lygia && npm install"
     },
     "browserslist": [
