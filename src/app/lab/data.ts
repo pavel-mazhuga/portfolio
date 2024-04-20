@@ -20,7 +20,7 @@ import displacedSphere2Preview from '@/app/lab/displaced-sphere-2/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     {
-        name: 'Displaced-sphere-2',
+        name: 'Displaced sphere v2',
         slug: 'displaced-sphere-2',
         tags: ['webgl', 'shaders', 'displacement'],
         preview: displacedSphere2Preview,
