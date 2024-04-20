@@ -16,8 +16,15 @@ import fboParticlesPreview from '@/app/lab/fbo-particles/preview.jpeg';
 import fboParticlesMorphingPreview from '@/app/lab/fbo-particles-morphing/preview.jpeg';
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
 import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-trail/preview.jpeg';
+import displacedSphere2Preview from '@/app/lab/displaced-sphere-2/preview.jpeg';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Displaced-sphere-2',
+        slug: 'displaced-sphere-2',
+        tags: ['webgl', 'shaders', 'displacement'],
+        preview: displacedSphere2Preview,
+    },
     {
         name: 'Particles photo mouse trail',
         slug: 'particles-photo-mouse-trail',
