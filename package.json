@@ -11,7 +11,8 @@
         "lint": "next lint",
         "format": "prettier --ignore-unknown --write \"src/**/*\"",
         "subsetting": "node ./subset-fonts.js",
-        "prepare": "husky install .husky"
+        "prepare": "husky install .husky",
+        "tsc": "tsc --noEmit --pretty"
     },
     "browserslist": [
         "Android >= 10",
@@ -59,6 +60,7 @@
         "@davcri/webpack-glsl-loader": "^1.0.2",
         "@next/bundle-analyzer": "^13.4.13",
         "@svgr/webpack": "^8.0.1",
+        "@types/jest": "^29.5.12",
         "@types/lodash.debounce": "^4.0.7",
         "@types/lodash.round": "^4.0.7",
         "@types/three": "^0.165.0",
