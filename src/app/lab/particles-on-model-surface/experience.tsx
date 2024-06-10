@@ -2,7 +2,6 @@
 
 import { ComputedAttribute, OrbitControls, Sampler, useGLTF } from '@react-three/drei';
 import { Canvas, GroupProps, useFrame, useThree } from '@react-three/fiber';
-import { GLTF } from 'three-stdlib';
 import { useMemo } from 'react';
 import {
     BufferAttribute,
@@ -18,19 +17,6 @@ import {
 import ExperimentLayout from '../ExperimentLayout';
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
-
-type GLTFResult = GLTF & {
-    nodes: {
-        shoe: THREE.Mesh;
-        shoe_1: THREE.Mesh;
-        shoe_2: THREE.Mesh;
-        shoe_3: THREE.Mesh;
-        shoe_4: THREE.Mesh;
-        shoe_5: THREE.Mesh;
-        shoe_6: THREE.Mesh;
-        shoe_7: THREE.Mesh;
-    };
-};
 
 function remap(x: number, [low1, high1]: number[], [low2, high2]: number[]) {
     return low2 + ((x - low1) * (high2 - low2)) / (high1 - low1);
