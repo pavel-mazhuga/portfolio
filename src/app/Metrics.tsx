@@ -7,6 +7,7 @@ import Script from 'next/script';
 import { useEffect } from 'react';
 
 export const YM_ID = 93587310;
+//
 
 const Metrics = () => {
     const pathname = usePathname();
