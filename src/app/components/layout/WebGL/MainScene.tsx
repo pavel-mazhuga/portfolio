@@ -100,7 +100,8 @@ const MainScene = () => {
                 <Preload all />
             </Suspense>
 
-            <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={0.62} distance={73} />
+            <ambientLight intensity={0.06} />
+            <pointLight ref={pointLight} position={[30, 55, -8]} color="#f5f5f5" intensity={10} />
             <AdaptiveDpr pixelated />
         </>
     );
