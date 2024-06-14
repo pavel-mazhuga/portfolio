@@ -5,6 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useControls } from 'leva';
 import { Suspense, useRef } from 'react';
 import { Color, Mesh, PlaneGeometry, ShaderMaterial, Vector3 } from 'three';
+import { useMediaQuery } from 'usehooks-ts';
 import { v4 as uuidv4 } from 'uuid';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
 import PageLoading from '@/app/components/shared/PageLoading';
@@ -13,7 +14,7 @@ import LevaWrapper from '../LevaWrapper';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
 
-const Experiment = () => {
+const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);
 
     const { gradientStrength, color, speed, noiseStrength, displacementStrength, fractAmount, remapPowerRange } =
@@ -106,7 +107,7 @@ const Experiment = () => {
 
     return (
         <mesh ref={plane}>
-            <icosahedronGeometry args={[1.3, 256]} />
+            <icosahedronGeometry args={[1.3, isMobile ? 180 : 256]} />
             <shaderMaterial
                 uniforms={{
                     uTime: { value: 0 },
@@ -137,13 +138,15 @@ const Experiment = () => {
 };
 
 const Experience = () => {
+    const isMobile = useMediaQuery('(max-width: 1199px)');
+
     return (
         <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2">
             <div className="canvas-wrapper">
                 <LevaWrapper />
                 <Canvas
                     camera={{
-                        position: [0, 0, 5],
+                        position: [0, 0, isMobile ? 9 : 5],
                         fov: 45,
                         near: 0.1,
                         far: 1000,
@@ -152,7 +155,7 @@ const Experience = () => {
                 >
                     <Suspense fallback={<PageLoading />}>
                         <ExperimentBackground />
-                        <Experiment />
+                        <Experiment isMobile={isMobile} />
                     </Suspense>
                     <OrbitControls />
                 </Canvas>
