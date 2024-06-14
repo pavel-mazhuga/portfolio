@@ -15,6 +15,7 @@ import {
 } from 'three';
 import CustomShaderMaterial from 'three-custom-shader-material';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { useMediaQuery } from 'usehooks-ts';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
 import PageLoading from '@/app/components/shared/PageLoading';
 import ExperimentLayout from '../ExperimentLayout';
@@ -164,11 +165,13 @@ const Experiment = () => {
         },
     });
 
+    const isMobile = useMediaQuery('(max-width: 1199px)');
+
     const geometry = useMemo(() => {
-        const g = mergeVertices(new IcosahedronGeometry(1.3, 200));
+        const g = mergeVertices(new IcosahedronGeometry(1.3, isMobile ? 128 : 200));
         g.computeTangents();
         return g;
-    }, []);
+    }, [isMobile]);
 
     return (
         <>
