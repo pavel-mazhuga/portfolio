@@ -188,7 +188,6 @@ const SwordParticles = ({ particleGeometry, ...props }: Props) => {
                         <bufferAttribute attach="attributes-uv" count={uvs.length / 2} array={uvs} itemSize={2} />
                     </bufferGeometry>
                     <shaderMaterial
-                        key={uuidv4()}
                         ref={simulationMaterialRef}
                         uniforms={simulationUniforms}
                         vertexShader={simulationVertexShader}
@@ -208,7 +207,6 @@ const SwordParticles = ({ particleGeometry, ...props }: Props) => {
                     />
                 </bufferGeometry>
                 <shaderMaterial
-                    key={uuidv4()}
                     uniforms={uniforms}
                     vertexShader={vertexShader}
                     fragmentShader={fragmentShader}

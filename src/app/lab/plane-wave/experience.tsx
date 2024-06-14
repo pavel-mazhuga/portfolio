@@ -27,7 +27,6 @@ const Experiment = () => {
         <mesh ref={plane}>
             <planeGeometry args={[1, 1, 64, 64]} />
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     image: { value: texture },
                     sizeImage: {

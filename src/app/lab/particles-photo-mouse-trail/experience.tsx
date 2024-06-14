@@ -209,7 +209,6 @@ const Experiment = () => {
     return (
         <points ref={plane} geometry={particlesGeometry}>
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uResolution: new Uniform(new Vector2(size.width * dpr, size.height * dpr)),
                     uPictureTexture: new Uniform(texture),

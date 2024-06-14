@@ -91,7 +91,6 @@ const Experiment = () => {
                 />
             </bufferGeometry>
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uTime: { value: 0 },
                     uResolution: { value: new Vector2(size.width, size.height) },

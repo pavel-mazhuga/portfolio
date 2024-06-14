@@ -34,7 +34,6 @@ const Slide = forwardRef<Mesh, Props>(({ images, index, src, planeSize, ...props
     return (
         <mesh {...props} ref={ref}>
             <shaderMaterial
-                key={uuidv4()}
                 ref={materialRef}
                 uniforms={{
                     uImage: { value: img },

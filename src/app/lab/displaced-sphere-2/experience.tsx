@@ -108,7 +108,6 @@ const Experiment = () => {
         <mesh ref={plane}>
             <icosahedronGeometry args={[1.3, 256]} />
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uTime: { value: 0 },
                     uColor: { value: new Color(color) },

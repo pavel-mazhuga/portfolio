@@ -26,7 +26,6 @@ const Experiment = () => {
         <mesh ref={plane}>
             <sphereGeometry args={[0.5, 128, 128]} />
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uMap: { value: texture },
                     uTime: { value: 0 },

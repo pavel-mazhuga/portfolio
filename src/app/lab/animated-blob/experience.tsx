@@ -35,7 +35,7 @@ const NoiseSphere = ({ frequency, amplitude, radius, offset = 0, ...props }: Noi
     return (
         <mesh ref={sphere} {...props}>
             <icosahedronGeometry args={[radius, 60]} />
-            <noiseMatCapMaterial key={uuidv4()} attach="material" args={[texture, offset]} />
+            <noiseMatCapMaterial attach="material" args={[texture, offset]} />
         </mesh>
     );
 };

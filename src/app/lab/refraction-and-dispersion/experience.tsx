@@ -77,12 +77,7 @@ const Dispersion = (props: MeshProps) => {
     return (
         <mesh {...props} ref={mesh}>
             <torusGeometry args={[1.2, 0.5, 256, 80]} />
-            <shaderMaterial
-                key={uuidv4()}
-                uniforms={uniforms}
-                vertexShader={vertexShader}
-                fragmentShader={fragmentShader}
-            />
+            <shaderMaterial uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} />
         </mesh>
     );
 };

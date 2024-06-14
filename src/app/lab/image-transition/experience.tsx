@@ -72,7 +72,6 @@ const Experiment = () => {
             <mesh ref={plane}>
                 <planeGeometry args={[planeSize.x, planeSize.y]} />
                 <shaderMaterial
-                    key={uuidv4()}
                     uniforms={{
                         uCurrentImage: { value: slides[activeIndex].texture },
                         uCurrentImageSize: { value: slides[activeIndex].size },

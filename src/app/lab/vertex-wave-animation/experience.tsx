@@ -35,7 +35,6 @@ const Experiment = () => {
         <mesh ref={plane} rotation={[-Math.PI / 3, 0, 0]} scale={[1.4, 1.4, 1.4]}>
             <planeGeometry args={[1, 1, 256, 256]} />
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     image: { value: texture },
                     sizeImage: {

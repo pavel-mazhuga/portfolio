@@ -21,7 +21,6 @@ const Experiment = () => {
         <mesh ref={mesh}>
             <icosahedronGeometry args={[1.2, 64]} />
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uTime: { value: 0 },
                 }}

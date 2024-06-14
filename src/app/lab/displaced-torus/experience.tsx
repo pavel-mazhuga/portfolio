@@ -20,7 +20,6 @@ const Experiment = () => {
         <mesh ref={mesh}>
             <torusGeometry args={[1, 0.3, 1000, 1000]} />
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uTime: { value: 0 },
                 }}

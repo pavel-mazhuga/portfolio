@@ -26,7 +26,6 @@ const Experiment = () => {
     return (
         <ScreenQuad ref={plane}>
             <shaderMaterial
-                key={uuidv4()}
                 uniforms={{
                     uTime: { value: 0 },
                     uResolution: { value: new Vector2(size.width, size.height) },

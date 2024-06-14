@@ -134,7 +134,6 @@ const Experiment = () => {
                     />
                 </bufferGeometry>
                 <shaderMaterial
-                    key={uuidv4()}
                     uniforms={uniforms}
                     vertexShader={vertexShader}
                     fragmentShader={fragmentShader}

@@ -8,9 +8,11 @@
 * returns => smooth edges
 */
 
-#define PI 3.14159265358979323846
+#ifndef PI
+#define PI 3.1415926535897932384626433832795
+#endif
 
-float smoothMod(float axis, float amp, float rad){
+float smoothMod(float axis, float amp, float rad) {
     float top = cos(PI * (axis / amp)) * sin(PI * (axis / amp));
     float bottom = pow(sin(PI * (axis / amp)), 2.0) + pow(rad, 2.0);
     float at = atan(top / bottom);

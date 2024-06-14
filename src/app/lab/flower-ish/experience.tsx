@@ -31,12 +31,7 @@ const Flower = (props: MeshProps) => {
     return (
         <mesh {...props} ref={mesh}>
             <torusGeometry args={[1, 0.55, 128, 256]} />
-            <shaderMaterial
-                key={uuidv4()}
-                uniforms={uniforms}
-                vertexShader={vertexShader}
-                fragmentShader={fragmentShader}
-            />
+            <shaderMaterial uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} />
         </mesh>
     );
 };

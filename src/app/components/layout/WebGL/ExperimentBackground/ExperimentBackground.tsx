@@ -24,7 +24,6 @@ const ExperimentBackground = ({ color = '#a6a6a6' }: Props) => {
             <sphereGeometry args={[1, 1, 256, 256]} />
             <shaderMaterial
                 ref={material}
-                key={uuidv4()}
                 uniforms={{
                     uTime: { value: 0 },
                     uColor: { value: new Color(color) },
