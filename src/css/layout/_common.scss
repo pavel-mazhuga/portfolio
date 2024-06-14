@@ -141,6 +141,7 @@ body:not(.sb-show-main) {
     top: 10px;
     right: 120px;
     max-height: calc(100vh - 100px);
+    max-height: calc(100svh - 100px);
     overflow-y: auto;
 
     @include mobile {
