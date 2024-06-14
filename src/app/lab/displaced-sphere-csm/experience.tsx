@@ -23,7 +23,7 @@ import LevaWrapper from '../LevaWrapper';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
 
-const Experiment = () => {
+const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     const materialRef = useRef<ShaderMaterial>(null);
 
     useFrame(({ clock }) => {
@@ -165,8 +165,6 @@ const Experiment = () => {
         },
     });
 
-    const isMobile = useMediaQuery('(max-width: 1199px)');
-
     const geometry = useMemo(() => {
         const g = mergeVertices(new IcosahedronGeometry(1.3, isMobile ? 128 : 200));
         g.computeTangents();
@@ -229,22 +227,24 @@ const Experiment = () => {
 };
 
 const Experience = () => {
+    const isMobile = useMediaQuery('(max-width: 1199px)');
+
     return (
         <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-csm">
             <div className="canvas-wrapper">
                 <LevaWrapper />
                 <Canvas
                     camera={{
-                        position: [0, 0, 5],
+                        position: [0, 0, isMobile ? 10 : 5],
                         fov: 45,
                         near: 0.1,
-                        far: 100,
+                        far: 1000,
                     }}
                     gl={{ alpha: false }}
                 >
                     <Suspense fallback={<PageLoading />}>
                         <ExperimentBackground />
-                        <Experiment />
+                        <Experiment isMobile={isMobile} />
                     </Suspense>
                     <OrbitControls />
                 </Canvas>
