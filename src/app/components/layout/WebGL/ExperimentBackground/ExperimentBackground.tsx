@@ -20,7 +20,7 @@ const ExperimentBackground = ({ color = '#a6a6a6' }: Props) => {
     });
 
     return (
-        <mesh scale={[scale, scale, scale]}>
+        <mesh scale={[scale, scale, scale]} frustumCulled={false}>
             <sphereGeometry args={[1, 1, 256, 256]} />
             <shaderMaterial
                 ref={material}
