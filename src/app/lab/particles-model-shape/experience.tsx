@@ -232,7 +232,7 @@ const Experience = () => {
                         position: [0, 0, 50],
                         fov: 45,
                         near: 0.1,
-                        far: 100,
+                        far: 1000,
                     }}
                     gl={{ alpha: false, antialias: false }}
                 >

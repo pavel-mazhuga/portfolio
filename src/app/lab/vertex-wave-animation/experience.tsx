@@ -64,7 +64,7 @@ const Experience = () => {
                         position: [0, 0, 1.8],
                         fov: 45,
                         near: 0.1,
-                        far: 100,
+                        far: 1000,
                     }}
                 >
                     <Suspense fallback={<PageLoading />}>

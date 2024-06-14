@@ -26,7 +26,7 @@ const WebGL = () => {
                     position: [0, 2, 20],
                     fov: 35,
                     near: 1,
-                    far: 100,
+                    far: 1000,
                 }}
                 // gl={(canvas) => {
                 //     const renderer = new WebGLRenderer({ canvas, antialias: false });
