@@ -1,6 +1,6 @@
 import { ShaderMaterial, Texture } from 'three';
-import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 export default class NoiseMatCapMaterial extends ShaderMaterial {
     constructor(texture: Texture, offset: number) {

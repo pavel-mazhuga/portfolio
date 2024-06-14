@@ -1,22 +1,22 @@
-import { ImageShape } from '@/types';
-import planeWavePreview from '@/app/lab/plane-wave/preview.jpeg';
-import displacedTorusPreview from '@/app/lab/displaced-torus/preview.jpeg';
 import animatedBlobPreview from '@/app/lab/animated-blob/preview.jpeg';
-import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/preview.jpeg';
-import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
-import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
-import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
-import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
-import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
-import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
-import distortedScrollerPreview from '@/app/lab/distorted-scroller/preview.jpeg';
-import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
-import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
-import fboParticlesPreview from '@/app/lab/fbo-particles/preview.jpeg';
-import fboParticlesMorphingPreview from '@/app/lab/fbo-particles-morphing/preview.jpeg';
-import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
-import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-trail/preview.jpeg';
 import displacedSphere2Preview from '@/app/lab/displaced-sphere-2/preview.jpeg';
+import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
+import displacedTorusPreview from '@/app/lab/displaced-torus/preview.jpeg';
+import distortedScrollerPreview from '@/app/lab/distorted-scroller/preview.jpeg';
+import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
+import fboParticlesMorphingPreview from '@/app/lab/fbo-particles-morphing/preview.jpeg';
+import fboParticlesPreview from '@/app/lab/fbo-particles/preview.jpeg';
+import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
+import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
+import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
+import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
+import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
+import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-trail/preview.jpeg';
+import planeWavePreview from '@/app/lab/plane-wave/preview.jpeg';
+import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/preview.jpeg';
+import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
+import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
+import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     {

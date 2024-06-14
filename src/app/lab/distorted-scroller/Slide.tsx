@@ -1,11 +1,11 @@
+import { useScroll, useTexture } from '@react-three/drei';
+import { MeshProps, useFrame } from '@react-three/fiber';
 import { forwardRef, useRef } from 'react';
 import { Mesh, SRGBColorSpace, ShaderMaterial, Vector2 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import { MeshProps, useFrame } from '@react-three/fiber';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
-import { useScroll, useTexture } from '@react-three/drei';
 import { remap } from '@/utils/math';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 type Props = MeshProps & {
     src: string;

@@ -1,6 +1,6 @@
 import { BufferGeometry, DataTexture, FloatType, RGBAFormat, ShaderMaterial, Vector2, Vector3 } from 'three';
-import simulationVertexShader from './shaders/simulation-vertex.glsl';
 import simulationFragmentShader from './shaders/simulation-fragment.glsl';
+import simulationVertexShader from './shaders/simulation-vertex.glsl';
 
 let done = false;
 

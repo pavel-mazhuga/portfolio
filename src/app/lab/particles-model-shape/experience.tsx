@@ -1,6 +1,8 @@
 'use client';
 
+import { useFBO, useGLTF } from '@react-three/drei';
 import { Canvas, createPortal, extend, useFrame, useThree } from '@react-three/fiber';
+import { useControls } from 'leva';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import {
     AdditiveBlending,
@@ -18,17 +20,15 @@ import {
     ShaderMaterial,
     Vector2,
 } from 'three';
-import { v4 as uuidv4 } from 'uuid';
-import { useControls } from 'leva';
 import { useMediaQuery } from 'usehooks-ts';
-import { useFBO, useGLTF } from '@react-three/drei';
-import ExperimentLayout from '../ExperimentLayout';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
+import { v4 as uuidv4 } from 'uuid';
 import PageLoading from '@/app/components/shared/PageLoading';
+import { lerp } from '@/utils/lerp';
+import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
 import { SimulationMaterial as SMat } from './SimulationMaterial';
-import { lerp } from '@/utils/lerp';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 extend({ SMat });
 

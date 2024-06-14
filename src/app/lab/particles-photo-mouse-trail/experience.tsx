@@ -1,6 +1,8 @@
 'use client';
 
+import { useDetectGPU, useTexture } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useControls } from 'leva';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import {
     BufferAttribute,
@@ -15,13 +17,11 @@ import {
     Vector2,
 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import { useDetectGPU, useTexture } from '@react-three/drei';
-import { useControls } from 'leva';
-import ExperimentLayout from '../ExperimentLayout';
 import PageLoading from '@/app/components/shared/PageLoading';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
+import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 const createDisplacementCanvas = (width: number, height: number) => {
     const canvas = document.createElement('canvas');

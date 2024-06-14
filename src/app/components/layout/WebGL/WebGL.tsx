@@ -1,11 +1,11 @@
 'use client';
 
-import { WebGLRenderer } from 'three';
+import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import round from 'lodash.round';
 // import { Canvas } from '@react-three/offscreen';
 import { useState } from 'react';
-import { PerformanceMonitor } from '@react-three/drei';
-import round from 'lodash.round';
+import { WebGLRenderer } from 'three';
 import MainScene from './MainScene';
 
 // const MainScene = lazy(() => import('./MainScene'));

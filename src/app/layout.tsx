@@ -1,11 +1,11 @@
-import '../css/app.scss';
-import type { Metadata } from 'next';
-import Providers from '@/app/components/layout/Providers';
-import Header from '@/app/components/layout/Header';
+import type { Metadata, Viewport } from 'next';
 import Footer from '@/app/components/layout/Footer';
+import Header from '@/app/components/layout/Header';
+import Providers from '@/app/components/layout/Providers';
 import LayoutGrid from '@/app/components/utils/LayoutGrid';
-import Html from './Html';
+import '../css/app.scss';
 import HideInterface from './HideInterface';
+import Html from './Html';
 import Metrics from './Metrics';
 
 const WEBSITE_NAME = 'Pavel Mazhuga — creative frontend developer';
@@ -19,10 +19,6 @@ export const metadata: Metadata = {
         template: `%s — ${WEBSITE_NAME}`,
     },
     description: WEBSITE_DESCRIPTION,
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-    },
     icons: {
         icon: '/favicon.png',
         // apple: '/apple-touch-icon.png',
@@ -46,6 +42,11 @@ export const metadata: Metadata = {
         description: WEBSITE_DESCRIPTION,
         images: [WEBSITE_OG_IMAGE],
     },
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {

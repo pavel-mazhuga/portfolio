@@ -9,7 +9,10 @@
     background-repeat: no-repeat;
     background-size: var(--bg-size);
     display: inline;
-    transition: background-size 0.4s easeOutCubic, color 0.25s easeOutCubic, opacity 0.25s easeOutCubic;
+    transition:
+        background-size 0.4s easeOutCubic,
+        color 0.25s easeOutCubic,
+        opacity 0.25s easeOutCubic;
 
     @include hover {
         background-size: var(--bg-size-hover);

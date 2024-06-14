@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useDebounce<T = any>(value: any, delay: number) {
     // Состояние и сеттер для отложенного значения

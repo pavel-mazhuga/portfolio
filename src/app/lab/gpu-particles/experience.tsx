@@ -1,15 +1,15 @@
 'use client';
 
 import { Canvas, useFrame } from '@react-three/fiber';
+import { useControls } from 'leva';
 import { Suspense, useMemo, useRef } from 'react';
 import { AdditiveBlending, BufferGeometry, MathUtils, Points, ShaderMaterial, Vector2 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import { useControls } from 'leva';
-import ExperimentLayout from '../ExperimentLayout';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
 import PageLoading from '@/app/components/shared/PageLoading';
+import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);

@@ -1,16 +1,16 @@
 'use client';
 
+import { OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useControls } from 'leva';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { AdditiveBlending, Color, PlaneGeometry, Points, ShaderMaterial, Vector2 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import ExperimentLayout from '../ExperimentLayout';
 import PageLoading from '@/app/components/shared/PageLoading';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
-import { useControls } from 'leva';
+import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
-import { OrbitControls } from '@react-three/drei';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 const Experiment = () => {
     const plane = useRef<Points<PlaneGeometry, ShaderMaterial>>(null);

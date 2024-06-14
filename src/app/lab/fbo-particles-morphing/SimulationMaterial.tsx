@@ -1,6 +1,6 @@
 import { DataTexture, FloatType, MathUtils, RGBAFormat, ShaderMaterial } from 'three';
-import simulationVertexShader from './shaders/simulation-vertex.glsl';
 import simulationFragmentShader from './shaders/simulation-fragment.glsl';
+import simulationVertexShader from './shaders/simulation-vertex.glsl';
 
 const getRandomDataSphere = (width: number, height: number) => {
     const length = width * height * 4;

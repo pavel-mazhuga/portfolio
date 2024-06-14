@@ -5,9 +5,9 @@ import { Canvas, MeshProps, extend, useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { IcosahedronGeometry, Mesh, ShaderMaterial } from 'three';
 import { v4 as uuidv4 } from 'uuid';
+import glowyImg from '@/../public/img/glowy.png';
 import ExperimentLayout from '../ExperimentLayout';
 import NoiseMatCapMaterial from './noise-matcap-material';
-import glowyImg from '@/../public/img/glowy.png';
 
 type NoiseSphereProps = MeshProps & {
     frequency: number;

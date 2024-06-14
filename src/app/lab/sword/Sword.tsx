@@ -1,7 +1,7 @@
 import { useGLTF } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
-import SwordParticles from './SwordParticles';
 import { Color } from 'three';
+import SwordParticles from './SwordParticles';
 
 const Sword = (props: GroupProps) => {
     const { nodes, materials } = useGLTF('/gltf/fantasy_sword.glb') as any;

@@ -4,5 +4,8 @@
     "semi": true,
     "singleQuote": true,
     "arrowParens": "always",
-    "printWidth": 120
+    "printWidth": 120,
+    "importOrder": ["<THIRD_PARTY_MODULES>", "^@/(.*)$", "^[./]"],
+    "importOrderSortSpecifiers": true,
+    "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }

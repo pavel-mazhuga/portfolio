@@ -1,12 +1,12 @@
 'use client';
 
-import { Canvas, useThree } from '@react-three/fiber';
 import { Scroll, ScrollControls } from '@react-three/drei';
-import { Vector2 } from 'three';
+import { Canvas, useThree } from '@react-three/fiber';
 import { useMemo } from 'react';
+import { Vector2 } from 'three';
+import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import ExperimentLayout from '../ExperimentLayout';
 import Slider from './Slider';
-import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 
 const Experiment = () => {
     const images = [

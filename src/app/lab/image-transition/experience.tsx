@@ -1,17 +1,17 @@
 'use client';
 
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useTexture } from '@react-three/drei';
-import { Mesh, PlaneGeometry, SRGBColorSpace, ShaderMaterial, Vector2 } from 'three';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useControls } from 'leva';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Mesh, PlaneGeometry, SRGBColorSpace, ShaderMaterial, Vector2 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import ExperimentLayout from '../ExperimentLayout';
-import PageLoading from '@/app/components/shared/PageLoading';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
+import PageLoading from '@/app/components/shared/PageLoading';
+import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 const Experiment = () => {
     const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);

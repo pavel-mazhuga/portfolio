@@ -1,7 +1,7 @@
 import { GroupProps } from '@react-three/fiber';
-import { forwardRef, Suspense, useRef } from 'react';
-import { mergeRefs } from '@/utils/merge-refs';
+import { Suspense, forwardRef, useRef } from 'react';
 import { BoxGeometry, Color, Group, Material, MeshBasicMaterial } from 'three';
+import { mergeRefs } from '@/utils/merge-refs';
 import StandImageScreen from './StandImageScreen';
 
 interface Props extends GroupProps {

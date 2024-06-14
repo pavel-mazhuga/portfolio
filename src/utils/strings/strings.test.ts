@@ -1,4 +1,4 @@
-import { withLeadingZero, trimDecimal, deleteGetParams, formatTimeInSeconds } from '.';
+import { deleteGetParams, formatTimeInSeconds, trimDecimal, withLeadingZero } from '.';
 
 describe('strings', () => {
     test('withLeadingZero', () => {

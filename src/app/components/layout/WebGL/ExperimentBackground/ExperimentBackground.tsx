@@ -2,8 +2,8 @@ import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { BackSide, Color, ColorRepresentation, ShaderMaterial } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 type Props = {
     color?: ColorRepresentation;

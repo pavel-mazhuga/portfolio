@@ -1,13 +1,13 @@
 'use client';
 
+import { Environment, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Suspense } from 'react';
-import { Environment, OrbitControls } from '@react-three/drei';
-import ExperimentLayout from '../ExperimentLayout';
-import PageLoading from '@/app/components/shared/PageLoading';
-import Sword from './Sword';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground/ExperimentBackground';
+import PageLoading from '@/app/components/shared/PageLoading';
+import ExperimentLayout from '../ExperimentLayout';
 import Effects from './Effects';
+import Sword from './Sword';
 
 const Experiment = () => {
     return <Sword position={[-0.3, 0, 0]} rotation={[0, Math.PI / 2, Math.PI / 2]} />;

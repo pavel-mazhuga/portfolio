@@ -17,10 +17,10 @@ import {
     Vector3,
 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
-import simulationVertexShader from './shaders/simulation-vertex.glsl';
-import simulationFragmentShader from './shaders/simulation-fragment.glsl';
-import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
+import simulationFragmentShader from './shaders/simulation-fragment.glsl';
+import simulationVertexShader from './shaders/simulation-vertex.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 type Props = PointsProps & {
     particleGeometry: BufferGeometry;

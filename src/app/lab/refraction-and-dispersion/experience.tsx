@@ -1,14 +1,14 @@
 'use client';
 
-import { Image as WebglImage, OrbitControls, useFBO, useTexture } from '@react-three/drei';
+import { OrbitControls, Image as WebglImage, useFBO, useTexture } from '@react-three/drei';
 import { Canvas, MeshProps, useFrame } from '@react-three/fiber';
-import { v4 as uuidv4 } from 'uuid';
 import { useMemo, useRef } from 'react';
 import { BufferGeometry, FrontSide, Mesh, ShaderMaterial, Vector2, Vector3 } from 'three';
-import ExperimentLayout from '../ExperimentLayout';
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
+import { v4 as uuidv4 } from 'uuid';
 import { viewport } from '@/utils/viewport';
+import ExperimentLayout from '../ExperimentLayout';
+import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.glsl';
 
 const BackgroundImage = () => {
     const texture = useTexture(

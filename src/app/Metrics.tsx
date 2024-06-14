@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-before-interactive-script-outside-document */
-
 'use client';
 
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 import { useEffect } from 'react';
+
+/* eslint-disable @next/next/no-before-interactive-script-outside-document */
 
 export const YM_ID = 93587310;
 

@@ -1,12 +1,12 @@
 'use client';
 
+import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { BoxGeometry, Group, MeshBasicMaterial, PointLight } from 'three';
 import { useMapRefs } from '@/hooks/use-map-refs';
+import CameraMovement from './CameraMovement';
 import Stand from './Stand';
 import Walls from './Walls';
-import { AdaptiveDpr, Preload, ScrollControls } from '@react-three/drei';
-import CameraMovement from './CameraMovement';
 
 const portfolio = [
     {

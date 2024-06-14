@@ -1,6 +1,6 @@
-import { PlaneGeometry, ShaderMaterial, Vector2 } from 'three';
 import { GroupProps } from '@react-three/fiber';
 import { useMemo } from 'react';
+import { PlaneGeometry, ShaderMaterial, Vector2 } from 'three';
 import Slide from './Slide';
 
 type Props = GroupProps & {

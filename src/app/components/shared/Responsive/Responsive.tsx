@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { Children, cloneElement, HTMLAttributes, isValidElement, ReactElement } from 'react';
+import { Children, HTMLAttributes, ReactElement, cloneElement, isValidElement } from 'react';
 
 interface Props extends HTMLAttributes<HTMLElement> {}
 
