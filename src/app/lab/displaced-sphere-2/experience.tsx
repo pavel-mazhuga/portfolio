@@ -19,7 +19,7 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     const { gradientStrength, color, speed, noiseStrength, displacementStrength, fractAmount, remapPowerRange } =
         useControls({
             gradientStrength: {
-                value: 1,
+                value: 1.3,
                 min: 1,
                 max: 3,
                 step: 0.001,
