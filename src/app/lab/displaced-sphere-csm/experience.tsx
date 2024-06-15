@@ -48,12 +48,13 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
         iridescence,
     } = useControls({
         gradientStrength: {
-            value: 1.3,
+            value: 1,
             min: 1,
             max: 3,
             step: 0.001,
         },
-        color: '#fff900',
+        // color: '#fff900',
+        color: '#af00ff',
         speed: {
             value: 1.1,
             min: 0,
@@ -87,37 +88,43 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
             min: 0,
             max: 1,
             step: 0.001,
-            value: 0.5,
+            // value: 0.5,
+            value: 0.56,
         },
         metalness: {
             min: 0,
             max: 1,
             step: 0.001,
-            value: 0.5,
+            // value: 0.5,
+            value: 0.76,
         },
         clearcoat: {
             min: 0,
             max: 1,
             step: 0.001,
-            value: 0.33,
+            // value: 0.33,
+            value: 0,
         },
         reflectivity: {
             min: 0,
             max: 1,
             step: 0.001,
-            value: 0.5,
+            // value: 0.5,
+            value: 0.46,
         },
         ior: {
             min: 0.001,
             max: 5,
             step: 0.001,
-            value: 1.5,
+            // value: 1.5,
+            value: 2.81,
         },
         iridescence: {
             min: 0,
             max: 1,
             step: 0.001,
-            value: 0.15,
+            // value: 0.15,
+            value: 0.96,
         },
     });
 
@@ -140,7 +147,8 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     } = useControls('Directional light', {
         color: '#fff',
         intensity: {
-            value: 3,
+            // value: 3,
+            value: 5,
             min: 0,
             max: 5,
             step: 0.001,
