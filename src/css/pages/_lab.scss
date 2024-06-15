@@ -25,6 +25,14 @@
     }
 }
 
+.experiments-list__item {
+    display: flex;
+
+    > .experiments-list-item {
+        width: 100%;
+    }
+}
+
 .experiments-list-item {
     --filter-value: 0;
     display: flex;
