@@ -6,7 +6,6 @@ import { useControls } from 'leva';
 import { Suspense, useRef } from 'react';
 import { Color, Mesh, PlaneGeometry, ShaderMaterial, Vector3 } from 'three';
 import { useMediaQuery } from 'usehooks-ts';
-import { v4 as uuidv4 } from 'uuid';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
 import PageLoading from '@/app/components/shared/PageLoading';
 import ExperimentLayout from '../ExperimentLayout';
@@ -20,7 +19,7 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     const { gradientStrength, color, speed, noiseStrength, displacementStrength, fractAmount, remapPowerRange } =
         useControls({
             gradientStrength: {
-                value: 1.3,
+                value: 1,
                 min: 1,
                 max: 3,
                 step: 0.001,
