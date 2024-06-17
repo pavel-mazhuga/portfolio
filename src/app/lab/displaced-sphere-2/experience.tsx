@@ -105,7 +105,7 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     });
 
     return (
-        <mesh ref={plane}>
+        <mesh ref={plane} matrixAutoUpdate={false}>
             <icosahedronGeometry args={[1.3, isMobile ? 180 : 256]} />
             <shaderMaterial
                 uniforms={{
