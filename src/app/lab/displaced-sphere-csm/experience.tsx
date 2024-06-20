@@ -179,16 +179,27 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
         return g;
     }, [isMobile]);
 
+    const uniforms = {
+        uTime: { value: 0 },
+        uColor: { value: new Color(color) },
+        uGradientStrength: { value: gradientStrength },
+        uAmbientLightColor: { value: new Color(ambientLightColor) },
+        uAmbientLightIntensity: { value: ambientLightIntensity },
+        uDirectionalLightColor: { value: new Color(directionalLightColor) },
+        uDirectionalLightIntensity: { value: directionalLightIntensity },
+        uDirectionalLightPosition: {
+            value: new Vector3(directionalLightPositionX, directionalLightPositionY, directionalLightPositionZ),
+        },
+        uSpeed: { value: speed },
+        uNoiseStrength: { value: noiseStrength },
+        uDisplacementStrength: { value: displacementStrength },
+        uFractAmount: { value: fractAmount },
+        uRemapPower: { value: remapPowerRange },
+    };
+
     return (
         <>
             <mesh geometry={geometry} matrixAutoUpdate={false} frustumCulled={false}>
-                <CustomShaderMaterial
-                    baseMaterial={MeshDepthMaterial}
-                    vertexShader={vertexShader}
-                    silent
-                    depthPacking={RGBADepthPacking}
-                    attach="customDepthMaterial"
-                />
                 <CustomShaderMaterial
                     ref={materialRef}
                     baseMaterial={MeshPhysicalMaterial}
@@ -201,27 +212,15 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
                     clearcoat={clearcoat}
                     ior={ior}
                     iridescence={iridescence}
-                    uniforms={{
-                        uTime: { value: 0 },
-                        uColor: { value: new Color(color) },
-                        uGradientStrength: { value: gradientStrength },
-                        uAmbientLightColor: { value: new Color(ambientLightColor) },
-                        uAmbientLightIntensity: { value: ambientLightIntensity },
-                        uDirectionalLightColor: { value: new Color(directionalLightColor) },
-                        uDirectionalLightIntensity: { value: directionalLightIntensity },
-                        uDirectionalLightPosition: {
-                            value: new Vector3(
-                                directionalLightPositionX,
-                                directionalLightPositionY,
-                                directionalLightPositionZ,
-                            ),
-                        },
-                        uSpeed: { value: speed },
-                        uNoiseStrength: { value: noiseStrength },
-                        uDisplacementStrength: { value: displacementStrength },
-                        uFractAmount: { value: fractAmount },
-                        uRemapPower: { value: remapPowerRange },
-                    }}
+                    uniforms={uniforms}
+                />
+                <CustomShaderMaterial
+                    baseMaterial={MeshDepthMaterial}
+                    vertexShader={vertexShader}
+                    uniforms={uniforms}
+                    silent
+                    depthPacking={RGBADepthPacking}
+                    attach="customDepthMaterial"
                 />
             </mesh>
             <ambientLight color={ambientLightColor} intensity={ambientLightIntensity} />
