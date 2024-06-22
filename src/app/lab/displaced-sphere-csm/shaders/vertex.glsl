@@ -1,5 +1,4 @@
 #pragma glslify: smoothMod = require('../../../glsl-utils/smoothmod.glsl')
-#pragma glslify: remap = require('../../../glsl-utils/remap.glsl')
 
 attribute vec4 tangent;
 
@@ -10,16 +9,15 @@ uniform float uSpeed;
 uniform float uNoiseStrength;
 uniform float uDisplacementStrength;
 uniform float uFractAmount;
-uniform float[2] uRemapPower;
 
-#include "../../../../../lygia/generative/snoise.glsl"
+#include "../../../../../lygia/generative/cnoise.glsl"
 
 float getDisplacement(vec3 position) {
     vec3 pos = position;
     pos.y -= uTime * 0.05 * uSpeed;
-    pos += snoise3(pos) * uNoiseStrength;
+    pos += cnoise(pos * 1.65) * uNoiseStrength;
 
-    return remap(smoothMod(pos.y * uFractAmount, 1., 1.5), uRemapPower[0], uRemapPower[1], 0., 1.) * uDisplacementStrength;
+    return smoothMod(pos.y * uFractAmount, 1., 1.5) * uDisplacementStrength;
 }
 
 void main() {
