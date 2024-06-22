@@ -25,10 +25,17 @@ import vertexShader from './shaders/vertex.glsl';
 
 const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     const materialRef = useRef<ShaderMaterial>(null);
+    const depthMaterialRef = useRef<ShaderMaterial>(null);
 
     useFrame(({ clock }) => {
+        const elapsedTime = clock.getElapsedTime();
+
         if (materialRef.current) {
-            materialRef.current.uniforms.uTime.value = clock.elapsedTime;
+            materialRef.current.uniforms.uTime.value = elapsedTime;
+        }
+
+        if (depthMaterialRef.current) {
+            depthMaterialRef.current.uniforms.uTime.value = elapsedTime;
         }
     });
 
@@ -183,13 +190,6 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
         uTime: { value: 0 },
         uColor: { value: new Color(color) },
         uGradientStrength: { value: gradientStrength },
-        uAmbientLightColor: { value: new Color(ambientLightColor) },
-        uAmbientLightIntensity: { value: ambientLightIntensity },
-        uDirectionalLightColor: { value: new Color(directionalLightColor) },
-        uDirectionalLightIntensity: { value: directionalLightIntensity },
-        uDirectionalLightPosition: {
-            value: new Vector3(directionalLightPositionX, directionalLightPositionY, directionalLightPositionZ),
-        },
         uSpeed: { value: speed },
         uNoiseStrength: { value: noiseStrength },
         uDisplacementStrength: { value: displacementStrength },
@@ -215,6 +215,7 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
                     uniforms={uniforms}
                 />
                 <CustomShaderMaterial
+                    ref={depthMaterialRef}
                     baseMaterial={MeshDepthMaterial}
                     vertexShader={vertexShader}
                     uniforms={uniforms}
