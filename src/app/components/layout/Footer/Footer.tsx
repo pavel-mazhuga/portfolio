@@ -7,7 +7,7 @@ const Footer = () => {
                 rel="noreferrer"
                 className="link link--underlined footer-availability pointer-events-auto"
             >
-                Available for work from July 2024
+                Available for work
             </a>
             <ul className="list-unstyled soc-list footer-soc-list pointer-events-auto">
                 {/* <li className="soc-list__item">
