@@ -10,11 +10,11 @@ const Footer = () => {
                 Available for work from July 2024
             </a>
             <ul className="list-unstyled soc-list footer-soc-list pointer-events-auto">
-                <li className="soc-list__item">
+                {/* <li className="soc-list__item">
                     <a href="mailto:pavelmazhuga.gl@gmail.com" target="_blank" rel="noreferrer" className="link">
                         Email
                     </a>
-                </li>
+                </li> */}
                 <li className="soc-list__item">
                     <a href="https://www.instagram.com/mazhuga.gl/" target="_blank" rel="noreferrer" className="link">
                         Instagram
