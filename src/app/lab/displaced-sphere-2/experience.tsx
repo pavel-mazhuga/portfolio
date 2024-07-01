@@ -14,7 +14,7 @@ import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
 
 const Experiment = ({ isMobile }: { isMobile: boolean }) => {
-    const plane = useRef<Mesh<PlaneGeometry, ShaderMaterial>>(null);
+    const materialRef = useRef<ShaderMaterial>(null);
 
     const { gradientStrength, color, speed, noiseStrength, displacementStrength, fractAmount, remapPowerRange } =
         useControls({
@@ -101,13 +101,16 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
     });
 
     useFrame(({ clock }) => {
-        plane.current!.material.uniforms.uTime.value = clock.getElapsedTime();
+        if (materialRef.current) {
+            materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
+        }
     });
 
     return (
-        <mesh ref={plane} matrixAutoUpdate={false}>
+        <mesh matrixAutoUpdate={false} frustumCulled={false}>
             <icosahedronGeometry args={[1.3, isMobile ? 180 : 256]} />
             <shaderMaterial
+                ref={materialRef}
                 uniforms={{
                     uTime: { value: 0 },
                     uColor: { value: new Color(color) },
