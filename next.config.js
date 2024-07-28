@@ -13,7 +13,7 @@ const nextConfig = withBundleAnalyzer({
     //     ignoreBuildErrors: true,
     // },
     images: {
-        formats: ['image/avif', 'image/webp'],
+        formats: ['image/webp'],
         // domains: [],
         minimumCacheTTL: 60 * 60 * 24 * 60 * 3, // хранить сгенерированные изображения в кэше 3 месяца
     },
@@ -59,6 +59,11 @@ const nextConfig = withBundleAnalyzer({
             test: /\.(glsl|frag|vert)$/,
             use: [require.resolve('@davcri/webpack-glsl-loader'), require.resolve('glslify-loader')],
         });
+
+        config.experiments = {
+            topLevelAwait: true,
+            layers: true,
+        };
 
         return config;
     },

@@ -14,7 +14,7 @@ import {
     Vector3,
 } from 'three';
 import CustomShaderMaterial from 'three-custom-shader-material';
-import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { useMediaQuery } from 'usehooks-ts';
 import ExperimentBackground from '@/app/components/layout/WebGL/ExperimentBackground';
 import PageLoading from '@/app/components/shared/PageLoading';
