@@ -1,7 +1,6 @@
 #pragma glslify: smoothMod = require('../../../glsl-utils/smoothmod.glsl')
 #pragma glslify: remap = require('../../../glsl-utils/remap.glsl')
 
-varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vViewDirection;
 varying vec3 vEyeVector;
@@ -17,7 +16,6 @@ uniform float[2] uRemapPower;
 #include "../../../../../lygia/generative/snoise.glsl"
 
 void main() {
-    vUv = uv;
     vNormal = normal;
 
     vec3 coords = normal;
