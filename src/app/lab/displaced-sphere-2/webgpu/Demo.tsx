@@ -26,6 +26,7 @@ import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
 import { ambientLightNode } from '@/utils/webgpu/nodes/lighting/ambient';
 import { directionalLightNode } from '@/utils/webgpu/nodes/lighting/directional';
+import { cnoise } from '@/utils/webgpu/nodes/noise/cnoise';
 import { snoise3 } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
 import { remapNode } from '@/utils/webgpu/nodes/remap';
 import { smoothMod } from '@/utils/webgpu/nodes/smooth-mod';
@@ -171,6 +172,7 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
             const coords = normalLocal.toVar();
             coords.y.subAssign(timer.mul(0.05));
             coords.addAssign(snoise3(coords).mul(uniforms.noiseStrength));
+            // coords.addAssign(cnoise(coords).mul(uniforms.noiseStrength));
 
             const pattern = remapNode(
                 smoothMod(coords.y.mul(uniforms.fractAmount), 1, 1.5),
