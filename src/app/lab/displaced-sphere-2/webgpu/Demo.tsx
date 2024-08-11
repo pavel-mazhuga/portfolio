@@ -1,11 +1,12 @@
 'use client';
 
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, useTexture } from '@react-three/drei';
 import { useControls } from 'leva';
 import { Suspense, useEffect, useMemo } from 'react';
 import {
     MeshBasicNodeMaterial,
     Node,
+    RepeatWrapping,
     ShaderNodeObject,
     cameraPosition,
     color,
@@ -14,6 +15,7 @@ import {
     positionLocal,
     positionViewDirection,
     pow,
+    texture,
     timerLocal,
     tslFn,
     uniform,
@@ -32,6 +34,10 @@ import { remapNode } from '@/utils/webgpu/nodes/remap';
 import { smoothMod } from '@/utils/webgpu/nodes/smooth-mod';
 
 const Demo = ({ isMobile }: { isMobile: boolean }) => {
+    const noiseTexture = useTexture('/img/perlin.png');
+    noiseTexture.wrapS = RepeatWrapping;
+    noiseTexture.wrapT = RepeatWrapping;
+
     const controls = useControls({
         gradientStrength: {
             value: 1.3,
@@ -169,10 +175,12 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
             vNormal.assign(normalLocal);
             vViewDirection.assign(positionViewDirection);
 
+            const noise = texture(noiseTexture, normalLocal.xy).toVar();
+
             const coords = normalLocal.toVar();
             coords.y.subAssign(timer.mul(0.05));
             coords.addAssign(snoise3(coords).mul(uniforms.noiseStrength));
-            // coords.addAssign(cnoise(coords).mul(uniforms.noiseStrength));
+            // coords.addAssign(noise.r.mul(uniforms.noiseStrength));
 
             const pattern = remapNode(
                 smoothMod(coords.y.mul(uniforms.fractAmount), 1, 1.5),
