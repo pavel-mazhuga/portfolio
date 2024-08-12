@@ -8,6 +8,7 @@ import {
     Node,
     RepeatWrapping,
     ShaderNodeObject,
+    abs,
     cameraPosition,
     color,
     normalLocal,
@@ -19,6 +20,7 @@ import {
     timerLocal,
     tslFn,
     uniform,
+    uv,
     varyingProperty,
     vec3,
     vec4,
@@ -175,12 +177,12 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
             vNormal.assign(normalLocal);
             vViewDirection.assign(positionViewDirection);
 
-            const noise = texture(noiseTexture, normalLocal.xy).toVar();
+            const noise = texture(noiseTexture, abs(uv().sub(0.5))).toVar();
 
             const coords = normalLocal.toVar();
             coords.y.subAssign(timer.mul(0.05));
-            coords.addAssign(snoise3(coords).mul(uniforms.noiseStrength));
-            // coords.addAssign(noise.r.mul(uniforms.noiseStrength));
+            // coords.addAssign(snoise3(coords).mul(uniforms.noiseStrength));
+            coords.addAssign(noise.r.mul(uniforms.noiseStrength));
 
             const pattern = remapNode(
                 smoothMod(coords.y.mul(uniforms.fractAmount), 1, 1.5),
