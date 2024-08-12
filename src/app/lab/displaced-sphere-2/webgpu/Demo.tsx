@@ -30,7 +30,6 @@ import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
 import { ambientLightNode } from '@/utils/webgpu/nodes/lighting/ambient';
 import { directionalLightNode } from '@/utils/webgpu/nodes/lighting/directional';
-import { cnoise } from '@/utils/webgpu/nodes/noise/cnoise';
 import { snoise3 } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
 import { remapNode } from '@/utils/webgpu/nodes/remap';
 import { smoothMod } from '@/utils/webgpu/nodes/smooth-mod';
