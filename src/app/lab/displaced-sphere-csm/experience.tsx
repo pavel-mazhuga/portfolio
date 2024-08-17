@@ -232,8 +232,8 @@ const Experience = () => {
 
     return (
         <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-csm">
+            <LevaWrapper />
             <div className="canvas-wrapper">
-                <LevaWrapper />
                 <Canvas
                     camera={{
                         position: [0, 0, isMobile ? 9 : 5],

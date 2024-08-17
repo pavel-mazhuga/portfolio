@@ -12,8 +12,8 @@ const Experience = () => {
             sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2/webgpu"
             webglVersion="/lab/displaced-sphere-2"
         >
+            <LevaWrapper />
             <div className="canvas-wrapper">
-                <LevaWrapper />
                 <Demo />
             </div>
         </ExperimentLayout>

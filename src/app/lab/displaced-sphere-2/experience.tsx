@@ -147,8 +147,8 @@ const Experience = () => {
             sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2"
             webgpuVersion="/lab/displaced-sphere-2/webgpu"
         >
+            <LevaWrapper />
             <div className="canvas-wrapper">
-                <LevaWrapper />
                 <Canvas
                     camera={{
                         position: [0, 0, isMobile ? 9 : 5],
