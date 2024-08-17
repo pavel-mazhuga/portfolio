@@ -2,7 +2,7 @@
 
 import { OrbitControls, useTexture } from '@react-three/drei';
 import { useControls } from 'leva';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import {
     MeshBasicNodeMaterial,
     Node,
@@ -39,129 +39,152 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
     noiseTexture.wrapS = RepeatWrapping;
     noiseTexture.wrapT = RepeatWrapping;
 
-    const controls = useControls({
+    useControls({
         gradientStrength: {
             value: 1.3,
             min: 1,
             max: 3,
             step: 0.001,
+            onChange: (val: number) => {
+                uniforms.gradientStrength.value = val;
+            },
         },
-        color: '#2994ff',
+        color: {
+            value: '#2994ff',
+            onChange: (val: string) => {
+                (uniforms.color.value as any).set(val);
+            },
+        },
         speed: {
             value: 1.1,
             min: 0,
             max: 20,
             step: 0.001,
+            onChange: (val: number) => {
+                uniforms.speed.value = val;
+            },
         },
         noiseStrength: {
             value: 1,
             min: 0,
             max: 3,
             step: 0.001,
+            onChange: (val: number) => {
+                uniforms.noiseStrength.value = val;
+            },
         },
         displacementStrength: {
             value: 0.3,
             min: 0,
             max: 1,
             step: 0.001,
+            onChange: (val: number) => {
+                uniforms.displacementStrength.value = val;
+            },
         },
         fractAmount: {
             value: 6,
             min: 0,
             max: 10,
             step: 1,
+            onChange: (val: number) => {
+                uniforms.fractAmount.value = val;
+            },
         },
-        remapPowerRange: {
-            min: 0,
-            max: 1,
-            value: [0.4, 0.7],
-        },
+        // remapPowerRange: {
+        //     min: 0,
+        //     max: 1,
+        //     value: [0.4, 0.7],
+        //     onChange: (val: [number, number]) => {
+        //         uniforms.remapPowerRange.value = val;
+        //     },
+        // },
     });
 
-    const ambientLightControls = useControls('Ambient light', {
-        color: '#fff',
+    useControls('Ambient light', {
+        color: {
+            value: '#fff',
+            onChange: (val: string) => {
+                (uniforms.ambientLight.color.value as any).set(val);
+            },
+        },
         intensity: {
-            value: 0.35,
+            value: 0.3,
             min: 0,
             max: 1,
             step: 0.001,
+            onChange: (val: number) => {
+                uniforms.ambientLight.intensity.value = val;
+            },
         },
     });
 
-    const directionalLightControls = useControls('Directional light', {
-        color: '#fff',
+    useControls('Directional light', {
+        color: {
+            value: '#fff',
+            onChange: (val: string) => {
+                (uniforms.directionalLight.color.value as any).set(val);
+            },
+        },
         intensity: {
             value: 1,
             min: 0,
             max: 5,
             step: 0.001,
+            onChange: (val: number) => {
+                uniforms.directionalLight.intensity.value = val;
+            },
         },
         positionX: {
             value: -2,
             min: -10,
             max: 10,
             step: 0.001,
+            onChange: (val: number) => {
+                (uniforms.directionalLight.position.value as any).x = val;
+            },
         },
         positionY: {
             value: 2,
             min: -10,
             max: 10,
             step: 0.001,
+            onChange: (val: number) => {
+                (uniforms.directionalLight.position.value as any).y = val;
+            },
         },
         positionZ: {
             value: 3.5,
             min: -10,
             max: 10,
             step: 0.001,
+            onChange: (val: number) => {
+                (uniforms.directionalLight.position.value as any).z = val;
+            },
         },
     });
 
     const uniforms = useMemo(
         () => ({
-            color: uniform(color(controls.color)),
-            gradientStrength: uniform(controls.gradientStrength),
-            speed: uniform(controls.speed),
-            noiseStrength: uniform(controls.noiseStrength),
-            displacementStrength: uniform(controls.displacementStrength),
-            fractAmount: uniform(controls.fractAmount),
-            remapPowerRange: uniform(controls.remapPowerRange),
+            color: uniform(color('#2994ff')),
+            gradientStrength: uniform(1.3),
+            speed: uniform(1.1),
+            noiseStrength: uniform(1),
+            displacementStrength: uniform(0.3),
+            fractAmount: uniform(6),
+            // remapPowerRange: uniform([0.4, 0.7]),
             ambientLight: {
-                color: uniform(color(ambientLightControls.color)),
-                intensity: uniform(ambientLightControls.intensity),
+                color: uniform(color('#fff')),
+                intensity: uniform(0.3),
             },
             directionalLight: {
-                color: uniform(color(directionalLightControls.color)),
-                intensity: uniform(directionalLightControls.intensity),
-                position: uniform(
-                    vec3(
-                        directionalLightControls.positionX,
-                        directionalLightControls.positionY,
-                        directionalLightControls.positionZ,
-                    ),
-                ),
+                color: uniform(color('#fff')),
+                intensity: uniform(1),
+                position: uniform(vec3(-2, 2, 3.5)),
             },
         }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
-
-    useEffect(() => {
-        // uniforms.directionalLight.position.value = vec3(
-        //     directionalLightControls.positionX,
-        //     directionalLightControls.positionY,
-        //     directionalLightControls.positionZ,
-        // );
-        uniforms.ambientLight.intensity.value = ambientLightControls.intensity;
-    }, [uniforms, ambientLightControls]);
-
-    useEffect(() => {
-        // uniforms.directionalLight.position.value = vec3(
-        //     directionalLightControls.positionX,
-        //     directionalLightControls.positionY,
-        //     directionalLightControls.positionZ,
-        // );
-        uniforms.directionalLight.intensity.value = directionalLightControls.intensity;
-    }, [uniforms, directionalLightControls]);
 
     const nodeMaterial = useMemo(() => {
         const material = new MeshBasicNodeMaterial();
@@ -228,7 +251,7 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
         material.colorNode = colorNode();
 
         return material;
-    }, [uniforms]);
+    }, [uniforms, noiseTexture]);
 
     return (
         <mesh matrixAutoUpdate={false} frustumCulled={false} material={nodeMaterial}>
