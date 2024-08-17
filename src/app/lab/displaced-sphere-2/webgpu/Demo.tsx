@@ -1,14 +1,12 @@
 'use client';
 
-import { OrbitControls, useTexture } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
 import { Suspense, useMemo } from 'react';
 import {
     MeshBasicNodeMaterial,
     Node,
-    RepeatWrapping,
     ShaderNodeObject,
-    abs,
     cameraPosition,
     color,
     normalLocal,
@@ -16,11 +14,9 @@ import {
     positionLocal,
     positionViewDirection,
     pow,
-    texture,
     timerLocal,
     tslFn,
     uniform,
-    uv,
     varyingProperty,
     vec3,
     vec4,
@@ -30,15 +26,11 @@ import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
 import { ambientLightNode } from '@/utils/webgpu/nodes/lighting/ambient';
 import { directionalLightNode } from '@/utils/webgpu/nodes/lighting/directional';
-import { snoise3 } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
+import { simplexNoise4d } from '@/utils/webgpu/nodes/noise/simplexNoise4d';
 import { remapNode } from '@/utils/webgpu/nodes/remap';
 import { smoothMod } from '@/utils/webgpu/nodes/smooth-mod';
 
 const Demo = ({ isMobile }: { isMobile: boolean }) => {
-    const noiseTexture = useTexture('/img/perlin.png');
-    noiseTexture.wrapS = RepeatWrapping;
-    noiseTexture.wrapT = RepeatWrapping;
-
     useControls({
         gradientStrength: {
             value: 1.3,
@@ -199,12 +191,9 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
             vNormal.assign(normalLocal);
             vViewDirection.assign(positionViewDirection);
 
-            const noise = texture(noiseTexture, abs(uv().sub(0.5))).toVar();
-
             const coords = normalLocal.toVar();
             coords.y.subAssign(timer.mul(0.05));
-            // coords.addAssign(snoise3(coords).mul(uniforms.noiseStrength));
-            coords.addAssign(noise.r.mul(uniforms.noiseStrength));
+            coords.addAssign(simplexNoise4d(vec4(coords, 1)).mul(uniforms.noiseStrength));
 
             const pattern = remapNode(
                 smoothMod(coords.y.mul(uniforms.fractAmount), 1, 1.5),
@@ -251,7 +240,7 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
         material.colorNode = colorNode();
 
         return material;
-    }, [uniforms, noiseTexture]);
+    }, [uniforms]);
 
     return (
         <mesh matrixAutoUpdate={false} frustumCulled={false} material={nodeMaterial}>
