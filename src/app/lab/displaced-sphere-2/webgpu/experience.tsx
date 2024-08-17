@@ -8,7 +8,10 @@ const Demo = dynamic(() => import('./Demo'), { ssr: false });
 
 const Experience = () => {
     return (
-        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2/webgpu">
+        <ExperimentLayout
+            sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2/webgpu"
+            webglVersion="/lab/displaced-sphere-2"
+        >
             <div className="canvas-wrapper">
                 <LevaWrapper />
                 <Demo />

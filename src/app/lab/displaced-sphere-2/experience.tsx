@@ -143,7 +143,10 @@ const Experience = () => {
     const isMobile = useMediaQuery('(max-width: 1199px)');
 
     return (
-        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2">
+        <ExperimentLayout
+            sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/displaced-sphere-2"
+            webgpuVersion="/lab/displaced-sphere-2/webgpu"
+        >
             <div className="canvas-wrapper">
                 <LevaWrapper />
                 <Canvas

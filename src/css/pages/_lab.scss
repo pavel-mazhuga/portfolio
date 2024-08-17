@@ -74,11 +74,21 @@
     align-items: center;
 }
 
+.experiment__top-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
 .experiment-src-code-link {
     @include clickable();
-    margin-left: auto;
 
     svg {
         fill: currentColor;
     }
+}
+
+.experiment-link {
+    opacity: 0.7;
 }
