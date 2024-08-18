@@ -5,6 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useControls } from 'leva';
 import { Suspense, useMemo, useRef } from 'react';
 import { AdditiveBlending, BufferGeometry, Color, Points, ShaderMaterial } from 'three';
+import { v4 as uuidv4 } from 'uuid';
 import PageLoading from '@/app/components/shared/PageLoading';
 import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
@@ -106,7 +107,7 @@ const Experiment = () => {
                     />
                 </bufferGeometry>
                 <shaderMaterial
-                    key={vertexShader + fragmentShader}
+                    key={process.env.NODE_ENV === 'development' ? uuidv4() : undefined}
                     uniforms={uniforms}
                     vertexShader={vertexShader}
                     fragmentShader={fragmentShader}
