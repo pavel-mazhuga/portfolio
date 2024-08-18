@@ -1,42 +1,23 @@
 'use client';
 
-import { OrbitControls, useFBO } from '@react-three/drei';
-import { Canvas, createPortal, extend, useFrame } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useControls } from 'leva';
 import { Suspense, useMemo, useRef } from 'react';
-import {
-    AdditiveBlending,
-    BufferGeometry,
-    Color,
-    FloatType,
-    NearestFilter,
-    OrthographicCamera,
-    Points,
-    RGBAFormat,
-    Scene,
-    ShaderMaterial,
-} from 'three';
+import { AdditiveBlending, BufferGeometry, Color, Points, ShaderMaterial } from 'three';
 import PageLoading from '@/app/components/shared/PageLoading';
 import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
-import { SimulationMaterial } from './SimulationMaterial';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
-
-extend({ SimulationMaterial });
+import useGPGPU from './useGPGPU';
 
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
-    const simulationMaterialRef = useRef<SimulationMaterial>(null);
 
-    const {
-        count: size,
-        frequency,
-        speed,
-        color,
-    } = useControls({
+    const { count: size } = useControls({
         count: {
-            value: 800,
+            value: 500,
             min: 0,
             max: 1000,
             step: 1,
@@ -46,28 +27,34 @@ const Experiment = () => {
             min: 0,
             max: 1,
             step: 0.001,
+            onChange: (val: number) => {
+                if (simulationMeshRef.current) {
+                    simulationMeshRef.current.material.uniforms.uFrequency.value = val;
+                }
+            },
         },
         speed: {
             value: 0.07,
             min: 0,
             max: 1,
             step: 0.001,
+            onChange: (val: number) => {
+                if (simulationMeshRef.current) {
+                    simulationMeshRef.current.material.uniforms.uSpeed.value = val;
+                }
+            },
         },
-        color: '#04080d',
+        color: {
+            value: '#1c2631',
+            onChange: (val: string) => {
+                if (meshRef.current) {
+                    meshRef.current.material.uniforms.uColor.value.set(val);
+                }
+            },
+        },
     });
 
-    const scene = new Scene();
-    const fboCamera = new OrthographicCamera(-1, 1, 1, -1, 1 / Math.pow(2, 53), 1);
-    const positions = new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0]);
-    const uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0]);
-
-    const renderTarget = useFBO(size, size, {
-        minFilter: NearestFilter,
-        magFilter: NearestFilter,
-        format: RGBAFormat,
-        stencilBuffer: false,
-        type: FloatType,
-    });
+    const { renderOffscreen, compute, simulationMeshRef } = useGPGPU(size);
 
     const particlesPosition = useMemo(() => {
         const length = size * size;
@@ -77,6 +64,7 @@ const Experiment = () => {
             let i3 = i * 3;
             particles[i3 + 0] = (i % size) / size;
             particles[i3 + 1] = i / size / size;
+            particles[i3 + 2] = 0;
         }
 
         return particles;
@@ -94,34 +82,19 @@ const Experiment = () => {
     useFrame(({ gl, clock }) => {
         const time = clock.getElapsedTime();
 
-        gl.setRenderTarget(renderTarget);
-        gl.clear();
-        gl.render(scene, fboCamera);
-        gl.setRenderTarget(null);
+        const renderTarget = compute(gl);
 
         meshRef.current!.material.uniforms.uPositions.value = renderTarget.texture;
         meshRef.current!.material.uniforms.uTime.value = time;
 
-        simulationMaterialRef.current!.uniforms.uTime.value = time;
+        if (simulationMeshRef.current) {
+            simulationMeshRef.current.material.uniforms.uTime.value = time;
+        }
     });
 
     return (
         <>
-            {createPortal(
-                <mesh>
-                    <simulationMaterial ref={simulationMaterialRef} args={[size, frequency, speed]} />
-                    <bufferGeometry>
-                        <bufferAttribute
-                            attach="attributes-position"
-                            count={positions.length / 3}
-                            array={positions}
-                            itemSize={3}
-                        />
-                        <bufferAttribute attach="attributes-uv" count={uvs.length / 2} array={uvs} itemSize={2} />
-                    </bufferGeometry>
-                </mesh>,
-                scene,
-            )}
+            {renderOffscreen()}
             <points ref={meshRef}>
                 <bufferGeometry>
                     <bufferAttribute
@@ -133,6 +106,7 @@ const Experiment = () => {
                     />
                 </bufferGeometry>
                 <shaderMaterial
+                    key={vertexShader + fragmentShader}
                     uniforms={uniforms}
                     vertexShader={vertexShader}
                     fragmentShader={fragmentShader}
