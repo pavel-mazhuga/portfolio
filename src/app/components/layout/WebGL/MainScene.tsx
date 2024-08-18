@@ -15,7 +15,7 @@ const portfolio = [
         color: '#f2f5f7',
     },
     {
-        imgSrc: '/chipsa.webp',
+        imgSrc: '/chipsa-2.webp',
         href: 'https://chipsa.design',
         color: '#f2f5f7',
     },
