@@ -15,18 +15,18 @@ const portfolio = [
         color: '#f2f5f7',
     },
     {
-        imgSrc: '/zagranitsa.webp',
-        href: 'https://zagranitsa.pro',
-        color: '#444',
-    },
-    {
         imgSrc: '/chipsa.webp',
         href: 'https://chipsa.design',
         color: '#f2f5f7',
     },
     {
+        imgSrc: '/zagranitsa.webp',
+        href: 'https://zagranitsa.pro',
+        color: '#444',
+    },
+    {
         imgSrc: '/control.webp',
-        href: 'https://control.chipsa.ru/',
+        href: 'https://control.chipsa.design/',
         color: '#f2f5f7',
     },
     {
