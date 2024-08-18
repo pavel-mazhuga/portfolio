@@ -16,7 +16,6 @@ import {
     Scene,
     ShaderMaterial,
 } from 'three';
-import { v4 as uuidv4 } from 'uuid';
 import PageLoading from '@/app/components/shared/PageLoading';
 import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
@@ -87,9 +86,9 @@ const Experiment = () => {
         () => ({
             uPositions: { value: null },
             uTime: { value: 0 },
-            uColor: { value: new Color(color) },
+            uColor: { value: new Color('#04080d') },
         }),
-        [color],
+        [],
     );
 
     useFrame(({ gl, clock }) => {
