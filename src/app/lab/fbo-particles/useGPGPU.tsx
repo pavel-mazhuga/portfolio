@@ -31,7 +31,7 @@ const generatePositions = (width: number, height: number) => {
         data[stride] = distance * Math.sin(theta) * Math.cos(phi);
         data[stride + 1] = distance * Math.sin(theta) * Math.sin(phi);
         data[stride + 2] = distance * Math.cos(theta);
-        data[stride + 3] = 1.0;
+        data[stride + 3] = 0.3 + Math.random() * 1.7; // speed multiplier
     }
 
     return data;
