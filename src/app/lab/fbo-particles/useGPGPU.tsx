@@ -64,7 +64,6 @@ function useGPGPU(size: number) {
     const positions = useMemo(() => new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0]), []);
     const uvs = useMemo(() => new Float32Array([0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0]), []);
     const simulationMaterial = useMemo(() => new SimulationMaterial(size), [size]);
-    console.log('r');
 
     const renderTarget = useFBO(size, size, {
         minFilter: NearestFilter,
