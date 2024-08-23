@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import Footer from '@/app/components/layout/Footer';
 import Header from '@/app/components/layout/Header';
 import Providers from '@/app/components/layout/Providers';
-import LayoutGrid from '@/app/components/utils/LayoutGrid';
 import '../css/app.scss';
 import HideInterface from './HideInterface';
 import Html from './Html';
@@ -48,6 +48,8 @@ export const viewport: Viewport = {
     width: 'device-width',
     initialScale: 1,
 };
+
+const LayoutGrid = dynamic(() => import('@/app/components/utils/LayoutGrid'), { ssr: false });
 
 function RootLayout({ children }: { children: React.ReactNode }) {
     return (
