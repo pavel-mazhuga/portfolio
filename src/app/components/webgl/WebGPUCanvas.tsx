@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import { ACESFilmicToneMapping, SRGBColorSpace, WebGPURenderer } from 'three/webgpu';
 
 type Props = CanvasProps & {
-    webglFallback?: boolean;
     canvasProps?: any; // todo
 };
 
-const WebGPUCanvas = ({ webglFallback = true, frameloop = 'always', children, canvasProps = {}, ...props }: Props) => {
+const WebGPUCanvas = ({ frameloop = 'always', children, canvasProps = {}, ...props }: Props) => {
     const [canvasFrameloop, setCanvasFrameloop] = useState<'always' | 'never' | 'demand'>('never');
     const [initialising, setInitialising] = useState(true);
 
