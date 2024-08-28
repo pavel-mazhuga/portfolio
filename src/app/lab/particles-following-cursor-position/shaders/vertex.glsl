@@ -19,7 +19,5 @@ void main() {
 
     gl_PointSize = 100.0;
     gl_PointSize *= aSize;
-    // gl_PointSize *= aSize / vDistance;
-    // gl_PointSize = min(gl_PointSize, 200.);
     gl_PointSize *= (1.0 / -viewPosition.z);
 }

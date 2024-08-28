@@ -1,6 +1,6 @@
 'use client';
 
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useControls } from 'leva';
 import { Suspense, useMemo, useRef } from 'react';
 import { BufferGeometry, Mesh, MeshBasicMaterial, PlaneGeometry, Points, ShaderMaterial } from 'three';
@@ -15,6 +15,8 @@ import useGPGPUPositions from './useGPGPUPositions';
 
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
+    const prevTime = useRef(0);
+    const viewport = useThree((state) => state.viewport);
 
     const { size } = useControls({
         size: {
@@ -77,7 +79,10 @@ const Experiment = () => {
         return colors;
     }, [size]);
 
-    const dummyPlane = useMemo(() => new Mesh(new PlaneGeometry(10, 10), new MeshBasicMaterial()), []);
+    const dummyPlane = useMemo(
+        () => new Mesh(new PlaneGeometry(viewport.width, viewport.height), new MeshBasicMaterial()),
+        [viewport.width, viewport.height],
+    );
 
     const uniforms = useMemo(
         () => ({
@@ -89,6 +94,7 @@ const Experiment = () => {
 
     useFrame(({ gl, clock, pointer, raycaster, camera }) => {
         const time = clock.getElapsedTime();
+        const delta = time - prevTime.current;
         const gpgpuPositionsRt = gpgpuPositions.compute(gl);
 
         if (gpgpuPositions.simulationMeshRef.current) {
@@ -101,12 +107,12 @@ const Experiment = () => {
                 gpgpuPositions.simulationMeshRef.current.material.uniforms.uPointer.value.x = lerp(
                     gpgpuPositions.simulationMeshRef.current.material.uniforms.uPointer.value.x,
                     x,
-                    0.01,
+                    delta * 1.5,
                 );
                 gpgpuPositions.simulationMeshRef.current.material.uniforms.uPointer.value.y = lerp(
                     gpgpuPositions.simulationMeshRef.current.material.uniforms.uPointer.value.y,
                     y,
-                    0.01,
+                    delta * 1.5,
                 );
             }
 
@@ -117,6 +123,8 @@ const Experiment = () => {
             meshRef.current.material.uniforms.uPositions.value = gpgpuPositionsRt.texture;
             meshRef.current.material.uniforms.uTime.value = time;
         }
+
+        prevTime.current = time;
     });
 
     return (
