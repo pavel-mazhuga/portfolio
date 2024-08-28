@@ -140,20 +140,20 @@ const Demo = () => {
         [count],
     );
 
-    useEffect(() => {
-        if (gl instanceof WebGPURenderer) {
-            // Compute init
-            const particlesInit = tslFn(() => {
-                const basePosition = basePositionBuffer.element(instanceIndex);
-                const position = positionBuffer.element(instanceIndex);
+    // useEffect(() => {
+    //     if (gl instanceof WebGPURenderer) {
+    //         // Compute init
+    //         const particlesInit = tslFn(() => {
+    //             const basePosition = basePositionBuffer.element(instanceIndex);
+    //             const position = positionBuffer.element(instanceIndex);
 
-                position.assign(basePosition);
-            });
+    //             position.assign(basePosition);
+    //         });
 
-            const particlesInitCompute = particlesInit().compute(count);
-            // gl.compute(particlesInitCompute);
-        }
-    }, [count, gl, basePositionBuffer, positionBuffer]);
+    //         const particlesInitCompute = particlesInit().compute(count);
+    //         // gl.compute(particlesInitCompute);
+    //     }
+    // }, [count, gl, basePositionBuffer, positionBuffer]);
 
     const nodeMaterial = useMemo(() => {
         const material = new SpriteNodeMaterial({
@@ -169,7 +169,7 @@ const Demo = () => {
         });
 
         // material.positionNode = positionAttribute;
-        material.positionNode = positionBuffer.toAttribute();
+        material.positionNode = (positionBuffer as any).toAttribute();
         // material.scaleNode = float(2);
         material.colorNode = colorNode();
 
