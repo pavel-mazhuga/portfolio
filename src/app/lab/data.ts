@@ -10,6 +10,7 @@ import fboParticlesPreview from '@/app/lab/fbo-particles/preview.jpeg';
 import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
 import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
+import particlesFollowingCursorPositionPreview from '@/app/lab/particles-following-cursor-position/preview.jpeg';
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
 import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
 import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-trail/preview.jpeg';
@@ -20,12 +21,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
-    // {
-    //     name: 'Particles following cursor position',
-    //     slug: 'particles-following-cursor-position',
-    //     tags: ['webgl', 'shaders', 'particles'],
-    //     // preview: displacedSphereCsmPreview,
-    // },
+    {
+        name: 'Particles following cursor position',
+        slug: 'particles-following-cursor-position',
+        tags: ['webgl', 'shaders', 'particles'],
+        preview: particlesFollowingCursorPositionPreview,
+    },
     {
         name: 'Displaced sphere with extended three.js material',
         slug: 'displaced-sphere-csm',
