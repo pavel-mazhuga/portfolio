@@ -20,6 +20,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    // {
+    //     name: 'Particles following cursor position',
+    //     slug: 'particles-following-cursor-position',
+    //     tags: ['webgl', 'shaders', 'particles'],
+    //     // preview: displacedSphereCsmPreview,
+    // },
     {
         name: 'Displaced sphere with extended three.js material',
         slug: 'displaced-sphere-csm',

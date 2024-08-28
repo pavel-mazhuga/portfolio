@@ -99,7 +99,6 @@ const Experiment = () => {
             <points ref={meshRef}>
                 <bufferGeometry>
                     <bufferAttribute
-                        key={particlesPosition.length}
                         attach="attributes-position"
                         count={particlesPosition.length / 3}
                         array={particlesPosition}
