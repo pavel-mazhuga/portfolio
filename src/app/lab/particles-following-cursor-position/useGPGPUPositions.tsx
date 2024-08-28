@@ -92,13 +92,21 @@ function useGPGPUPositions(size: number) {
                 <mesh ref={simulationMeshRef} material={simulationMaterial}>
                     <bufferGeometry>
                         <bufferAttribute
+                            key={`position-${positions.length}`}
                             attach="attributes-position"
                             count={positions.length / 3}
                             array={positions}
                             itemSize={3}
                         />
-                        <bufferAttribute attach="attributes-uv" count={uvs.length / 2} array={uvs} itemSize={2} />
                         <bufferAttribute
+                            key={`uv-${uvs.length}`}
+                            attach="attributes-uv"
+                            count={uvs.length / 2}
+                            array={uvs}
+                            itemSize={2}
+                        />
+                        <bufferAttribute
+                            key={`koef-${particlesKoefs.length}`}
                             attach="attributes-aKoef"
                             count={particlesKoefs.length}
                             array={particlesKoefs}

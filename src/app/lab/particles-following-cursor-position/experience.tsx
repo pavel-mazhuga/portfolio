@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useControls } from 'leva';
-import { Suspense, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { BufferGeometry, Mesh, MeshBasicMaterial, PlaneGeometry, Points, ShaderMaterial } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import PageLoading from '@/app/components/shared/PageLoading';
@@ -16,17 +16,18 @@ import useGPGPUPositions from './useGPGPUPositions';
 const Experiment = () => {
     const meshRef = useRef<Points<BufferGeometry, ShaderMaterial>>(null);
     const prevTime = useRef(0);
+    const speed = useRef<number>(3);
     const viewport = useThree((state) => state.viewport);
 
     const { size } = useControls({
         size: {
             value: 80,
             min: 0,
-            max: 512,
+            max: 300,
             step: 1,
         },
         speed: {
-            value: 3,
+            value: speed.current,
             min: 0,
             max: 10,
             step: 0.001,
@@ -34,6 +35,7 @@ const Experiment = () => {
                 if (gpgpuPositions.simulationMeshRef.current) {
                     gpgpuPositions.simulationMeshRef.current.material.uniforms.uSpeed.value = val;
                 }
+                speed.current = val;
             },
         },
     });
@@ -92,6 +94,12 @@ const Experiment = () => {
         [],
     );
 
+    useEffect(() => {
+        if (gpgpuPositions.simulationMeshRef.current) {
+            gpgpuPositions.simulationMeshRef.current.material.uniforms.uSpeed.value = speed.current;
+        }
+    }, [gpgpuPositions.simulationMeshRef, size]);
+
     useFrame(({ gl, clock, pointer, raycaster, camera }) => {
         const time = clock.getElapsedTime();
         const delta = time - prevTime.current;
@@ -133,18 +141,21 @@ const Experiment = () => {
             <points ref={meshRef}>
                 <bufferGeometry>
                     <bufferAttribute
+                        key={`position-${particlesPosition.length}`}
                         attach="attributes-position"
                         count={particlesPosition.length / 3}
                         array={particlesPosition}
                         itemSize={3}
                     />
                     <bufferAttribute
+                        key={`color-${particlesColor.length}`}
                         attach="attributes-aColor"
                         count={particlesColor.length / 3}
                         array={particlesColor}
                         itemSize={3}
                     />
                     <bufferAttribute
+                        key={`size-${particlesSize.length}`}
                         attach="attributes-aSize"
                         count={particlesSize.length}
                         array={particlesSize}
