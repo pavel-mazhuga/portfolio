@@ -16,9 +16,9 @@ function useGPGPUPositions(count: number) {
             // const i3 = i * 3;
             const i4 = i * 4;
 
-            texture.image.data[i4 + 0] = Math.random() - 0.5; // x
-            texture.image.data[i4 + 1] = (Math.random() - 0.5) * 2; // y
-            texture.image.data[i4 + 2] = Math.random() - 0.5; // z
+            texture.image.data[i4 + 0] = (Math.random() - 0.5) * (i / count); // x
+            texture.image.data[i4 + 1] = (Math.random() - 0.5) * 2 * (i / count); // y
+            texture.image.data[i4 + 2] = (Math.random() - 0.5) * (i / count); // z
             texture.image.data[i4 + 3] = Math.random(); // lifespan
         }
 

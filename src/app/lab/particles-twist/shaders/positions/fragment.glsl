@@ -18,6 +18,7 @@ void main() {
     float time = uTime * 0.05;
     vec2 uv = gl_FragCoord.xy / resolution.xy;
     vec4 data = texture(uPositions, uv);
+    // data.xyz = mix(vec3(0.), data.xyz, min(1., uTime));
     vec4 initialData = texture(uInitialPositions, uv);
 
     if (data.a >= 1.) {
@@ -33,8 +34,8 @@ void main() {
 
         vec3 flowField = normalize(vec3(
                     snoise(vec4(data.xyz, time)) * 0.5,
-                    abs(snoise(vec4(data.xyz + 1., time))),
-                    snoise(vec4(data.xyz + 2., time)) * 0.
+                    abs(snoise(vec4(data.xyz + 1., time * 3.))),
+                    snoise(vec4(data.xyz + 2., time))
                 ));
 
         data.xyz += flowField * uDeltaTime;

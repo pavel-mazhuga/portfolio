@@ -21,9 +21,9 @@ const Experiment = () => {
 
     const { count } = useControls({
         count: {
-            value: 3000,
+            value: 5000,
             min: 0,
-            max: 30000,
+            max: 50000,
             step: 1,
         },
         pointSize: {
@@ -44,7 +44,7 @@ const Experiment = () => {
             step: 0.001,
         },
         color: {
-            value: '#00c7f8',
+            value: '#ff6730',
             onChange: (val: string) => {
                 if (plane.current) {
                     plane.current.material.uniforms.uColor.value.set(val);
@@ -127,7 +127,7 @@ const Experiment = () => {
                     uDeltaTime: { value: 0 },
                     uResolution: { value: new Vector2(viewport.width, viewport.height) },
                     uPointSize: { value: 20 },
-                    uColor: { value: new Color('#00c7f8') },
+                    uColor: { value: new Color('#ff6730') },
                     uPositions: { value: null },
                 }}
                 vertexShader={vertexShader}
