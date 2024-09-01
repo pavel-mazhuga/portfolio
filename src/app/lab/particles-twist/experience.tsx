@@ -1,22 +1,24 @@
 'use client';
 
-import { OrbitControls } from '@react-three/drei';
+import { ComputedAttribute, OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useControls } from 'leva';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
-import { AdditiveBlending, Color, PlaneGeometry, Points, ShaderMaterial, Vector2 } from 'three';
+import { Suspense, useEffect, useRef } from 'react';
+import { AdditiveBlending, BufferAttribute, Color, PlaneGeometry, Points, ShaderMaterial, Vector2 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import PageLoading from '@/app/components/shared/PageLoading';
+import Perf from '@/app/components/webgl/Perf';
 import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
+import useGPGPUPositions from './useGPGPUPositions';
 
 const Experiment = () => {
     const plane = useRef<Points<PlaneGeometry, ShaderMaterial>>(null);
-    const size = useThree((state) => state.size);
+    const viewport = useThree((state) => state.viewport);
 
-    const { count, pointSize, speed, color } = useControls({
+    const { count } = useControls({
         count: {
             value: 3000,
             min: 0,
@@ -28,6 +30,11 @@ const Experiment = () => {
             min: 0,
             max: 10,
             step: 0.001,
+            onChange: (val: number) => {
+                if (plane.current) {
+                    plane.current.material.uniforms.uPointSize.value = val;
+                }
+            },
         },
         speed: {
             value: 0.3,
@@ -35,67 +42,81 @@ const Experiment = () => {
             max: 3,
             step: 0.001,
         },
-        color: '#80e5ff',
+        color: {
+            value: '#00c7f8',
+            onChange: (val: string) => {
+                if (plane.current) {
+                    plane.current.material.uniforms.uColor.value.set(val);
+                }
+            },
+        },
     });
 
-    const particlesPosition = useMemo(() => {
-        const positions = new Float32Array(count * 3);
-
-        for (let i = 0; i < count; i++) {
-            let x = (Math.random() - 0.5) * 0.2;
-            let y = Math.random() - 0.5;
-            let z = 0;
-
-            positions.set([x, y, z], i * 3);
-        }
-
-        return positions;
-    }, [count]);
-
-    const particlesSizes = useMemo(() => {
-        const sizes = new Float32Array(count);
-
-        for (let i = 0; i < count; i++) {
-            let size = 0.5 + Math.random() * 0.5;
-            sizes.set([size], i);
-        }
-
-        return sizes;
-    }, [count]);
+    const { gpgpuRenderer, variables } = useGPGPUPositions(count);
 
     useEffect(() => {
-        plane.current!.material.uniforms.uResolution.value.x = size.width;
-        plane.current!.material.uniforms.uResolution.value.y = size.height;
-    }, [size.width, size.height]);
+        plane.current!.material.uniforms.uResolution.value.x = viewport.width;
+        plane.current!.material.uniforms.uResolution.value.y = viewport.height;
+    }, [viewport.width, viewport.height]);
 
     useFrame(({ clock }) => {
-        plane.current!.material.uniforms.uTime.value = clock.getElapsedTime();
+        gpgpuRenderer.compute();
+
+        if (plane.current) {
+            plane.current.material.uniforms.uPositions.value = gpgpuRenderer.getCurrentRenderTarget(
+                variables.positionsVariable,
+            ).texture;
+
+            plane.current.material.uniforms.uTime.value = clock.getElapsedTime();
+        }
     });
 
     return (
         <points ref={plane}>
-            <bufferGeometry>
-                <bufferAttribute
-                    key={particlesPosition.length}
-                    attach="attributes-position"
-                    count={particlesPosition.length / 3}
-                    array={particlesPosition}
-                    itemSize={3}
+            <bufferGeometry drawRange={{ start: 0, count }}>
+                <ComputedAttribute
+                    key={`size-${count}`}
+                    name="aSize"
+                    compute={() => {
+                        const sizes = new Float32Array(count);
+
+                        for (let i = 0; i < count; i++) {
+                            const size = 0.5 + Math.random() * 0.5;
+                            sizes[i] = size;
+                        }
+
+                        return new BufferAttribute(sizes, 1);
+                    }}
                 />
-                <bufferAttribute
-                    key={particlesSizes.length}
-                    attach="attributes-aSize"
-                    count={particlesSizes.length}
-                    array={particlesSizes}
-                    itemSize={1}
+                <ComputedAttribute
+                    key={`uv-${count}`}
+                    name="aParticleUv"
+                    compute={() => {
+                        const uvArray = new Float32Array(count * 2);
+                        const size = Math.ceil(Math.sqrt(count));
+
+                        for (let x = 0; x < size; x++) {
+                            for (let y = 0; y < size; y++) {
+                                const i = x * size + y;
+                                const i2 = i * 2;
+
+                                uvArray[i2 + 0] = (y + 0.5) / size;
+                                uvArray[i2 + 1] = (x + 0.5) / size;
+                            }
+                        }
+
+                        return new BufferAttribute(uvArray, 2);
+                    }}
                 />
             </bufferGeometry>
             <shaderMaterial
+                key={process.env.NODE_ENV === 'development' ? uuidv4() : undefined}
                 uniforms={{
                     uTime: { value: 0 },
-                    uResolution: { value: new Vector2(size.width, size.height) },
-                    uPointSize: { value: pointSize },
-                    uColor: { value: new Color(color) },
+                    uResolution: { value: new Vector2(viewport.width, viewport.height) },
+                    uPointSize: { value: 3 },
+                    uColor: { value: new Color('#00c7f8') },
+                    uPositions: { value: null },
                 }}
                 vertexShader={vertexShader}
                 fragmentShader={fragmentShader}
@@ -114,7 +135,7 @@ const Experience = () => {
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
-                        position: [0, 0, 2],
+                        position: [0, 0, 4],
                         fov: 45,
                         near: 0.1,
                         far: 1000,
@@ -125,6 +146,7 @@ const Experience = () => {
                         <Experiment />
                     </Suspense>
                     <OrbitControls />
+                    <Perf />
                 </Canvas>
             </div>
         </ExperimentLayout>

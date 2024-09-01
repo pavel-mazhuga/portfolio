@@ -1,9 +1,11 @@
 #pragma glslify: rotate2D = require('../../../glsl-utils/2d-rotation.glsl')
 
 attribute float aSize;
+attribute vec2 aParticleUv;
 
 uniform float uTime;
 uniform float uPointSize;
+uniform sampler2D uPositions;
 
 varying vec3 vPosition;
 
@@ -18,10 +20,11 @@ mat3 rotation3dY(float angle) {
 }
 
 void main() {
-    float distanceFactor = pow(1. - distance(position, vec3(0.)), 1.);
+    vec4 data = texture(uPositions, aParticleUv);
 
-    vec3 particlePosition = position;
-    particlePosition.xz += rotate2D(position.y * 10. + uTime) * position.xz /*  * distanceFactor */ ;
+    vec3 particlePosition = data.xyz;
+    float distanceFactor = pow(1. - distance(particlePosition, vec3(0.)), 1.);
+    // particlePosition.xz += rotate2D(position.y * 10. + uTime) * position.xz /*  * distanceFactor */ ;
 
     float progress = fract(uTime);
 

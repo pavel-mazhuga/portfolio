@@ -2,7 +2,6 @@
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useControls } from 'leva';
-import { Perf } from 'r3f-perf';
 import { Suspense, useMemo, useRef } from 'react';
 import {
     BufferGeometry,
@@ -17,6 +16,7 @@ import {
 } from 'three';
 import { v4 as uuidv4 } from 'uuid';
 import PageLoading from '@/app/components/shared/PageLoading';
+import Perf from '@/app/components/webgl/Perf';
 import { lerp } from '@/utils/lerp';
 import ExperimentLayout from '../ExperimentLayout';
 import LevaWrapper from '../LevaWrapper';
@@ -210,7 +210,7 @@ const Experience = () => {
                     <Suspense fallback={<PageLoading />}>
                         <Experiment />
                     </Suspense>
-                    {process.env.NODE_ENV === 'development' && <Perf deepAnalyze matrixUpdate className="r3f-perf" />}
+                    <Perf />
                 </Canvas>
             </div>
         </ExperimentLayout>
