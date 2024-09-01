@@ -16,19 +16,20 @@ import useGPGPUPositions from './useGPGPUPositions';
 
 const Experiment = () => {
     const plane = useRef<Points<PlaneGeometry, ShaderMaterial>>(null);
+    const prevTime = useRef(0);
     const viewport = useThree((state) => state.viewport);
 
     const { count } = useControls({
         count: {
             value: 3000,
             min: 0,
-            max: 10000,
+            max: 30000,
             step: 1,
         },
         pointSize: {
-            value: 3,
+            value: 20,
             min: 0,
-            max: 10,
+            max: 50,
             step: 0.001,
             onChange: (val: number) => {
                 if (plane.current) {
@@ -52,23 +53,33 @@ const Experiment = () => {
         },
     });
 
-    const { gpgpuRenderer, variables } = useGPGPUPositions(count);
+    const { gpgpuRenderer, data } = useGPGPUPositions(count);
 
     useEffect(() => {
-        plane.current!.material.uniforms.uResolution.value.x = viewport.width;
-        plane.current!.material.uniforms.uResolution.value.y = viewport.height;
+        if (plane.current) {
+            plane.current.material.uniforms.uResolution.value.x = viewport.width;
+            plane.current.material.uniforms.uResolution.value.y = viewport.height;
+        }
     }, [viewport.width, viewport.height]);
 
     useFrame(({ clock }) => {
+        const elapsedTime = clock.getElapsedTime();
+        const deltaTime = Math.min(elapsedTime - prevTime.current, 1 / 30);
+
+        data.positions.variables.positionsVariable.material.uniforms.uTime.value = elapsedTime;
+        data.positions.variables.positionsVariable.material.uniforms.uDeltaTime.value = deltaTime;
+
         gpgpuRenderer.compute();
 
         if (plane.current) {
             plane.current.material.uniforms.uPositions.value = gpgpuRenderer.getCurrentRenderTarget(
-                variables.positionsVariable,
+                data.positions.variables.positionsVariable,
             ).texture;
-
-            plane.current.material.uniforms.uTime.value = clock.getElapsedTime();
+            plane.current.material.uniforms.uTime.value = elapsedTime;
+            plane.current.material.uniforms.uDeltaTime.value = deltaTime;
         }
+
+        prevTime.current = elapsedTime;
     });
 
     return (
@@ -113,8 +124,9 @@ const Experiment = () => {
                 key={process.env.NODE_ENV === 'development' ? uuidv4() : undefined}
                 uniforms={{
                     uTime: { value: 0 },
+                    uDeltaTime: { value: 0 },
                     uResolution: { value: new Vector2(viewport.width, viewport.height) },
-                    uPointSize: { value: 3 },
+                    uPointSize: { value: 20 },
                     uColor: { value: new Color('#00c7f8') },
                     uPositions: { value: null },
                 }}
