@@ -110,13 +110,6 @@ body:not(.sb-show-main) {
     pointer-events: auto;
 }
 
-// https://nextjs.org/docs/api-reference/next/image#known-browser-bugs
-@supports (font: -apple-system-body) and (-webkit-appearance: none) {
-    img[loading='lazy'] {
-        clip-path: inset(0.6px);
-    }
-}
-
 .canvas-wrapper {
     position: fixed;
     top: 0;
@@ -152,4 +145,12 @@ body:not(.sb-show-main) {
         right: 65px;
         width: 260px;
     }
+}
+
+.r3f-perf {
+    top: 0 !important;
+    bottom: auto !important;
+    right: auto !important;
+    left: 50% !important;
+    transform: translate(-50%, 0);
 }

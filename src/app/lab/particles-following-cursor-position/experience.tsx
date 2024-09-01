@@ -210,7 +210,7 @@ const Experience = () => {
                     <Suspense fallback={<PageLoading />}>
                         <Experiment />
                     </Suspense>
-                    <Perf deepAnalyze matrixUpdate position="bottom-right" />
+                    {process.env.NODE_ENV === 'development' && <Perf deepAnalyze matrixUpdate className="r3f-perf" />}
                 </Canvas>
             </div>
         </ExperimentLayout>
