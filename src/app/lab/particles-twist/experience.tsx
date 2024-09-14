@@ -21,7 +21,7 @@ const Experiment = () => {
 
     const { count } = useControls({
         count: {
-            value: 10000,
+            value: 25000,
             min: 0,
             max: 50000,
             step: 1,
