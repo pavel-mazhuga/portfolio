@@ -14,6 +14,7 @@ import particlesFollowingCursorPositionPreview from '@/app/lab/particles-followi
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
 import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
 import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-trail/preview.jpeg';
+import particlesTwistPreview from '@/app/lab/particles-twist/preview.jpeg';
 import planeWavePreview from '@/app/lab/plane-wave/preview.jpeg';
 import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/preview.jpeg';
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
@@ -21,6 +22,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Particles twist',
+        slug: 'particles-twist',
+        tags: ['webgl', 'shaders', 'particles', 'gpgpu', 'compute'],
+        preview: particlesTwistPreview,
+    },
     {
         name: 'Particles following cursor position',
         slug: 'particles-following-cursor-position',
