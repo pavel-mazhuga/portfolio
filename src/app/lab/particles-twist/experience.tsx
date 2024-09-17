@@ -147,7 +147,7 @@ const Experience = () => {
             <div className="canvas-wrapper">
                 <Canvas
                     camera={{
-                        position: [0, 0, 4],
+                        position: [0, 0, 5],
                         fov: 45,
                         near: 0.1,
                         far: 1000,
