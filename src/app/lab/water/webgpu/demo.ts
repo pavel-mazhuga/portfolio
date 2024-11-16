@@ -94,11 +94,11 @@ class Demo {
 
     onTouchMove(event: TouchEvent) {
         const x = event.touches[0].clientX;
-        const deltaX = (x - this.#touchStart.x) * 0.003;
+        const deltaX = (x - this.#touchStart.x) * 0.03;
         this.camera.position.x = this.#touchStart.cameraX - deltaX;
         this.mesh.position.x = this.camera.position.x;
         const y = event.touches[0].clientY;
-        const deltaY = (y - this.#touchStart.y) * 0.003;
+        const deltaY = (y - this.#touchStart.y) * 0.03;
         this.camera.position.z = this.#touchStart.cameraZ - deltaY;
         this.mesh.position.z = this.camera.position.z;
     }
