@@ -1,30 +1,13 @@
 // @ts-nocheck
-import {
-    If,
-    abs,
-    clamp,
-    dot,
-    float,
-    floor,
-    fract,
-    max,
-    mod,
-    mul,
-    step,
-    sub,
-    tslFn,
-    vec2,
-    vec3,
-    vec4,
-} from 'three/webgpu';
+import { Fn, If, abs, clamp, dot, float, floor, fract, max, mod, mul, step, sub, vec2, vec3, vec4 } from 'three/webgpu';
 
-const permute_0 = tslFn(([x_immutable]) => {
+const permute_0 = Fn(([x_immutable]) => {
     const x = vec4(x_immutable).toVar();
 
     return mod(x.mul(34.0).add(1.0).mul(x), 289.0);
 });
 
-const permute_1 = tslFn(([x_immutable]) => {
+const permute_1 = Fn(([x_immutable]) => {
     const x = float(x_immutable).toVar();
 
     return floor(mod(x.mul(34.0).add(1.0).mul(x), 289.0));
@@ -33,13 +16,13 @@ const permute_1 = tslFn(([x_immutable]) => {
 // const permute = overloadingFn([permute_0, permute_1]);
 const permute = permute_0;
 
-const taylorInvSqrt_0 = tslFn(([r_immutable]) => {
+const taylorInvSqrt_0 = Fn(([r_immutable]) => {
     const r = vec4(r_immutable).toVar();
 
     return sub(1.79284291400159, mul(0.85373472095314, r));
 });
 
-const taylorInvSqrt_1 = tslFn(([r_immutable]) => {
+const taylorInvSqrt_1 = Fn(([r_immutable]) => {
     const r = float(r_immutable).toVar();
 
     return sub(1.79284291400159, mul(0.85373472095314, r));
@@ -48,7 +31,7 @@ const taylorInvSqrt_1 = tslFn(([r_immutable]) => {
 // const taylorInvSqrt = overloadingFn([taylorInvSqrt_0, taylorInvSqrt_1]);
 const taylorInvSqrt = taylorInvSqrt_0;
 
-const grad4 = tslFn(([j_immutable, ip_immutable]) => {
+const grad4 = Fn(([j_immutable, ip_immutable]) => {
     const ip = vec4(ip_immutable).toVar();
     const j = float(j_immutable).toVar();
     const ones = vec4(1.0, 1.0, 1.0, -1.0);
@@ -71,7 +54,7 @@ const grad4 = tslFn(([j_immutable, ip_immutable]) => {
     return p;
 });
 
-const simplexNoise4d = tslFn(([v_immutable]) => {
+const simplexNoise4d = Fn(([v_immutable]) => {
     const v = vec4(v_immutable).toVar();
     const C = vec2(0.138196601125010504, 0.309016994374947451);
     const i = vec4(floor(v.add(dot(v, C.yyyy)))).toVar();

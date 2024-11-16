@@ -37,12 +37,6 @@ const Experiment = () => {
                 }
             },
         },
-        speed: {
-            value: 0.3,
-            min: 0,
-            max: 3,
-            step: 0.001,
-        },
         color: {
             value: '#ff6730',
             onChange: (val: string) => {
@@ -142,7 +136,10 @@ const Experiment = () => {
 
 const Experience = () => {
     return (
-        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/particles-twist">
+        <ExperimentLayout
+            sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/particles-twist"
+            webgpuVersion="/lab/particles-twist/webgpu"
+        >
             <LevaWrapper />
             <div className="canvas-wrapper">
                 <Canvas

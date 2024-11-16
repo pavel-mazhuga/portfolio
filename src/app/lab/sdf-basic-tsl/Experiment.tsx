@@ -5,6 +5,7 @@ import { Suspense, useMemo } from 'react';
 import {
     // @ts-ignore
     Break,
+    Fn,
     If,
     MeshBasicNodeMaterial,
     dot,
@@ -15,11 +16,10 @@ import {
     reflect,
     sin,
     timerLocal,
-    tslFn,
     uv,
     vec2,
     vec3,
-    viewportResolution,
+    viewport,
 } from 'three/webgpu';
 import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
@@ -37,7 +37,7 @@ const Demo = () => {
 
         const timer = timerLocal(1);
 
-        const sdf = tslFn<any, any>(([pos]) => {
+        const sdf = Fn<any, any>(([pos]) => {
             const translatedPos = pos.add(vec3(sin(timer), 0, 0));
             const sphere = sdSphere(translatedPos, 0.5);
             const secondSphere = sdSphere(pos, 0.3);
@@ -45,7 +45,7 @@ const Demo = () => {
             return smoothmin(secondSphere, sphere, 0.3);
         });
 
-        const calcNormal = tslFn<any, any>(([ray]) => {
+        const calcNormal = Fn<any, any>(([ray]) => {
             const eps = float(0.0001);
             const h = vec2(eps, 0);
 
@@ -58,7 +58,7 @@ const Demo = () => {
             );
         });
 
-        const lighting = tslFn<any, any>(([rayOrigin, ray]) => {
+        const lighting = Fn<any, any>(([rayOrigin, ray]) => {
             const normal = calcNormal(ray);
             const viewDir = normalize(rayOrigin.sub(ray));
             const lightDir = normalize(vec3(1));
@@ -83,9 +83,9 @@ const Demo = () => {
             return finalColor;
         });
 
-        const raymarch = tslFn(() => {
+        const raymarch = Fn(() => {
             // Use frag coordinates to get an aspect-fixed UV
-            const _uv = uv().mul(viewportResolution.xy).mul(2).sub(viewportResolution.xy).div(viewportResolution.y);
+            const _uv = uv().mul(viewport.xy).mul(2).sub(viewport.xy).div(viewport.y);
 
             // Initialize the ray and its direction
             const rayOrigin = vec3(0, 0, -3);

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { PropsWithChildren } from 'react';
 import ErrorBoundary from '@/app/components/layout/ErrorBoundary';
