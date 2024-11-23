@@ -1,6 +1,15 @@
 import Stats from 'stats-gl';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Mesh, PerspectiveCamera, Scene, WebGPURenderer } from 'three/webgpu';
+import {
+    ACESFilmicToneMapping,
+    BoxGeometry,
+    Mesh,
+    MeshStandardNodeMaterial,
+    PerspectiveCamera,
+    PointLight,
+    Scene,
+    WebGPURenderer,
+} from 'three/webgpu';
 import { Pane } from 'tweakpane';
 import Water from './Water';
 
@@ -12,6 +21,7 @@ class Demo {
     controls?: OrbitControls;
     stats: Stats;
     mesh: Mesh;
+    light: PointLight;
 
     #touchStart = {
         x: 0,
@@ -37,6 +47,7 @@ class Demo {
 
         this.canvas = canvas;
         this.renderer = new WebGPURenderer({ canvas, antialias: true });
+        this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 
@@ -57,9 +68,18 @@ class Demo {
         this.#initTweakPane();
         this.renderer.setAnimationLoop(this.render);
 
-        this.mesh = new Water();
-
+        this.mesh = new Water(this.scene);
         this.scene.add(this.mesh);
+
+        const geometry = new BoxGeometry(1, 1, 1);
+        const material = new MeshStandardNodeMaterial({ color: 'red' });
+        const cube = new Mesh(geometry, material);
+        cube.position.y = 0.8;
+        cube.position.z = -5;
+        this.scene.add(cube);
+        this.light = new PointLight(0xffffff, 10, 50, 1);
+        this.light.position.set(0, 3, 3);
+        this.scene.add(this.light);
 
         document.documentElement.style.overscrollBehavior = 'none';
     }
@@ -77,12 +97,17 @@ class Demo {
         this.camera.updateProjectionMatrix();
     }
 
-    onWheel(event: WheelEvent) {
-        event.preventDefault();
-        this.camera.position.x += event.deltaX * 0.003;
-        this.camera.position.z -= event.deltaY * 0.003;
+    #onCameraMove() {
         this.mesh.position.x = this.camera.position.x;
         this.mesh.position.z = this.camera.position.z;
+        this.light.position.x = this.camera.position.x;
+        this.light.position.z = 3 + this.camera.position.z;
+    }
+
+    onWheel(event: WheelEvent) {
+        this.camera.position.x += event.deltaX * 0.003;
+        this.camera.position.z += event.deltaY * 0.003;
+        this.#onCameraMove();
     }
 
     onTouchStart(event: TouchEvent) {
@@ -96,11 +121,12 @@ class Demo {
         const x = event.touches[0].clientX;
         const deltaX = (x - this.#touchStart.x) * 0.03;
         this.camera.position.x = this.#touchStart.cameraX - deltaX;
-        this.mesh.position.x = this.camera.position.x;
+
         const y = event.touches[0].clientY;
         const deltaY = (y - this.#touchStart.y) * 0.03;
         this.camera.position.z = this.#touchStart.cameraZ - deltaY;
-        this.mesh.position.z = this.camera.position.z;
+
+        this.#onCameraMove();
     }
 
     #initEvents() {

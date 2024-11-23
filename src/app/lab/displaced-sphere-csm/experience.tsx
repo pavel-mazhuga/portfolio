@@ -194,11 +194,10 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
         <>
             <mesh geometry={geometry} matrixAutoUpdate={false} frustumCulled={false}>
                 <CustomShaderMaterial
-                    ref={materialRef}
+                    ref={materialRef as any}
                     baseMaterial={MeshPhysicalMaterial}
                     vertexShader={vertexShader}
                     fragmentShader={fragmentShader}
-                    silent
                     roughness={roughness}
                     metalness={metalness}
                     reflectivity={reflectivity}
@@ -208,11 +207,10 @@ const Experiment = ({ isMobile }: { isMobile: boolean }) => {
                     uniforms={uniforms}
                 />
                 <CustomShaderMaterial
-                    ref={depthMaterialRef}
+                    ref={depthMaterialRef as any}
                     baseMaterial={MeshDepthMaterial}
                     vertexShader={vertexShader}
                     uniforms={uniforms}
-                    silent
                     depthPacking={RGBADepthPacking}
                     attach="customDepthMaterial"
                 />
