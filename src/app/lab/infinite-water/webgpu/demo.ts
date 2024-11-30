@@ -1,16 +1,7 @@
 import Stats from 'stats-gl';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import {
-    ACESFilmicToneMapping,
-    BoxGeometry,
-    Mesh,
-    MeshStandardNodeMaterial,
-    PerspectiveCamera,
-    PointLight,
-    Scene,
-    WebGPURenderer,
-} from 'three/webgpu';
-import { Pane } from 'tweakpane';
+import { vec4 } from 'three/tsl';
+import { ACESFilmicToneMapping, Mesh, PerspectiveCamera, PointLight, Scene, WebGPURenderer } from 'three/webgpu';
 import Water from './Water';
 
 class Demo {
@@ -19,7 +10,7 @@ class Demo {
     camera: PerspectiveCamera;
     scene: Scene;
     controls?: OrbitControls;
-    stats: Stats;
+    stats?: Stats;
     mesh: Mesh;
     light: PointLight;
 
@@ -29,8 +20,6 @@ class Demo {
         cameraX: 0,
         cameraZ: 0,
     };
-
-    tweakPane = new Pane();
 
     params = {
         position: { x: 0, y: 0, z: 0 },
@@ -46,37 +35,31 @@ class Demo {
         this.onTouchMove = this.onTouchMove.bind(this);
 
         this.canvas = canvas;
-        this.renderer = new WebGPURenderer({ canvas, antialias: true });
+        this.renderer = new WebGPURenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 
         this.scene = new Scene();
+        this.scene.backgroundNode = vec4(0, 0, 0, 1);
 
         this.camera = new PerspectiveCamera(45, canvas.width / canvas.height, 0.1, 1000);
         this.camera.position.set(0, 0.5, 0);
 
-        this.stats = new Stats({
-            trackGPU: true,
-        });
-        this.stats.init(this.renderer);
-        canvas.parentElement?.appendChild(this.stats.dom);
-
-        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        if (process.env.NODE_ENV === 'development') {
+            this.stats = new Stats({
+                trackGPU: true,
+            });
+            this.stats.init(this.renderer);
+            canvas.parentElement?.appendChild(this.stats.dom);
+        }
 
         this.#initEvents();
-        this.#initTweakPane();
         this.renderer.setAnimationLoop(this.render);
 
-        this.mesh = new Water(this.scene);
+        this.mesh = new Water();
         this.scene.add(this.mesh);
 
-        const geometry = new BoxGeometry(1, 1, 1);
-        const material = new MeshStandardNodeMaterial({ color: 'red' });
-        const cube = new Mesh(geometry, material);
-        cube.position.y = 0.8;
-        cube.position.z = -5;
-        this.scene.add(cube);
         this.light = new PointLight(0xffffff, 10, 50, 1);
         this.light.position.set(0, 3, 3);
         this.scene.add(this.light);
@@ -85,7 +68,7 @@ class Demo {
     }
 
     get dpr() {
-        return Math.min(window.devicePixelRatio, 2);
+        return Math.min(window.devicePixelRatio, 1.5);
     }
 
     onWindowResize() {
@@ -143,36 +126,15 @@ class Demo {
         this.canvas.removeEventListener('touchmove', this.onTouchMove);
     }
 
-    #initTweakPane() {
-        this.tweakPane = new Pane();
-
-        // this.tweakPane.addBinding(this.params, 'position').on('change', (event) => {
-        //     this.mesh.position.set(event.value.x, event.value.y, event.value.z);
-        //     this.camera.position.x = event.value.x;
-        //     this.camera.position.z = 5 + event.value.z;
-        // });
-
-        // this.tweakPane.addBinding(this.params, 'count', { min: 0, max: 50000, step: 1 });
-
-        // this.tweakPane.addBinding(this.params, 'pointSize', { min: 0, max: 50, step: 0.001 }).on('change', (event) => {
-        //     this.uniforms.pointSize.value = event.value;
-        // });
-    }
-
-    #destroyTweakPane() {
-        this.tweakPane.dispose();
-    }
-
     async render() {
-        this.stats.update();
+        this.stats?.update();
         await this.renderer.renderAsync(this.scene, this.camera);
     }
 
     destroy() {
         this.#destroyEvents();
-        this.#destroyTweakPane();
         this.controls?.dispose();
-        this.stats.dom.remove();
+        this.stats?.dom.remove();
         this.renderer.dispose();
     }
 }

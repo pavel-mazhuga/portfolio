@@ -51,7 +51,7 @@
         "sass-loader": "^14.2.1",
         "sharp": "^0.33.4",
         "stats-gl": "^3.6.0",
-        "three": "^0.170.0",
+        "three": "^0.171.0",
         "three-custom-shader-material": "^6.2.0",
         "tweakpane": "^4.0.5",
         "typescript": "^5.4.5",
