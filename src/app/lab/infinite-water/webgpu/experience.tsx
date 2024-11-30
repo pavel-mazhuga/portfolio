@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useIsClient } from 'usehooks-ts';
 import Demo from './demo';
+import styles from './styles.module.scss';
 
 const Experience = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,7 +24,12 @@ const Experience = () => {
         };
     }, [isClient]);
 
-    return <canvas ref={canvasRef} className="responsive__item"></canvas>;
+    return (
+        <>
+            <canvas ref={canvasRef} className="responsive__item"></canvas>
+            <div className={styles.tip}>SCROLL</div>
+        </>
+    );
 };
 
 export default Experience;
