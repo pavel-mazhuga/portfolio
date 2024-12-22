@@ -1,4 +1,6 @@
-# Recreation of [Nightingale hover wave image effect](https://www.awwwards.com/inspiration/projects-hover-wave-image-effect-nightingale) with TSL. All the credits to [Unseen Studio](https://unseen.co/).
+# Recreation of [Nightingale hover wave image effect](https://www.awwwards.com/inspiration/projects-hover-wave-image-effect-nightingale) with TSL.
+
+All the credits to [Unseen Studio](https://unseen.co/).
 
 ## Demo
 
