@@ -1,12 +1,14 @@
 import { Fn, Node, ShaderNodeObject, abs, float, sin, time, vec3 } from 'three/tsl';
 
-export const positionNode = Fn<{
+type Params = {
     position: ShaderNodeObject<Node>;
     progress: ShaderNodeObject<Node> | number;
     frequency: ShaderNodeObject<Node> | number;
     speed: ShaderNodeObject<Node> | number;
     amplitude: ShaderNodeObject<Node> | number;
-}>(({ position, progress, frequency, speed, amplitude }) => {
+};
+
+export const positionNode = Fn<Params>(({ position, progress, frequency, speed, amplitude }) => {
     const transformedProgress = abs(float(progress).mul(2).sub(1)).oneMinus();
     const newPos = vec3(position).toVar();
 
