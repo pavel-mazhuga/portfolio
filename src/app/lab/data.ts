@@ -11,6 +11,7 @@ import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
 import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
 import infiniteWaterPreview from '@/app/lab/infinite-water/webgpu/preview.jpeg';
+import nightingaleHoverEffectRecreatedPreview from '@/app/lab/nightingale-hover-effect-recreated/webgpu/preview.jpeg';
 import particlesFollowingCursorPositionPreview from '@/app/lab/particles-following-cursor-position/preview.jpeg';
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
 import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
@@ -23,6 +24,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Nightingale hover effect (recreated)',
+        slug: 'nightingale-hover-effect-recreated/webgpu',
+        tags: ['webgpu', 'tsl', 'shaders'],
+        preview: nightingaleHoverEffectRecreatedPreview,
+    },
     {
         name: 'Infinite water',
         slug: 'infinite-water/webgpu',

@@ -20,7 +20,7 @@ const HideInterface = () => {
     useEffect(() => {
         [
             ...document.querySelectorAll<HTMLElement>(
-                '.header, .footer, .experiment__top, #leva__root, .leva-wrapper, .r3f-perf',
+                '.header, .footer, .experiment__top, #leva__root, .leva-wrapper, .r3f-perf, .tp-dfwv',
             ),
         ].forEach((el) => {
             if (el) {
