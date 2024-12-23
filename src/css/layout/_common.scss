@@ -161,4 +161,8 @@ body:not(.sb-show-main) {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+
+    @include mobile {
+        bottom: 60px;
+    }
 }
