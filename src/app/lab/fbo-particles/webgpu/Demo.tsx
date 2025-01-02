@@ -5,14 +5,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useControls } from 'leva';
 import { Suspense, useEffect, useMemo } from 'react';
 import {
-    AdditiveBlending,
-    MathUtils,
-    MeshBasicNodeMaterial,
-    Node,
+    Fn,
     ShaderNodeObject,
-    SpriteNodeMaterial,
-    StorageInstancedBufferAttribute,
-    WebGPURenderer,
     cameraPosition,
     color,
     float,
@@ -24,11 +18,19 @@ import {
     pow,
     storage,
     timerLocal,
-    tslFn,
     uniform,
     varyingProperty,
     vec3,
     vec4,
+} from 'three/tsl';
+import {
+    AdditiveBlending,
+    MathUtils,
+    MeshBasicNodeMaterial,
+    Node,
+    SpriteNodeMaterial,
+    StorageInstancedBufferAttribute,
+    WebGPURenderer,
 } from 'three/webgpu';
 import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
@@ -143,7 +145,7 @@ const Demo = () => {
     // useEffect(() => {
     //     if (gl instanceof WebGPURenderer) {
     //         // Compute init
-    //         const particlesInit = tslFn(() => {
+    //         const particlesInit = Fn(() => {
     //             const basePosition = basePositionBuffer.element(instanceIndex);
     //             const position = positionBuffer.element(instanceIndex);
 
@@ -164,7 +166,7 @@ const Demo = () => {
 
         const timer = timerLocal();
 
-        const colorNode = tslFn(() => {
+        const colorNode = Fn(() => {
             return vec4(uniforms.color, 1);
         });
 

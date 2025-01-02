@@ -4,8 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useControls } from 'leva';
 import { Suspense, useMemo } from 'react';
 import {
-    MeshBasicNodeMaterial,
-    Node,
+    Fn,
     ShaderNodeObject,
     cameraPosition,
     color,
@@ -15,12 +14,12 @@ import {
     positionViewDirection,
     pow,
     timerLocal,
-    tslFn,
     uniform,
     varyingProperty,
     vec3,
     vec4,
-} from 'three/webgpu';
+} from 'three/tsl';
+import { MeshBasicNodeMaterial, Node } from 'three/webgpu';
 import { useMediaQuery } from 'usehooks-ts';
 import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
@@ -187,7 +186,7 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
         const vNormal = varyingProperty('vec3');
         const vViewDirection = varyingProperty('vec3');
 
-        const positionNode = tslFn<ShaderNodeObject<Node>[]>(([position]) => {
+        const positionNode = Fn<ShaderNodeObject<Node>[]>(([position]) => {
             vNormal.assign(normalLocal);
             vViewDirection.assign(positionViewDirection);
 
@@ -215,7 +214,7 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
             return newPosition;
         });
 
-        const colorNode = tslFn(() => {
+        const colorNode = Fn(() => {
             const color = pow(vPattern, uniforms.gradientStrength).mul(uniforms.color);
 
             const ambientLight = ambientLightNode(uniforms.ambientLight.color, uniforms.ambientLight.intensity);

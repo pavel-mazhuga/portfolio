@@ -1,17 +1,6 @@
 import { OrthographicCamera } from 'three';
-import {
-    Fn,
-    MeshBasicNodeMaterial,
-    StorageTexture,
-    WebGPURenderer,
-    instanceIndex,
-    texture,
-    textureStore,
-    uvec2,
-    vec2,
-    vec3,
-    vec4,
-} from 'three/webgpu';
+import { Fn, instanceIndex, texture, textureStore, uvec2, vec2, vec3, vec4 } from 'three/tsl';
+import { MeshBasicNodeMaterial, StorageTexture, WebGPURenderer } from 'three/webgpu';
 import { snoise } from '@/utils/webgpu/nodes/noise/simplexNoise2d';
 
 export function computeSimplex2DNoiseTexture(

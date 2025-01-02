@@ -1,4 +1,5 @@
-import { Fn, Node, ShaderNodeObject, TextureNode, clamp, float, mix, mul, smoothstep, sub, uv, vec4 } from 'three/tsl';
+import { Fn, ShaderNodeObject, clamp, float, mix, mul, smoothstep, sub, uv, vec4 } from 'three/tsl';
+import { Node, TextureNode } from 'three/webgpu';
 import { coverTextureUv } from '@/app/tsl-utils/image/uv-cover';
 
 type Params = {

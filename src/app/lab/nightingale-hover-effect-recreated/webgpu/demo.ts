@@ -1,9 +1,10 @@
 import { animate } from 'framer-motion';
-import { Node, ShaderNodeObject, UniformNode, positionLocal, texture, uniform, vec2 } from 'three/tsl';
+import { ShaderNodeObject, positionLocal, texture, uniform, vec2 } from 'three/tsl';
 import {
     ACESFilmicToneMapping,
     Color,
     Mesh,
+    Node,
     NodeMaterial,
     PerspectiveCamera,
     PlaneGeometry,
@@ -11,6 +12,7 @@ import {
     Scene,
     Texture,
     TextureLoader,
+    UniformNode,
     Vector2,
     WebGPURenderer,
 } from 'three/webgpu';

@@ -1,18 +1,9 @@
 import Stats from 'stats-gl';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
-    AdditiveBlending,
-    ComputeNode,
     Fn,
     If,
-    InstancedMesh,
-    PerspectiveCamera,
-    PlaneGeometry,
-    Scene,
     ShaderNodeObject,
-    SpriteNodeMaterial,
-    StorageInstancedBufferAttribute,
-    WebGPURenderer,
     abs,
     cameraViewMatrix,
     color,
@@ -37,6 +28,17 @@ import {
     vec2,
     vec3,
     vec4,
+} from 'three/tsl';
+import {
+    AdditiveBlending,
+    ComputeNode,
+    InstancedMesh,
+    PerspectiveCamera,
+    PlaneGeometry,
+    Scene,
+    SpriteNodeMaterial,
+    StorageInstancedBufferAttribute,
+    WebGPURenderer,
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
 import { simplexNoise4d } from '@/utils/webgpu/nodes/noise/simplexNoise4d';

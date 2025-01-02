@@ -1,6 +1,7 @@
-import { Node, ShaderNodeObject, dot, max, normalize, pow, reflect, tslFn } from 'three/webgpu';
+import { Fn, ShaderNodeObject, dot, max, normalize, pow, reflect } from 'three/tsl';
+import { Node } from 'three/webgpu';
 
-export const directionalLightNode = tslFn<ShaderNodeObject<Node>[]>(
+export const directionalLightNode = Fn<ShaderNodeObject<Node>[]>(
     ([lightColor, lightIntensity, normal, lightPosition, viewDirection, specularPower]) => {
         const lightDirection = normalize(lightPosition);
         const lightReflection = reflect(lightDirection.negate(), normal);

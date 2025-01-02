@@ -3,13 +3,11 @@
 import { useThree } from '@react-three/fiber';
 import { Suspense, useMemo } from 'react';
 import {
-    // @ts-ignore
     Break,
     Fn,
     If,
-    MeshBasicNodeMaterial,
     dot,
-    float, // @ts-ignore
+    float,
     loop,
     max,
     normalize,
@@ -20,7 +18,8 @@ import {
     vec2,
     vec3,
     viewport,
-} from 'three/webgpu';
+} from 'three/tsl';
+import { MeshBasicNodeMaterial } from 'three/webgpu';
 import PageLoading from '@/app/components/shared/PageLoading';
 import WebGPUCanvas from '@/app/components/webgl/WebGPUCanvas';
 import { diffuseNode } from '@/utils/webgpu/nodes/lighting/diffuse';

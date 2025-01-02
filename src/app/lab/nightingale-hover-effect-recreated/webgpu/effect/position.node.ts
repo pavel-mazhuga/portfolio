@@ -1,4 +1,5 @@
-import { Fn, Node, ShaderNodeObject, abs, float, sin, time, vec3 } from 'three/tsl';
+import { Fn, ShaderNodeObject, abs, float, sin, time, vec3 } from 'three/tsl';
+import { Node } from 'three/webgpu';
 
 type Params = {
     position: ShaderNodeObject<Node>;
