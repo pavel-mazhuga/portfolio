@@ -174,5 +174,6 @@ body:not(.sb-show-main) {
 
     @include mobile {
         width: 300px !important;
+        bottom: 55px;
     }
 }

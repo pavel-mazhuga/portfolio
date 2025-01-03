@@ -316,7 +316,10 @@ class Demo {
     }
 
     #initTweakPane() {
-        this.tweakPane = new Pane();
+        this.tweakPane = new Pane({
+            title: 'Parameters',
+            expanded: matchMedia('(min-width: 1200px)').matches,
+        });
 
         this.tweakPane
             .addBinding(this.params, 'cursorRadius', { min: 6, max: 20, step: 0.01 })
