@@ -125,10 +125,10 @@ class Demo {
         gltfLoader.load('/gltf/face2.glb', (gltf) => {
             gltf.scene.traverse((node) => {
                 if (node instanceof Mesh) {
-                    this.amount = node.geometry.attributes.position.array.length;
                     node.geometry.toNonIndexed();
                     node.geometry.center();
                     node.geometry.rotateX(-Math.PI / 2);
+                    this.amount = node.geometry.attributes.position.array.length / 3;
 
                     this.particlesBasePositionsBuffer = storage(
                         new StorageInstancedBufferAttribute(node.geometry.attributes.position.array, 3),
@@ -188,10 +188,10 @@ class Demo {
                         // position.addAssign(velocity.mul(deltaTime));
 
                         // Cursor based strength
-                        const distanceToCursor = this.pointerHandler.uPointer.distance(basePosition).toVar();
+                        const distanceToCursor = this.pointerHandler.uPointer.distance(basePosition);
                         const cursorStrength = float(this.uniforms.cursorRadius).sub(distanceToCursor).smoothstep(0, 1);
 
-                        strength.assign(strength.add(cursorStrength).sub(deltaTime.mul(1)).clamp(0, 1));
+                        strength.assign(strength.add(cursorStrength).sub(deltaTime).clamp(0, 1));
 
                         const pointerAttraction = normalize(position.sub(this.pointerHandler.uPointer)).mul(
                             this.uniforms.pointerAttractionStrength,
