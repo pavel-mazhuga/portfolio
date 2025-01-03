@@ -67,11 +67,12 @@ class Demo {
 
     params = {
         cursorRadius: 10,
-        scale: 1,
+        baseParticleScale: 1,
         pointerAttractionStrength: 0.015,
         hoverPower: 1,
+        hoverDuration: 1,
         wanderingSpeed: 0.003,
-        contactScale: 1,
+        contactParticleScaleMultiplier: 1,
 
         usePostprocessing: true,
 
@@ -85,11 +86,12 @@ class Demo {
 
     uniforms = {
         cursorRadius: uniform(this.params.cursorRadius),
-        scale: uniform(this.params.scale),
+        scale: uniform(this.params.baseParticleScale),
         pointerAttractionStrength: uniform(this.params.pointerAttractionStrength),
         hoverPower: uniform(this.params.hoverPower),
+        hoverDuration: uniform(this.params.hoverDuration),
         wanderingSpeed: uniform(this.params.wanderingSpeed),
-        contactScale: uniform(this.params.contactScale),
+        contactScale: uniform(this.params.contactParticleScaleMultiplier),
     };
 
     constructor(canvas: HTMLCanvasElement) {
@@ -193,9 +195,12 @@ class Demo {
                         const distanceToCursor = this.pointerHandler.uPointer.distance(basePosition);
                         const cursorStrength = float(this.uniforms.cursorRadius).sub(distanceToCursor).smoothstep(0, 1);
 
-                        strength.assign(strength.add(cursorStrength).sub(deltaTime).clamp(0, 1));
+                        strength.assign(
+                            strength.add(cursorStrength).sub(deltaTime.mul(this.uniforms.hoverDuration)).clamp(0, 1),
+                        );
 
-                        const pointerAttraction = normalize(position.sub(this.pointerHandler.uPointer)).mul(
+                        const pointerAttractionDirection = normalize(position.sub(this.pointerHandler.uPointer));
+                        const pointerAttraction = pointerAttractionDirection.mul(
                             this.uniforms.pointerAttractionStrength,
                         );
 
@@ -319,9 +324,11 @@ class Demo {
                 this.uniforms.cursorRadius.value = event.value;
             });
 
-        this.tweakPane.addBinding(this.params, 'scale', { min: 0, max: 3, step: 0.01 }).on('change', (event) => {
-            this.uniforms.scale.value = event.value;
-        });
+        this.tweakPane
+            .addBinding(this.params, 'baseParticleScale', { min: 0, max: 3, step: 0.01 })
+            .on('change', (event) => {
+                this.uniforms.scale.value = event.value;
+            });
 
         this.tweakPane
             .addBinding(this.params, 'pointerAttractionStrength', { min: 0, max: 0.3, step: 0.01 })
@@ -334,14 +341,22 @@ class Demo {
         });
 
         this.tweakPane
+            .addBinding(this.params, 'hoverDuration', { min: 0.1, max: 1, step: 0.01 })
+            .on('change', (event) => {
+                this.uniforms.hoverDuration.value = 1 / event.value;
+            });
+
+        this.tweakPane
             .addBinding(this.params, 'wanderingSpeed', { min: 0, max: 0.03, step: 0.0001 })
             .on('change', (event) => {
                 this.uniforms.wanderingSpeed.value = event.value;
             });
 
-        this.tweakPane.addBinding(this.params, 'contactScale', { min: 0, max: 3, step: 0.01 }).on('change', (event) => {
-            this.uniforms.contactScale.value = event.value;
-        });
+        this.tweakPane
+            .addBinding(this.params, 'contactParticleScaleMultiplier', { min: 0, max: 3, step: 0.01 })
+            .on('change', (event) => {
+                this.uniforms.contactScale.value = event.value;
+            });
 
         this.tweakPane.addBinding(this.params, 'usePostprocessing');
     }
@@ -355,13 +370,13 @@ class Demo {
         this.pointerHandler.update();
 
         if (this.updateParticlesCompute instanceof ComputeNode) {
-            await this.renderer.computeAsync(this.updateParticlesCompute);
+            this.renderer.computeAsync(this.updateParticlesCompute);
         }
 
         if (this.params.usePostprocessing) {
-            await this.postProcessing.renderAsync();
+            this.postProcessing.renderAsync();
         } else {
-            await this.renderer.renderAsync(this.scene, this.camera);
+            this.renderer.renderAsync(this.scene, this.camera);
         }
     }
 

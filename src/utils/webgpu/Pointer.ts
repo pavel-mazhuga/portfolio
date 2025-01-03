@@ -15,7 +15,7 @@ export class Pointer {
     clientPointer = new Vector2();
     pointer = new Vector2();
     scenePointer = new Vector3();
-    pointerDown: boolean = false;
+    pointerDown = false;
     uPointerDown = uniform(0);
     uPointer = uniform(new Vector3());
 
