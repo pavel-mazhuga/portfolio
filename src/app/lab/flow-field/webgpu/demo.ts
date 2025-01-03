@@ -144,25 +144,25 @@ class Demo {
                         new StorageInstancedBufferAttribute(node.geometry.attributes.position.array, 3),
                         'vec3',
                         this.amount,
-                    ).setPBO(true);
+                    );
 
                     this.particlesLifeBuffer = storage(
                         new StorageInstancedBufferAttribute(this.amount, 1),
                         'float',
                         this.amount,
-                    ).setPBO(true);
+                    );
 
                     this.particlesVelocitiesBuffer = storage(
                         new StorageInstancedBufferAttribute(this.amount, 3),
                         'vec3',
                         this.amount,
-                    ).setPBO(true);
+                    );
 
                     const strengthBuffer = storage(
                         new StorageInstancedBufferAttribute(this.amount, 1),
                         'float',
                         this.amount,
-                    ).setPBO(true);
+                    );
 
                     const initParticlesCompute = Fn<any>(() => {
                         this.particlesVelocitiesBuffer!.element(instanceIndex).xyz.assign(vec3(0));
@@ -278,6 +278,7 @@ class Demo {
         /**
          * Post processing
          */
+
         this.postProcessing = new PostProcessing(this.renderer);
 
         // Color
@@ -373,13 +374,13 @@ class Demo {
         this.pointerHandler.update();
 
         if (this.updateParticlesCompute instanceof ComputeNode) {
-            this.renderer.computeAsync(this.updateParticlesCompute);
+            await this.renderer.computeAsync(this.updateParticlesCompute);
         }
 
         if (this.params.usePostprocessing) {
-            this.postProcessing.renderAsync();
+            await this.postProcessing.renderAsync();
         } else {
-            this.renderer.renderAsync(this.scene, this.camera);
+            await this.renderer.renderAsync(this.scene, this.camera);
         }
     }
 
