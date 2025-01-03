@@ -166,3 +166,13 @@ body:not(.sb-show-main) {
         bottom: 60px;
     }
 }
+
+.tp-dfwv {
+    top: auto !important;
+    bottom: 100px;
+    width: 350px !important;
+
+    @include mobile {
+        width: 300px !important;
+    }
+}
