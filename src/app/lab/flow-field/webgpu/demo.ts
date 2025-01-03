@@ -73,6 +73,8 @@ class Demo {
         wanderingSpeed: 0.003,
         contactScale: 1,
 
+        usePostprocessing: true,
+
         turbFrequency: 0.5,
         turbAmplitude: 0.5,
         turbOctaves: 2,
@@ -103,7 +105,7 @@ class Demo {
         this.scene = new Scene();
         this.scene.backgroundNode = vec4(0, 0, 0, 1);
 
-        this.camera = new PerspectiveCamera(45, canvas.width / canvas.height, 0.1, 1000);
+        this.camera = new PerspectiveCamera(45, canvas.width / canvas.height, 0.1, 500);
         this.camera.position.set(0, 0, 50);
 
         if (process.env.NODE_ENV === 'development') {
@@ -273,14 +275,15 @@ class Demo {
          */
         this.postProcessing = new PostProcessing(this.renderer);
 
-        // // Color
-        // const colorPass = pass(this.scene, this.camera);
+        // Color
+        const scenePass = pass(this.scene, this.camera);
+        const scenePassColor = scenePass.getTextureNode('output');
 
-        // // Bloom
-        // const bloomPass = bloom(colorPass, 0.3, 0, 0);
+        // Bloom
+        const bloomPass = bloom(scenePassColor, 0.12, 0.05, 0.25);
 
-        // // Output
-        // this.postProcessing.outputNode = bloomPass;
+        // Output
+        this.postProcessing.outputNode = scenePassColor.add(bloomPass);
 
         this.renderer.setAnimationLoop(this.render);
     }
@@ -339,6 +342,8 @@ class Demo {
         this.tweakPane.addBinding(this.params, 'contactScale', { min: 0, max: 3, step: 0.01 }).on('change', (event) => {
             this.uniforms.contactScale.value = event.value;
         });
+
+        this.tweakPane.addBinding(this.params, 'usePostprocessing');
     }
 
     #destroyTweakPane() {
@@ -353,8 +358,11 @@ class Demo {
             await this.renderer.computeAsync(this.updateParticlesCompute);
         }
 
-        await this.renderer.renderAsync(this.scene, this.camera);
-        // await this.postProcessing.renderAsync();
+        if (this.params.usePostprocessing) {
+            await this.postProcessing.renderAsync();
+        } else {
+            await this.renderer.renderAsync(this.scene, this.camera);
+        }
     }
 
     destroy() {
