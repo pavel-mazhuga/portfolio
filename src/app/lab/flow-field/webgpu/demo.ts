@@ -158,7 +158,7 @@ class Demo {
                         new StorageInstancedBufferAttribute(this.amount, 1),
                         'float',
                         this.amount,
-                    );
+                    ).setPBO(true);
 
                     const initParticlesCompute = Fn<any>(() => {
                         this.particlesVelocitiesBuffer!.element(instanceIndex).xyz.assign(vec3(0));
