@@ -16,6 +16,7 @@ import {
     mx_fractal_noise_vec3,
     normalize,
     pass,
+    screenUV,
     smoothstep,
     storage,
     time,
@@ -105,7 +106,6 @@ class Demo {
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 
         this.scene = new Scene();
-        this.scene.backgroundNode = vec4(0, 0, 0, 1);
 
         this.camera = new PerspectiveCamera(45, canvas.width / canvas.height, 0.1, 500);
         this.camera.position.set(0, 0, 50);
@@ -124,6 +124,13 @@ class Demo {
         this.controls.enabled = matchMedia('(pointer: fine)').matches;
 
         this.pointerHandler = new Pointer(this.renderer, this.camera, new Plane(new Vector3(0, 0, 1), 0));
+
+        this.scene.backgroundNode = Fn(() => {
+            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
+            color.mulAssign(0.03);
+
+            return vec4(color, 1);
+        })();
 
         const gltfLoader = new GLTFLoader();
         gltfLoader.load('/gltf/face2.glb', (gltf) => {
