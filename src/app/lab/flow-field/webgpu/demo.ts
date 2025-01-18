@@ -397,6 +397,10 @@ class Demo {
         this.controls?.dispose();
         this.stats?.dom.remove();
         this.pointerHandler.destroy();
+        this.particlesBasePositionsBuffer?.dispose();
+        this.particlesPositionsBuffer?.dispose();
+        this.particlesLifeBuffer?.dispose();
+        this.particlesVelocitiesBuffer?.dispose();
 
         if (this.renderer.hasInitialized()) {
             this.renderer.dispose();
