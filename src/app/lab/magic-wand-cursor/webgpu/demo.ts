@@ -67,11 +67,11 @@ class Demo {
     bloomPass: ShaderNodeObject<BloomNode>;
 
     params = {
-        amount: 500,
+        amount: 1000,
         usePostprocessing: true,
-        sparkSpeed: 2.0,
+        sparkSpeed: 2,
         sparkLifeDecay: 0.8,
-        sparkSpread: 1.0,
+        sparkSpread: 1,
         velocityThreshold: 0.01,
         spawnMultiplier: 1,
         minSpawnCount: 1,
@@ -86,6 +86,9 @@ class Demo {
         pointerVelocity: uniform(new Vector3()),
         isMoving: uniform(0),
         spawnCount: uniform(0),
+        sparkLifeDecay: uniform(this.params.sparkLifeDecay),
+        sparkSpread: uniform(this.params.sparkSpread),
+        sparkSpeed: uniform(this.params.sparkSpeed),
     };
 
     lastPointerPosition = new Vector3();
@@ -152,10 +155,8 @@ class Demo {
             const velocity = this.particlesVelocitiesBuffer!.element(instanceIndex);
             const life = this.particlesLifeBuffer!.element(instanceIndex);
 
-            const clampedDeltaTime = min(deltaTime, float(180 / 1000)).toVar();
-
-            position.xyz.addAssign(velocity.mul(clampedDeltaTime));
-            life.subAssign(clampedDeltaTime.mul(this.params.sparkLifeDecay));
+            position.xyz.addAssign(velocity.mul(deltaTime));
+            life.subAssign(deltaTime.mul(this.uniforms.sparkLifeDecay));
 
             If(life.lessThan(0), () => {
                 const randomDir = normalize(
@@ -170,9 +171,9 @@ class Demo {
                     position.xyz.assign(this.pointerHandler.uPointer);
                     velocity.xyz.assign(
                         randomDir
-                            .mul(this.params.sparkSpeed)
+                            .mul(this.uniforms.sparkSpeed)
                             .add(this.uniforms.pointerVelocity)
-                            .mul(this.params.sparkSpread),
+                            .mul(this.uniforms.sparkSpread),
                     );
                     life.assign(hash(instanceIndex.add(time)).mul(1).add(0.5));
                 }).Else(() => {
@@ -181,7 +182,7 @@ class Demo {
                     life.assign(0);
                 });
             }).Else(() => {
-                velocity.y.subAssign(clampedDeltaTime.mul(2));
+                velocity.y.subAssign(deltaTime.mul(2));
                 velocity.mulAssign(0.98);
             });
         })().compute(this.params.amount);
@@ -268,13 +269,19 @@ class Demo {
         });
 
         const particlesFolder = this.tweakPane.addFolder({ title: 'Particles' });
-        // particlesFolder.addBinding(this.params, 'amount', { min: 0, max: 10000, step: 0.1 });
-        particlesFolder.addBinding(this.params, 'sparkSpeed', { min: 0, max: 5, step: 0.1 });
-        particlesFolder.addBinding(this.params, 'sparkLifeDecay', { min: 0.1, max: 2, step: 0.1 });
-        particlesFolder.addBinding(this.params, 'sparkSpread', { min: 0.1, max: 3, step: 0.1 });
-        particlesFolder.addBinding(this.params, 'velocityThreshold', { min: 0, max: 0.1, step: 0.001 });
-        particlesFolder.addBinding(this.params, 'spawnMultiplier', { min: 0.01, max: 1, step: 0.01 });
-        particlesFolder.addBinding(this.params, 'minSpawnCount', { min: 1, max: 10, step: 1 });
+        particlesFolder.addBinding(this.params, 'sparkSpeed', { min: 0, max: 5, step: 0.1 }).on('change', (event) => {
+            this.uniforms.sparkSpeed.value = event.value;
+        });
+        particlesFolder
+            .addBinding(this.params, 'sparkLifeDecay', { min: 0.1, max: 2, step: 0.1 })
+            .on('change', (event) => {
+                this.uniforms.sparkLifeDecay.value = event.value;
+            });
+        particlesFolder
+            .addBinding(this.params, 'sparkSpread', { min: 0.1, max: 3, step: 0.1 })
+            .on('change', (event) => {
+                this.uniforms.sparkSpread.value = event.value;
+            });
 
         const postprocessingFolder = this.tweakPane.addFolder({ title: 'Post-processing' });
         postprocessingFolder.addBinding(this.params, 'usePostprocessing');
@@ -330,9 +337,6 @@ class Demo {
         if (velocity > this.params.velocityThreshold) {
             const normalizedVelocity = Math.min(velocity * velocity * 4, 1);
 
-            // Это формула сглаживания для более резкого уменьшения количества частиц при низких скоростях
-            // При малых значениях normalizedVelocity результат будет ближе к нулю,
-            // а при больших значениях - плавно приближается к единице
             const t = normalizedVelocity * normalizedVelocity * (3 - 2 * normalizedVelocity);
 
             const spawnCount = Math.floor(
