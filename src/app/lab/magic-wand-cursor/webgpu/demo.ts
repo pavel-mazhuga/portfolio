@@ -1,7 +1,6 @@
 import Stats from 'stats-gl';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
+import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import {
     Discard,
     Fn,
@@ -65,6 +64,8 @@ class Demo {
 
     updateParticlesCompute: ComputeNode;
 
+    bloomPass: ShaderNodeObject<BloomNode>;
+
     params = {
         usePostprocessing: true,
         sparkSpeed: 2.0,
@@ -73,6 +74,11 @@ class Demo {
         velocityThreshold: 0.01,
         spawnMultiplier: 1,
         minSpawnCount: 1,
+        bloom: {
+            intensity: 0.45,
+            radius: 0.5,
+            threshold: 0.15,
+        },
     };
 
     uniforms = {
@@ -213,10 +219,15 @@ class Demo {
         const scenePassColor = scenePass.getTextureNode('output');
 
         // Bloom
-        const bloomPass = bloom(scenePassColor, 0.45, 0.2, 0.15);
+        this.bloomPass = bloom(
+            scenePassColor,
+            this.params.bloom.intensity,
+            this.params.bloom.radius,
+            this.params.bloom.threshold,
+        );
 
         // Output
-        this.postProcessing.outputNode = scenePassColor.add(bloomPass);
+        this.postProcessing.outputNode = scenePassColor.add(this.bloomPass);
 
         this.renderer.setAnimationLoop(this.render);
     }
@@ -249,13 +260,50 @@ class Demo {
             expanded: matchMedia('(min-width: 1200px)').matches,
         });
 
-        this.tweakPane.addBinding(this.params, 'usePostprocessing');
-        this.tweakPane.addBinding(this.params, 'sparkSpeed', { min: 0, max: 5, step: 0.1 });
-        this.tweakPane.addBinding(this.params, 'sparkLifeDecay', { min: 0.1, max: 2, step: 0.1 });
-        this.tweakPane.addBinding(this.params, 'sparkSpread', { min: 0.1, max: 3, step: 0.1 });
-        this.tweakPane.addBinding(this.params, 'velocityThreshold', { min: 0, max: 0.1, step: 0.001 });
-        this.tweakPane.addBinding(this.params, 'spawnMultiplier', { min: 0.01, max: 1, step: 0.01 });
-        this.tweakPane.addBinding(this.params, 'minSpawnCount', { min: 1, max: 10, step: 1 });
+        const particlesFolder = this.tweakPane.addFolder({ title: 'Particles' });
+        particlesFolder.addBinding(this.params, 'sparkSpeed', { min: 0, max: 5, step: 0.1 });
+        particlesFolder.addBinding(this.params, 'sparkLifeDecay', { min: 0.1, max: 2, step: 0.1 });
+        particlesFolder.addBinding(this.params, 'sparkSpread', { min: 0.1, max: 3, step: 0.1 });
+        particlesFolder.addBinding(this.params, 'velocityThreshold', { min: 0, max: 0.1, step: 0.001 });
+        particlesFolder.addBinding(this.params, 'spawnMultiplier', { min: 0.01, max: 1, step: 0.01 });
+        particlesFolder.addBinding(this.params, 'minSpawnCount', { min: 1, max: 10, step: 1 });
+
+        const postprocessingFolder = this.tweakPane.addFolder({ title: 'Post-processing' });
+        postprocessingFolder.addBinding(this.params, 'usePostprocessing');
+
+        const bloomFolder = postprocessingFolder.addFolder({ title: 'Bloom' });
+        bloomFolder
+            .addBinding(this.params.bloom, 'intensity', {
+                min: 0,
+                max: 2,
+                step: 0.05,
+                label: 'Intensity',
+            })
+            .on('change', (event) => {
+                this.bloomPass.strength.value = event.value;
+            });
+
+        bloomFolder
+            .addBinding(this.params.bloom, 'radius', {
+                min: 0,
+                max: 1,
+                step: 0.05,
+                label: 'Radius',
+            })
+            .on('change', (event) => {
+                this.bloomPass.radius.value = event.value;
+            });
+
+        bloomFolder
+            .addBinding(this.params.bloom, 'threshold', {
+                min: 0,
+                max: 1,
+                step: 0.05,
+                label: 'Threshold',
+            })
+            .on('change', (event) => {
+                this.bloomPass.threshold.value = event.value;
+            });
     }
 
     #destroyTweakPane() {
