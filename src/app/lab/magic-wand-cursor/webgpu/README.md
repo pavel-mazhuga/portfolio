@@ -1,4 +1,4 @@
-# Attractor and collisions
+# Magic wand cursor
 
 ## Demo
 
