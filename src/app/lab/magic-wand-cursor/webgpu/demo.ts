@@ -42,8 +42,8 @@ import {
     WebGPURenderer,
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
+import { lerp } from '@/utils/lerp';
 import { Pointer } from '@/utils/webgpu/Pointer';
-import { curlNoise4d } from '@/utils/webgpu/nodes/noise/curlNoise4d';
 
 class Demo {
     canvas: HTMLCanvasElement;
@@ -55,8 +55,8 @@ class Demo {
     stats?: Stats;
     mesh?: Mesh;
     tweakPane?: Pane;
-    amount = 500;
     pointerHandler: Pointer;
+    lerpedSpawnCount = 0;
 
     particlesPositionsBuffer: ShaderNodeObject<StorageBufferNode>;
     particlesVelocitiesBuffer: ShaderNodeObject<StorageBufferNode>;
@@ -67,6 +67,7 @@ class Demo {
     bloomPass: ShaderNodeObject<BloomNode>;
 
     params = {
+        amount: 500,
         usePostprocessing: true,
         sparkSpeed: 2.0,
         sparkLifeDecay: 0.8,
@@ -100,6 +101,12 @@ class Demo {
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 
         this.scene = new Scene();
+        this.scene.backgroundNode = Fn(() => {
+            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.17)))).toVar();
+            color.mulAssign(0.07);
+
+            return vec4(color, 1);
+        })();
 
         this.camera = new PerspectiveCamera(45, canvas.width / canvas.height, 0.1, 100);
         this.camera.position.set(0, 0, 5);
@@ -114,31 +121,29 @@ class Demo {
 
         this.pointerHandler = new Pointer(this.renderer, this.camera, new Plane(new Vector3(0, 0, 1), 0));
 
-        // this.scene.backgroundNode = Fn(() => {
-        //     const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
-        //     color.mulAssign(0.03);
-
-        //     return vec4(color, 1);
-        // })();
-
         this.particlesPositionsBuffer = storage(
-            new StorageInstancedBufferAttribute(this.amount, 3),
+            new StorageInstancedBufferAttribute(this.params.amount, 3),
             'vec3',
-            this.amount,
+            this.params.amount,
         ).setPBO(true);
 
-        this.particlesLifeBuffer = storage(new StorageInstancedBufferAttribute(this.amount, 1), 'float', this.amount);
+        this.particlesLifeBuffer = storage(
+            new StorageInstancedBufferAttribute(this.params.amount, 1),
+            'float',
+            this.params.amount,
+        );
 
         this.particlesVelocitiesBuffer = storage(
-            new StorageInstancedBufferAttribute(this.amount, 3),
+            new StorageInstancedBufferAttribute(this.params.amount, 3),
             'vec3',
-            this.amount,
+            this.params.amount,
         );
 
         const initParticlesCompute = Fn<any>(() => {
+            this.particlesPositionsBuffer.element(instanceIndex).xyz.assign(vec3(0));
             this.particlesVelocitiesBuffer.element(instanceIndex).xyz.assign(vec3(0));
             this.particlesLifeBuffer.element(instanceIndex).assign(0);
-        })().compute(this.amount);
+        })().compute(this.params.amount);
 
         this.renderer.computeAsync(initParticlesCompute);
 
@@ -147,8 +152,10 @@ class Demo {
             const velocity = this.particlesVelocitiesBuffer!.element(instanceIndex);
             const life = this.particlesLifeBuffer!.element(instanceIndex);
 
-            position.xyz.addAssign(velocity.mul(deltaTime));
-            life.subAssign(deltaTime.mul(this.params.sparkLifeDecay));
+            const clampedDeltaTime = min(deltaTime, float(180 / 1000)).toVar();
+
+            position.xyz.addAssign(velocity.mul(clampedDeltaTime));
+            life.subAssign(clampedDeltaTime.mul(this.params.sparkLifeDecay));
 
             If(life.lessThan(0), () => {
                 const randomDir = normalize(
@@ -174,10 +181,10 @@ class Demo {
                     life.assign(0);
                 });
             }).Else(() => {
-                velocity.y.subAssign(deltaTime.mul(2));
+                velocity.y.subAssign(clampedDeltaTime.mul(2));
                 velocity.mulAssign(0.98);
             });
-        })().compute(this.amount);
+        })().compute(this.params.amount);
 
         const geometry = new PlaneGeometry();
 
@@ -200,7 +207,7 @@ class Demo {
             return vec4(hash(instanceIndex), hash(instanceIndex.add(1)), hash(instanceIndex.add(2)), opacity);
         })();
 
-        this.mesh = new InstancedMesh(geometry, material, this.amount);
+        this.mesh = new InstancedMesh(geometry, material, this.params.amount);
         this.mesh.frustumCulled = false;
         this.mesh.matrixAutoUpdate = false;
         this.scene.add(this.mesh);
@@ -261,6 +268,7 @@ class Demo {
         });
 
         const particlesFolder = this.tweakPane.addFolder({ title: 'Particles' });
+        // particlesFolder.addBinding(this.params, 'amount', { min: 0, max: 10000, step: 0.1 });
         particlesFolder.addBinding(this.params, 'sparkSpeed', { min: 0, max: 5, step: 0.1 });
         particlesFolder.addBinding(this.params, 'sparkLifeDecay', { min: 0.1, max: 2, step: 0.1 });
         particlesFolder.addBinding(this.params, 'sparkSpread', { min: 0.1, max: 3, step: 0.1 });
@@ -328,10 +336,13 @@ class Demo {
             const t = normalizedVelocity * normalizedVelocity * (3 - 2 * normalizedVelocity);
 
             const spawnCount = Math.floor(
-                this.params.minSpawnCount + t * (this.amount - this.params.minSpawnCount) * this.params.spawnMultiplier,
+                this.params.minSpawnCount +
+                    t * (this.params.amount - this.params.minSpawnCount) * this.params.spawnMultiplier,
             );
 
-            this.uniforms.spawnCount.value = Math.min(spawnCount, this.amount);
+            this.lerpedSpawnCount = lerp(this.lerpedSpawnCount, spawnCount, 0.05);
+
+            this.uniforms.spawnCount.value = Math.min(this.lerpedSpawnCount, this.params.amount);
         } else {
             this.uniforms.spawnCount.value = 0;
         }

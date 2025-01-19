@@ -12,7 +12,7 @@ export class Pointer {
     rayCaster = new Raycaster();
     initPlane = new Plane(new Vector3(0, 0, 1));
     iPlane = new Plane(new Vector3(0, 0, 1));
-    clientPointer = new Vector2();
+    clientPointer = new Vector2(-999);
     pointer = new Vector2();
     scenePointer = new Vector3();
     pointerDown = false;
