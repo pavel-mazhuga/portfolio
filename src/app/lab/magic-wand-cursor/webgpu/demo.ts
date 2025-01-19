@@ -66,13 +66,13 @@ class Demo {
     updateParticlesCompute: ComputeNode;
 
     params = {
-        usePostprocessing: false,
+        usePostprocessing: true,
         sparkSpeed: 2.0,
         sparkLifeDecay: 0.8,
         sparkSpread: 1.0,
         velocityThreshold: 0.01,
-        spawnMultiplier: 5.0,
-        minSpawnCount: 5,
+        spawnMultiplier: 1,
+        minSpawnCount: 1,
     };
 
     uniforms = {
@@ -163,7 +163,7 @@ class Demo {
                     );
                     life.assign(hash(instanceIndex.add(time)).mul(1).add(0.5));
                 }).Else(() => {
-                    position.xyz.assign(vec3(1000));
+                    position.xyz.assign(vec3(0));
                     velocity.xyz.assign(vec3(0));
                     life.assign(0);
                 });
@@ -213,7 +213,7 @@ class Demo {
         const scenePassColor = scenePass.getTextureNode('output');
 
         // Bloom
-        const bloomPass = bloom(scenePassColor, 0.12, 0.05, 0.25);
+        const bloomPass = bloom(scenePassColor, 0.45, 0.2, 0.15);
 
         // Output
         this.postProcessing.outputNode = scenePassColor.add(bloomPass);
@@ -254,8 +254,8 @@ class Demo {
         this.tweakPane.addBinding(this.params, 'sparkLifeDecay', { min: 0.1, max: 2, step: 0.1 });
         this.tweakPane.addBinding(this.params, 'sparkSpread', { min: 0.1, max: 3, step: 0.1 });
         this.tweakPane.addBinding(this.params, 'velocityThreshold', { min: 0, max: 0.1, step: 0.001 });
-        this.tweakPane.addBinding(this.params, 'spawnMultiplier', { min: 0.1, max: 2, step: 0.1 });
-        this.tweakPane.addBinding(this.params, 'minSpawnCount', { min: 1, max: 20, step: 1 });
+        this.tweakPane.addBinding(this.params, 'spawnMultiplier', { min: 0.01, max: 1, step: 0.01 });
+        this.tweakPane.addBinding(this.params, 'minSpawnCount', { min: 1, max: 10, step: 1 });
     }
 
     #destroyTweakPane() {
@@ -267,16 +267,20 @@ class Demo {
         this.pointerHandler.update();
 
         const currentPosition = this.pointerHandler.uPointer.value;
-        this.uniforms.pointerVelocity.value.copy(currentPosition).sub(this.lastPointerPosition).multiplyScalar(40);
+        this.uniforms.pointerVelocity.value.copy(currentPosition).sub(this.lastPointerPosition).multiplyScalar(30);
 
         const velocity = this.uniforms.pointerVelocity.value.length();
 
         if (velocity > this.params.velocityThreshold) {
-            const normalizedVelocity = Math.min(velocity * velocity * 2, 1.0);
+            const normalizedVelocity = Math.min(velocity * velocity * 4, 1);
+
+            // Это формула сглаживания для более резкого уменьшения количества частиц при низких скоростях
+            // При малых значениях normalizedVelocity результат будет ближе к нулю,
+            // а при больших значениях - плавно приближается к единице
+            const t = normalizedVelocity * normalizedVelocity * (3 - 2 * normalizedVelocity);
 
             const spawnCount = Math.floor(
-                this.params.minSpawnCount +
-                    normalizedVelocity * (this.amount - this.params.minSpawnCount) * this.params.spawnMultiplier,
+                this.params.minSpawnCount + t * (this.amount - this.params.minSpawnCount) * this.params.spawnMultiplier,
             );
 
             this.uniforms.spawnCount.value = Math.min(spawnCount, this.amount);
@@ -287,13 +291,13 @@ class Demo {
         this.lastPointerPosition.copy(currentPosition);
 
         if (this.updateParticlesCompute instanceof ComputeNode) {
-            await this.renderer.computeAsync(this.updateParticlesCompute);
+            this.renderer.computeAsync(this.updateParticlesCompute);
         }
 
         if (this.params.usePostprocessing) {
-            await this.postProcessing.renderAsync();
+            this.postProcessing.renderAsync();
         } else {
-            await this.renderer.renderAsync(this.scene, this.camera);
+            this.renderer.renderAsync(this.scene, this.camera);
         }
     }
 
