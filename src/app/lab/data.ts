@@ -12,6 +12,7 @@ import flowerishPreview from '@/app/lab/flower-ish/preview.jpeg';
 import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
 import infiniteWaterPreview from '@/app/lab/infinite-water/webgpu/preview.jpeg';
+import magicWandCursorPreview from '@/app/lab/magic-wand-cursor/webgpu/preview.jpeg';
 import nightingaleHoverEffectRecreatedPreview from '@/app/lab/nightingale-hover-effect-recreated/webgpu/preview.jpeg';
 import particlesFollowingCursorPositionPreview from '@/app/lab/particles-following-cursor-position/preview.jpeg';
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
@@ -25,6 +26,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Magic wand',
+        slug: 'magic-wand-cursor/webgpu',
+        tags: ['webgpu', 'tsl', 'shaders', 'compute'],
+        preview: magicWandCursorPreview,
+    },
     {
         name: 'Flow field',
         slug: 'flow-field/webgpu',
