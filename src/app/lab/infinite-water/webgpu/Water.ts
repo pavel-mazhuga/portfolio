@@ -7,6 +7,7 @@ import {
     cross,
     float,
     mix,
+    modelWorldMatrix,
     positionLocal,
     sin,
     smoothstep,
@@ -43,10 +44,10 @@ class Water extends Mesh {
         const uWavesSpeed = float(0.75);
         const uWavesElevation = float(0.2);
 
-        const getWaveElevation = Fn<[any, any]>(([position, timer]) => {
-            const posWorld = position.add(cameraPosition);
+        const getWaveElevation = Fn<[any]>(([position]) => {
+            const posWorld = modelWorldMatrix.mul(position);
             const noise = cnoise3d(vec3(posWorld.xz, position.y)).toVar();
-            const timeMult = timer.mul(uWavesSpeed).toVar();
+            const timeMult = time.mul(uWavesSpeed).toVar();
             const elevation = cos(posWorld.x.mul(uWavesFrequency.x).add(timeMult).add(noise))
                 .mul(sin(posWorld.z.mul(uWavesFrequency.y).add(timeMult).add(noise)))
                 .mul(uWavesElevation)
@@ -59,7 +60,7 @@ class Water extends Mesh {
          * Position node
          */
 
-        const displacement = getWaveElevation(positionLocal, time);
+        const displacement = getWaveElevation(positionLocal);
         const position = positionLocal.add(vec3(0, displacement, 0));
 
         this.material.positionNode = position;
@@ -68,23 +69,25 @@ class Water extends Mesh {
          * Normal node
          */
 
-        const normalComputeShift = float(0.015);
+        this.material.normalNode = Fn(() => {
+            const normalComputeShift = float(0.015);
 
-        // Neighbours
-        let neighbourAPosition = positionLocal.add(tangentLocal.xyz.mul(normalComputeShift));
-        let neighbourBPosition = positionLocal.add(bitangentLocal.xyz.mul(normalComputeShift));
+            // Neighbours
+            let neighbourAPosition = positionLocal.add(tangentLocal.xyz.mul(normalComputeShift));
+            let neighbourBPosition = positionLocal.add(bitangentLocal.xyz.mul(normalComputeShift));
 
-        const displacementA = getWaveElevation(neighbourAPosition, time);
-        const displacementB = getWaveElevation(neighbourBPosition, time);
+            const displacementA = getWaveElevation(neighbourAPosition);
+            const displacementB = getWaveElevation(neighbourBPosition);
 
-        neighbourAPosition = neighbourAPosition.add(vec3(0, displacementA, 0));
-        neighbourBPosition = neighbourBPosition.add(vec3(0, displacementB, 0));
+            neighbourAPosition = neighbourAPosition.add(vec3(0, displacementA, 0));
+            neighbourBPosition = neighbourBPosition.add(vec3(0, displacementB, 0));
 
-        const toA = neighbourAPosition.sub(position).normalize();
-        const toB = neighbourBPosition.sub(position).normalize();
-        const normal = cross(toA, toB);
+            const toA = neighbourAPosition.sub(position).normalize();
+            const toB = neighbourBPosition.sub(position).normalize();
+            const normal = cross(toA, toB);
 
-        this.material.normalNode = transformNormalToView(normal);
+            return transformNormalToView(normal);
+        })();
 
         /**
          * Color node

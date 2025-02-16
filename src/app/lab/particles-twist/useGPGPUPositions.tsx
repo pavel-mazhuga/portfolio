@@ -16,10 +16,10 @@ function useGPGPUPositions(count: number) {
             // const i3 = i * 3;
             const i4 = i * 4;
 
-            texture.image.data[i4 + 0] = (Math.random() - 0.5) * (i / count); // x
-            texture.image.data[i4 + 1] = (Math.random() - 0.5) * 2 * (i / count); // y
-            texture.image.data[i4 + 2] = (Math.random() - 0.5) * (i / count); // z
-            texture.image.data[i4 + 3] = Math.random(); // lifespan
+            (texture.image.data as any)[i4 + 0] = (Math.random() - 0.5) * (i / count); // x
+            (texture.image.data as any)[i4 + 1] = (Math.random() - 0.5) * 2 * (i / count); // y
+            (texture.image.data as any)[i4 + 2] = (Math.random() - 0.5) * (i / count); // z
+            (texture.image.data as any)[i4 + 3] = Math.random(); // lifespan
         }
 
         const positionsVariable = gpgpuRenderer.addVariable('uPositions', simulationFragmentShader, texture);

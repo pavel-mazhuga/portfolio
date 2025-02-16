@@ -234,6 +234,8 @@ class Demo {
     }
 
     destroy() {
+        this.renderer.setAnimationLoop(null);
+
         this.scene.remove(this.mesh);
         this.geometry.dispose();
         this.material.dispose();

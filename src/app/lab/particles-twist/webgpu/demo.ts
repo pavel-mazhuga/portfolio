@@ -257,6 +257,8 @@ class Demo {
     }
 
     destroy() {
+        this.renderer.setAnimationLoop(null);
+
         this.#destroyEvents();
         this.#destroyTweakPane();
         this.controls.dispose();

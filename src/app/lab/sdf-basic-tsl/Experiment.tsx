@@ -36,7 +36,7 @@ const Demo = () => {
 
         const timer = timerLocal(1);
 
-        const sdf = Fn<any, any>(([pos]) => {
+        const sdf = Fn<any>(([pos]) => {
             const translatedPos = pos.add(vec3(sin(timer), 0, 0));
             const sphere = sdSphere(translatedPos, 0.5);
             const secondSphere = sdSphere(pos, 0.3);
@@ -44,7 +44,7 @@ const Demo = () => {
             return smoothmin(secondSphere, sphere, 0.3);
         });
 
-        const calcNormal = Fn<any, any>(([ray]) => {
+        const calcNormal = Fn<any>(([ray]) => {
             const eps = float(0.0001);
             const h = vec2(eps, 0);
 
@@ -57,7 +57,7 @@ const Demo = () => {
             );
         });
 
-        const lighting = Fn<any, any>(([rayOrigin, ray]) => {
+        const lighting = Fn<any>(([rayOrigin, ray]) => {
             const normal = calcNormal(ray);
             const viewDir = normalize(rayOrigin.sub(ray));
             const lightDir = normalize(vec3(1));

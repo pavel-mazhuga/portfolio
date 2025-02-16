@@ -132,6 +132,8 @@ class Demo {
     }
 
     destroy() {
+        this.renderer.setAnimationLoop(null);
+
         this.#destroyEvents();
         this.controls?.dispose();
         this.stats?.dom.remove();
