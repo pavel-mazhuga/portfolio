@@ -221,7 +221,7 @@ class Demo {
                     If(distance.lessThan(minDistance), () => {
                         const velocity2 = this.velocitiesBuffer.element(i);
                         const diff = minDistance.sub(distance);
-                        const correction = Var(dv.normalize().mul(diff.mul(0.3)));
+                        const correction = Var(dv.normalize().mul(diff.mul(0.5)));
 
                         If(not(isAttractor), () => {
                             const velocityCorrection1 = correction.mul(max(length(velocity1.xyz), 2));
