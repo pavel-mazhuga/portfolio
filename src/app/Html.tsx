@@ -1,6 +1,8 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
+import { useIsMounted } from 'usehooks-ts';
 import { useMediaQueryDeviceState } from '@/atoms/media-query-device';
 import useIsomorphicLayoutEffect from '@/hooks/use-isomorphic-layout-effect';
 import { calculateScrollbarWidth } from '@/utils/calculate-scrollbar-width';
@@ -11,8 +13,11 @@ if (typeof window !== 'undefined') {
     calculateScrollbarWidth();
 }
 
+const LayoutGrid = dynamic(() => import('@/app/components/utils/LayoutGrid'), { ssr: false });
+
 const Html = ({ children }: { children: ReactNode }) => {
     const [_, setMediaQueryDeviceState] = useMediaQueryDeviceState();
+    const isMounted = useIsMounted();
 
     useIsomorphicLayoutEffect(() => {
         const setDevice = () => {
@@ -45,7 +50,16 @@ const Html = ({ children }: { children: ReactNode }) => {
         return () => window.removeEventListener('resize', setDevice);
     }, [setMediaQueryDeviceState]);
 
-    return <html lang="en">{children}</html>;
+    return (
+        <html lang="en">
+            {children}
+            {process.env.NODE_ENV === 'development' && isMounted() && (
+                <>
+                    <LayoutGrid />
+                </>
+            )}
+        </html>
+    );
 };
 
 export default Html;

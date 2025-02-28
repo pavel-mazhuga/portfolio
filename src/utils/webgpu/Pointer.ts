@@ -9,6 +9,7 @@ import { Camera, Plane, Raycaster, Vector2, Vector3, WebGPURenderer } from 'thre
 export class Pointer {
     camera: Camera;
     renderer: WebGPURenderer;
+    delta = 0;
     rayCaster = new Raycaster();
     initPlane = new Plane(new Vector3(0, 0, 1));
     iPlane = new Plane(new Vector3(0, 0, 1));
@@ -18,6 +19,7 @@ export class Pointer {
     pointerDown = false;
     uPointerDown = uniform(0);
     uPointer = uniform(new Vector3());
+    uPointerVelocity = uniform(new Vector3());
 
     constructor(renderer: WebGPURenderer, camera: Camera, plane: Plane) {
         this.onPointerDown = this.onPointerDown.bind(this);
@@ -67,12 +69,19 @@ export class Pointer {
         );
         this.rayCaster.setFromCamera(this.pointer, this.camera);
         this.rayCaster.ray.intersectPlane(this.iPlane, this.scenePointer);
+        this.uPointerVelocity.value.addScalar(this.scenePointer.distanceTo(this.uPointer.value));
+        const damp = 1 - Math.exp(-0.55 * 1000 * Math.max(0.001, this.delta));
+        this.uPointerVelocity.value.multiplyScalar(damp);
         this.uPointer.value.x = this.scenePointer.x;
         this.uPointer.value.y = this.scenePointer.y;
         this.uPointer.value.z = this.scenePointer.z;
     }
 
-    update() {
+    update(delta?: number): void {
+        if (typeof delta === 'number') {
+            this.delta = delta;
+        }
+
         this.iPlane.normal.copy(this.initPlane.normal).applyEuler(this.camera.rotation);
         this.updateScreenPointer();
     }

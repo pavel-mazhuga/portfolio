@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import dynamic from 'next/dynamic';
 import Footer from '@/app/components/layout/Footer';
 import Header from '@/app/components/layout/Header';
 import Providers from '@/app/components/layout/Providers';
@@ -49,8 +48,6 @@ export const viewport: Viewport = {
     initialScale: 1,
 };
 
-const LayoutGrid = dynamic(() => import('@/app/components/utils/LayoutGrid'), { ssr: false });
-
 function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <Providers>
@@ -62,7 +59,6 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                     <Footer />
                     {process.env.NODE_ENV === 'development' && (
                         <>
-                            <LayoutGrid />
                             <HideInterface />
                         </>
                     )}
