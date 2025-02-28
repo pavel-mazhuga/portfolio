@@ -54,7 +54,7 @@ class Demo {
         })();
 
         this.camera = new PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 500);
-        this.camera.position.set(0, 0, 5);
+        this.camera.position.set(0, 0, 6);
 
         this.pointerHandler = new Pointer(this.renderer, this.camera, new Plane(new Vector3(0, 0, 1), 0));
 
@@ -134,7 +134,7 @@ class Demo {
         if (process.env.NODE_ENV === 'development') {
             this.stats = new Stats();
             this.stats.init(this.renderer);
-            canvas.parentElement?.appendChild(this.stats.dom);
+            // canvas.parentElement?.appendChild(this.stats.dom);
         }
 
         this.#initEvents();

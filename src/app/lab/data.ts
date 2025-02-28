@@ -16,6 +16,7 @@ import magicWandCursorPreview from '@/app/lab/magic-wand-cursor/webgpu/preview.j
 import nightingaleHoverEffectRecreatedPreview from '@/app/lab/nightingale-hover-effect-recreated/webgpu/preview.jpeg';
 import particlesFollowingCursorPositionPreview from '@/app/lab/particles-following-cursor-position/preview.jpeg';
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
+import particlesMorphing2Preview from '@/app/lab/particles-morphing-2/webgpu/preview.jpeg';
 import particlesOnModelSurfacePreview from '@/app/lab/particles-on-model-surface/preview.jpeg';
 import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-trail/preview.jpeg';
 import particlesTwistPreview from '@/app/lab/particles-twist/preview.jpeg';
@@ -26,6 +27,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Particles noised morphing',
+        slug: 'particles-morphing-2/webgpu',
+        tags: ['webgpu', 'tsl', 'shaders', 'compute'],
+        preview: particlesMorphing2Preview,
+    },
     {
         name: 'Magic wand',
         slug: 'magic-wand-cursor/webgpu',
