@@ -96,7 +96,7 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             new StorageInstancedBufferAttribute(new Float32Array(positions.flat() as unknown as ArrayBufferLike, 3), 3),
             'vec3',
             this.amount * positions.length,
-        );
+        ).setPBO(true);
         this.buffers.colors = storage(
             new StorageInstancedBufferAttribute(
                 new Float32Array(
@@ -110,7 +110,7 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             ),
             'vec3',
             this.amount * colors.length,
-        );
+        ).setPBO(true);
         this.buffers.positions = storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount);
         this.buffers.velocities = storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount);
 
