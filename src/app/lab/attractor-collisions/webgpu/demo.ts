@@ -98,14 +98,12 @@ class Demo {
     computeAttraction: ComputeNode;
     computeCollision: ComputeNode;
 
-    // centerPointLight: PointLight;
-
     params = {
         usePostprocessing: true,
     };
 
     uniforms = {
-        center: uniform(new Vector3(0)),
+        attractorPosition: uniform(new Vector3(0)),
     };
 
     constructor(canvas: HTMLCanvasElement) {
@@ -155,14 +153,15 @@ class Demo {
             this.amount,
         ).setPBO(true);
 
-        const center = uniform(new Vector3(0));
-        this.uniforms.center = center;
+        const geometry = new SphereGeometry(1, 32, 32);
+        geometry.deleteAttribute('uv');
+
+        const attractorPosition = uniform(new Vector3(0));
+        this.uniforms.attractorPosition = attractorPosition;
         const size = uniform(0.12);
         const attractorSize = uniform(8);
         const maxVelocity = uniform(0.03);
-
-        const geometry = new SphereGeometry(1, 32, 32);
-        geometry.deleteAttribute('uv');
+        const isAttractor = instanceIndex.equal(0);
 
         const hash0 = Var(hash(instanceIndex));
         const hash1 = Var(hash(instanceIndex.add(1)));
@@ -171,8 +170,6 @@ class Demo {
         const hash4 = Var(hash(instanceIndex.add(4)));
         const hash5 = Var(hash(instanceIndex.add(5)));
 
-        const isAttractor = instanceIndex.equal(0);
-
         const position = this.positionsBuffer.element(instanceIndex);
         const velocity = this.velocitiesBuffer.element(instanceIndex);
 
@@ -180,7 +177,7 @@ class Demo {
             velocity.xyz.assign(0);
 
             If(isAttractor, () => {
-                position.xyz.assign(center);
+                position.xyz.assign(attractorPosition);
                 position.w.assign(attractorSize);
                 velocity.w.assign(0);
             }).Else(() => {
@@ -194,46 +191,45 @@ class Demo {
 
         this.computeAttraction = Fn(() => {
             If(not(isAttractor), () => {
-                const dv = Var(center.sub(position.xyz));
-                const objSize = Var(position.w.mul(size));
+                const toAttractorVec = attractorPosition.sub(position.xyz).toVar('toAttractorVec');
+                const objSize = position.w.mul(size).toVar('objSize');
                 const intensity = max(objSize.mul(objSize), 0.1);
-                velocity.xyz.addAssign(dv.normalize().mul(0.005).mul(intensity));
+                velocity.xyz.addAssign(toAttractorVec.normalize().mul(0.005).mul(intensity));
                 velocity.xyz.mulAssign(0.999);
-                velocity.xyz.assign(min(velocity, maxVelocity));
+                velocity.xyz.assign(min(velocity.xyz, maxVelocity));
                 position.xyz.addAssign(velocity);
             }).Else(() => {
-                position.xyz.assign(center);
+                position.xyz.assign(attractorPosition);
             });
         })().compute(this.amount);
 
         this.computeCollision = Fn(() => {
-            const position1 = position;
-            const velocity1 = velocity;
             const count = uint(this.amount);
 
-            Loop({ start: uint(0), end: count, type: 'uint', condition: '<' }, ({ i }) => {
+            Loop(count, ({ i }) => {
                 If(uint(i).notEqual(instanceIndex), () => {
-                    const position2 = this.positionsBuffer.element(i);
-                    const dv = Var(position2.xyz.sub(position1.xyz));
-                    const distance = Var(length(dv));
-                    const minDistance = Var(position1.w.mul(size).add(position2.w.mul(size)));
+                    const neighbourPosition = this.positionsBuffer.element(i);
+                    const toNeighbourVec = Var(neighbourPosition.xyz.sub(position.xyz), 'toNeighbourVec');
+                    const toNeighbourDirection = toNeighbourVec.normalize();
+                    const distance = Var(length(toNeighbourVec), 'dist');
+                    const minDistance = Var(position.w.mul(size).add(neighbourPosition.w.mul(size)), 'minDist');
 
                     If(distance.lessThan(minDistance), () => {
+                        const stiffness = 0.3;
+
                         const velocity2 = this.velocitiesBuffer.element(i);
                         const diff = minDistance.sub(distance);
-                        const correction = Var(dv.normalize().mul(diff.mul(0.3)));
+                        const correction = Var(toNeighbourDirection.mul(diff.mul(stiffness)), 'correction');
 
                         If(not(isAttractor), () => {
-                            const velocityCorrection1 = correction.mul(max(length(velocity1.xyz), 2));
-                            // position1.xyz.subAssign(correction);
-                            position1.xyz.subAssign(correction.mul(float(2).sub(step(velocity2.w, 1))));
-                            velocity1.xyz.subAssign(velocityCorrection1);
+                            const velocityCorrection1 = correction.mul(max(length(velocity.xyz), 2));
+                            position.xyz.subAssign(correction);
+                            velocity.xyz.subAssign(velocityCorrection1);
                         });
 
                         If(uint(i).greaterThan(0), () => {
                             const velocityCorrection2 = correction.mul(max(length(velocity2.xyz), 2));
-                            // position2.xyz.addAssign(correction);
-                            position2.xyz.addAssign(correction.mul(float(2).sub(step(velocity1.w, 1))));
+                            neighbourPosition.xyz.addAssign(correction);
                             velocity2.xyz.addAssign(velocityCorrection2);
                         });
                     });
@@ -252,9 +248,7 @@ class Demo {
 
         material.positionNode = Fn(() => {
             const position = this.positionsBuffer.element(instanceIndex);
-
             const rMat = rotationXYZ(vec3(0));
-            // const rMat = rotate(positionLocal, vec3(0));
             const iMat = compose(position.xyz, rMat, vec3(position.w).mul(size));
             return iMat.mul(positionLocal);
         })();
@@ -292,8 +286,6 @@ class Demo {
         directionalLightRight.position.z = 5;
         this.scene.add(directionalLightRight);
 
-        console.log('i');
-
         /**
          * Post processing
          */
@@ -301,7 +293,7 @@ class Demo {
         this.postProcessing = new PostProcessing(this.renderer);
 
         // Color
-        const scenePass = pass(this.scene, this.camera, { anisotropy: 1, samples: 1 });
+        const scenePass = pass(this.scene, this.camera);
         scenePass.setMRT(
             mrt({
                 output,
@@ -323,7 +315,6 @@ class Demo {
 
         // Output
         this.postProcessing.outputNode = scenePassColor.mul(denoisePass);
-        // this.postProcessing.outputNode = aoPass;
 
         this.renderer.setAnimationLoop(this.render);
     }
@@ -367,9 +358,7 @@ class Demo {
         this.stats?.update();
         this.pointerHandler.update();
 
-        this.uniforms.center.value.lerp(this.pointerHandler.uPointer.value, 0.1);
-
-        // this.centerPointLight.position.copy(this.uniforms.center.value);
+        this.uniforms.attractorPosition.value.lerp(this.pointerHandler.uPointer.value, 0.1);
 
         if (this.computeAttraction instanceof ComputeNode) {
             this.renderer.computeAsync(this.computeAttraction);
