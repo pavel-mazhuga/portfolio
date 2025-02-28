@@ -1,10 +1,9 @@
 import { AdditiveBlending, Color, InstancedMesh, PlaneGeometry } from 'three';
 import {
     Fn,
-    PI2,
+    If,
     ShaderNodeObject,
-    abs,
-    deltaTime,
+    bool,
     float,
     hash,
     instanceIndex,
@@ -55,6 +54,7 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         rotationProgress: 0,
         wigglePower: 0.6,
         wiggleSpeed: 1,
+        isOffset: matchMedia('(orientation: landscape)').matches,
     };
 
     uniforms = {
@@ -65,6 +65,7 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         scale: uniform(this.params.baseParticleScale),
         wigglePower: uniform(this.params.wigglePower),
         wiggleSpeed: uniform(this.params.wiggleSpeed),
+        // isOffset: uniform(this.params.isOffset),
     };
 
     constructor(
@@ -159,8 +160,15 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             const offset = 2.5;
             const basePosition = buffer
                 .element(select(this.uniforms.activeIndex.equal(0), instanceIndex, instanceIndex.add(this.amount)))
-                .mul(rotate3dY(float(-0.35).add(float(0.7).mul(this.uniforms.activeIndex))))
-                .add(vec3(float(-offset).add(float(offset * 2).mul(this.uniforms.activeIndex)), 0, 0));
+                .toVar();
+
+            If(bool(this.params.isOffset), () => {
+                basePosition.assign(
+                    basePosition
+                        .mul(rotate3dY(float(-0.35).add(float(0.7).mul(this.uniforms.activeIndex))))
+                        .add(vec3(float(-offset).add(float(offset * 2).mul(this.uniforms.activeIndex)), 0, 0)),
+                );
+            });
 
             const velocity = this.buffers.velocities!.element(instanceIndex);
 
@@ -244,6 +252,14 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         folder.addBinding(this.params, 'baseParticleScale', { min: 0.1, max: 3, step: 0.01 }).on('change', (event) => {
             this.uniforms.scale.value = event.value;
         });
+
+        folder.addBinding(this.params, 'baseParticleScale', { min: 0.1, max: 3, step: 0.01 }).on('change', (event) => {
+            this.uniforms.scale.value = event.value;
+        });
+
+        // folder.addBinding(this.params, 'isOffset').on('change', (event) => {
+        //     this.uniforms.isOffset.value = event.value;
+        // });
     }
 }
 

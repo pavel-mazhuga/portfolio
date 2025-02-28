@@ -1,9 +1,7 @@
-import { animate } from 'framer-motion';
 import Stats from 'stats-gl';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { mx_fractal_noise_vec3 } from 'three/src/nodes/TSL.js';
-import { Fn, mx_cell_noise_float, mx_worley_noise_vec3, screenUV, time, vec3, vec4 } from 'three/tsl';
+import { Fn, mx_fractal_noise_vec3, screenUV, time, vec3, vec4 } from 'three/tsl';
 import {
     ACESFilmicToneMapping,
     Clock,
@@ -18,7 +16,6 @@ import {
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
 import { Pointer } from '@/utils/webgpu/Pointer';
-import { curlNoise4d } from '@/utils/webgpu/nodes/noise/curlNoise4d';
 import ParticlesMesh from './ParticlesMesh';
 
 const models = ['/gltf/face2.glb', '/gltf/suzanne.glb'];
@@ -38,10 +35,6 @@ class Demo {
 
     tweakPane?: Pane;
 
-    params = {
-        activeIndex: 0,
-    };
-
     constructor(canvas: HTMLCanvasElement) {
         this.render = this.render.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
@@ -55,9 +48,8 @@ class Demo {
 
         this.scene = new Scene();
         this.scene.backgroundNode = Fn(() => {
-            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.2)))).toVar();
+            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
             color.mulAssign(0.03);
-
             return vec4(color, 1);
         })();
 
@@ -69,8 +61,6 @@ class Demo {
         const gltfLoader = new GLTFLoader();
 
         Promise.all(models.map((url) => gltfLoader.loadAsync(url))).then((gltfs) => {
-            // console.log(gltfs);
-
             const getMesh = (scene: Object3D, index: number) => {
                 if (index === 0) {
                     return scene.children[1].children[0].children[0].children[0] as Mesh;
@@ -80,9 +70,7 @@ class Demo {
             };
 
             const maxCount = Math.max(
-                ...gltfs.map((gltf, i) => {
-                    return getMesh(gltf.scene, i).geometry.attributes.position.count;
-                }),
+                ...gltfs.map((gltf, i) => getMesh(gltf.scene, i).geometry.attributes.position.count),
             );
 
             const basePos: number[][] = [];
@@ -215,24 +203,6 @@ class Demo {
             title: 'Parameters',
             expanded: matchMedia('(min-width: 1200px)').matches,
         });
-
-        // this.tweakPane.addBinding(this.params, 'activeIndex', { min: 0, max: 1, step: 1 }).on('change', (event) => {
-        //     if (!this.mesh) {
-        //         return;
-        //     }
-
-        //     this.mesh.uniforms.prevActiveIndex.value = this.mesh.uniforms.activeIndex.value;
-        //     this.mesh.uniforms.activeIndex.value = event.value;
-        //     animate(0, 1, {
-        //         duration: 2.5,
-        //         ease: 'easeInOut',
-        //         onUpdate: (val) => {
-        //             if (this.mesh) {
-        //                 this.mesh.uniforms.transitionProgress.value = val;
-        //             }
-        //         },
-        //     });
-        // });
     }
 
     #destroyTweakPane() {
