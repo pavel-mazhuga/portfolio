@@ -25,7 +25,8 @@ const Experience = () => {
 
     return (
         <>
-            <canvas ref={canvasRef} className="responsive__item"></canvas>;<div className="tip">CLICK</div>
+            <canvas ref={canvasRef} className="responsive__item"></canvas>
+            <div className="tip">CLICK</div>
         </>
     );
 };

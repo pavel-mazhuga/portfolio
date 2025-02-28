@@ -2,6 +2,7 @@ import { animate } from 'framer-motion';
 import Stats from 'stats-gl';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { mx_fractal_noise_vec3 } from 'three/src/nodes/TSL.js';
 import { Fn, mx_cell_noise_float, mx_worley_noise_vec3, screenUV, time, vec3, vec4 } from 'three/tsl';
 import {
     ACESFilmicToneMapping,
@@ -50,15 +51,17 @@ class Demo {
         this.renderer = new WebGPURenderer({ canvas, powerPreference: 'high-performance' });
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
-        this.renderer.setClearColor(0x000000);
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 
         this.scene = new Scene();
-        // this.scene.backgroundNode = Fn(() => {
-        //     return vec3(curlNoise4d(vec4(screenUV, time, time.mul(0.1)))).mul(0.03);
-        // })();
+        this.scene.backgroundNode = Fn(() => {
+            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.2)))).toVar();
+            color.mulAssign(0.03);
 
-        this.camera = new PerspectiveCamera(64, canvas.width / canvas.height, 0.1, 500);
+            return vec4(color, 1);
+        })();
+
+        this.camera = new PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 500);
         this.camera.position.set(0, 0, 5);
 
         this.pointerHandler = new Pointer(this.renderer, this.camera, new Plane(new Vector3(0, 0, 1), 0));
@@ -94,7 +97,7 @@ class Demo {
                     const scale = 0.13;
                     mesh.geometry.scale(scale, scale, scale);
                 } else if (i === 1) {
-                    const scale = 1.3;
+                    const scale = 1.7;
                     mesh.geometry.scale(scale, scale, scale);
                 }
 

@@ -122,8 +122,16 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             const velocity = this.buffers.velocities!.element(instanceIndex);
 
             const mainColor = mix(
-                this.buffers.colors!.element(1),
-                this.buffers.colors!.element(2),
+                mix(
+                    this.buffers.colors!.element(1).sub(0.1),
+                    this.buffers.colors!.element(1),
+                    position.y.add(1).clamp(0, 1),
+                ),
+                mix(
+                    this.buffers.colors!.element(2).sub(0.5),
+                    this.buffers.colors!.element(2),
+                    position.y.add(1).clamp(0, 1),
+                ),
                 position.x.sub(0.5).clamp(0, 1),
             ).toVar();
             const color = mix(mainColor, this.buffers.colors!.element(0), velocity.length().mul(30).pow(2).clamp(0, 1));
@@ -159,10 +167,6 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             const flowField = curlNoise4d(vec4(position, 0)).toVar('flowField');
 
             /**
-             * Shape rotation
-             */
-
-            /**
              * Noise
              */
 
@@ -184,7 +188,7 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             const toTargetPositionLength = toTargetPosition.length().toVar('toTargetPositionLength');
             const toTargetPositionDirection = toTargetPosition.normalize().toVar('toTargetPositionDirection');
             const scale = toTargetPositionLength.remapClamp(0, 1, 0, 0.1).mul(0.4);
-            const speed = toTargetPositionDirection.mul(scale).mul(hash(instanceIndex).mul(0.4).add(0.6)).toVar();
+            const speed = toTargetPositionDirection.mul(scale).mul(hash(instanceIndex).mul(0.35).add(0.6)).toVar();
 
             /**
              * Velocity
