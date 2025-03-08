@@ -8,12 +8,15 @@ import {
     Loop,
     ShaderNodeObject,
     Var,
+    cos,
     deltaTime,
     float,
     hash,
     instanceIndex,
+    int,
     length,
     mat3,
+    mat4,
     max,
     min,
     mrt,
@@ -24,7 +27,7 @@ import {
     pass,
     positionLocal,
     screenUV,
-    step,
+    sin,
     storage,
     time,
     uint,
@@ -40,6 +43,7 @@ import {
     InstancedMesh,
     Mesh,
     MeshStandardNodeMaterial,
+    Node,
     PerspectiveCamera,
     Plane,
     PostProcessing,
@@ -53,30 +57,66 @@ import {
 import { Pane } from 'tweakpane';
 import { Pointer } from '@/utils/webgpu/Pointer';
 
-const rotationXYZ = wgslFn(`
-    fn rotationXYZ(euler:vec3<f32>) -> mat3x3<f32> {
-        let a = cos(euler.x); let b = sin(euler.x);
-        let c = cos(euler.y); let d = sin(euler.y);
-        let e = cos(euler.z); let f = sin(euler.z);
-        let ae = a * e; let af = a * f; let be = b * e; let bf = b * f;
-        return mat3x3<f32>(
-            vec3<f32>(c * e, af + be * d, bf - ae * d),
-            vec3<f32>(-c * f, ae - bf * d, be + af * d),
-            vec3<f32>(d, -b * c, a * c)
-        );
-    }
-`);
+// Three.js Transpiler r174
 
-const compose = wgslFn(`
-    fn compose(pos: vec3<f32>, rmat: mat3x3<f32>, scale: vec3<f32>) -> mat4x4<f32> {
-        return mat4x4<f32>(
-        rmat[0][0] * scale.x, rmat[0][1] * scale.x, rmat[0][2] * scale.x, 0.,
-        rmat[1][0] * scale.y, rmat[1][1] * scale.y, rmat[1][2] * scale.y, 0.,
-        rmat[2][0] * scale.z, rmat[2][1] * scale.z, rmat[2][2] * scale.z, 0.,
-        pos.x, pos.y, pos.z, 1.
+export const rotationXYZ = /*#__PURE__*/ Fn<[ShaderNodeObject<Node>]>(([euler_immutable]) => {
+    const euler = vec3(euler_immutable).toVar();
+    const a = float(cos(euler.x)).toVar();
+    const b = float(sin(euler.x)).toVar();
+    const c = float(cos(euler.y)).toVar();
+    const d = float(sin(euler.y)).toVar();
+    const e = float(cos(euler.z)).toVar();
+    const f = float(sin(euler.z)).toVar();
+    const ae = float(a.mul(e)).toVar();
+    const af = float(a.mul(f)).toVar();
+    const be = float(b.mul(e)).toVar();
+    const bf = float(b.mul(f)).toVar();
+
+    return mat3(
+        vec3(c.mul(e), af.add(be.mul(d)), bf.sub(ae.mul(d))),
+        vec3(c.negate().mul(f), ae.sub(bf.mul(d)), be.add(af.mul(d))),
+        vec3(d, b.negate().mul(c), a.mul(c)),
     );
-    }
-`);
+}).setLayout({
+    name: 'rotationXYZ',
+    type: 'mat3',
+    inputs: [{ name: 'euler', type: 'vec3' }],
+});
+
+// Three.js Transpiler r174
+
+export const compose = /*#__PURE__*/ Fn<any>(([pos_immutable, rmat_immutable, scale_immutable]) => {
+    const scale = vec3(scale_immutable).toVar();
+    const rmat = mat3(rmat_immutable).toVar();
+    const pos = vec3(pos_immutable).toVar();
+
+    return mat4(
+        rmat.element(int(0)).element(int(0)).mul(scale.x),
+        rmat.element(int(0)).element(int(1)).mul(scale.x),
+        rmat.element(int(0)).element(int(2)).mul(scale.x),
+        0.0,
+        rmat.element(int(1)).element(int(0)).mul(scale.y),
+        rmat.element(int(1)).element(int(1)).mul(scale.y),
+        rmat.element(int(1)).element(int(2)).mul(scale.y),
+        0.0,
+        rmat.element(int(2)).element(int(0)).mul(scale.z),
+        rmat.element(int(2)).element(int(1)).mul(scale.z),
+        rmat.element(int(2)).element(int(2)).mul(scale.z),
+        0.0,
+        pos.x,
+        pos.y,
+        pos.z,
+        1.0,
+    );
+}).setLayout({
+    name: 'compose',
+    type: 'mat4',
+    inputs: [
+        { name: 'pos', type: 'vec3' },
+        { name: 'rmat', type: 'mat3' },
+        { name: 'scale', type: 'vec3' },
+    ],
+});
 
 class Demo {
     canvas: HTMLCanvasElement;
@@ -95,8 +135,7 @@ class Demo {
     positionsBuffer: ShaderNodeObject<StorageBufferNode>;
     velocitiesBuffer: ShaderNodeObject<StorageBufferNode>;
 
-    computeAttraction: ComputeNode;
-    computeCollision: ComputeNode;
+    computeUpdate: ComputeNode;
 
     params = {
         usePostprocessing: true,
@@ -189,21 +228,34 @@ class Demo {
 
         this.renderer.computeAsync(initCompute);
 
-        this.computeAttraction = Fn(() => {
+        this.computeUpdate = Fn(() => {
+            /**
+             * Read from buffers
+             */
+
+            const pos = position.xyz.toVar('pos');
+            const vel = velocity.xyz.toVar('vel');
+
+            /**
+             * Attractions
+             */
+
             If(not(isAttractor), () => {
                 const toAttractorVec = attractorPosition.sub(position.xyz).toVar('toAttractorVec');
                 const objSize = position.w.mul(size).toVar('objSize');
                 const intensity = max(objSize.mul(objSize), 0.1);
-                velocity.xyz.addAssign(toAttractorVec.normalize().mul(0.005).mul(intensity));
-                velocity.xyz.mulAssign(0.999);
-                velocity.xyz.assign(min(velocity.xyz, maxVelocity));
-                position.xyz.addAssign(velocity);
+                vel.xyz.addAssign(toAttractorVec.normalize().mul(0.005).mul(intensity));
+                vel.xyz.mulAssign(0.999);
+                vel.xyz.assign(min(vel.xyz, maxVelocity));
+                pos.addAssign(velocity);
             }).Else(() => {
-                position.xyz.assign(attractorPosition);
+                pos.assign(attractorPosition);
             });
-        })().compute(this.amount);
 
-        this.computeCollision = Fn(() => {
+            /**
+             * Collisions
+             */
+
             const count = uint(this.amount);
 
             Loop(count, ({ i }) => {
@@ -222,9 +274,9 @@ class Demo {
                         const correction = Var(toNeighbourDirection.mul(diff.mul(stiffness)), 'correction');
 
                         If(not(isAttractor), () => {
-                            const velocityCorrection1 = correction.mul(max(length(velocity.xyz), 2));
-                            position.xyz.subAssign(correction);
-                            velocity.xyz.subAssign(velocityCorrection1);
+                            const velocityCorrection1 = correction.mul(max(length(vel), 2));
+                            pos.subAssign(correction);
+                            vel.subAssign(velocityCorrection1);
                         });
 
                         If(uint(i).greaterThan(0), () => {
@@ -235,6 +287,13 @@ class Demo {
                     });
                 });
             });
+
+            /**
+             * Write back to buffers
+             */
+
+            position.xyz.assign(pos);
+            velocity.xyz.assign(vel);
         })().compute(this.amount);
 
         /**
@@ -360,9 +419,8 @@ class Demo {
 
         this.uniforms.attractorPosition.value.lerp(this.pointerHandler.uPointer.value, 0.1);
 
-        if (this.computeAttraction instanceof ComputeNode) {
-            this.renderer.computeAsync(this.computeAttraction);
-            this.renderer.computeAsync(this.computeCollision);
+        if (this.computeUpdate instanceof ComputeNode) {
+            this.renderer.computeAsync(this.computeUpdate);
         }
 
         if (this.params.usePostprocessing) {
