@@ -420,13 +420,13 @@ class Demo {
         this.uniforms.attractorPosition.value.lerp(this.pointerHandler.uPointer.value, 0.1);
 
         if (this.computeUpdate instanceof ComputeNode) {
-            this.renderer.computeAsync(this.computeUpdate);
+            await this.renderer.computeAsync(this.computeUpdate);
         }
 
         if (this.params.usePostprocessing) {
-            this.postProcessing.renderAsync();
+            await this.postProcessing.renderAsync();
         } else {
-            this.renderer.renderAsync(this.scene, this.camera);
+            await this.renderer.renderAsync(this.scene, this.camera);
         }
     }
 
