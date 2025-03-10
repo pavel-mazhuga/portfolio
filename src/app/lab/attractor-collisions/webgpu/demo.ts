@@ -51,6 +51,7 @@ import {
     SphereGeometry,
     StorageBufferNode,
     StorageInstancedBufferAttribute,
+    TimestampQuery,
     Vector3,
     WebGPURenderer,
 } from 'three/webgpu';
@@ -135,7 +136,8 @@ class Demo {
     positionsBuffer: ShaderNodeObject<StorageBufferNode>;
     velocitiesBuffer: ShaderNodeObject<StorageBufferNode>;
 
-    computeUpdate: ComputeNode;
+    computeAttractions: ComputeNode;
+    computeСollisions: ComputeNode;
 
     params = {
         usePostprocessing: true,
@@ -150,11 +152,11 @@ class Demo {
         this.onWindowResize = this.onWindowResize.bind(this);
 
         this.canvas = canvas;
-        // this.renderer = new WebGPURenderer({ canvas, powerPreference: 'high-performance' });
         this.renderer = new WebGPURenderer({
             canvas,
             powerPreference: 'high-performance',
             antialias: !this.params.usePostprocessing,
+            // forceWebGL: true,
         });
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
@@ -173,7 +175,9 @@ class Demo {
 
         if (process.env.NODE_ENV === 'development') {
             this.stats = new Stats({
-                // trackGPU: true,
+                precision: 3,
+                trackGPU: true,
+                trackCPT: true,
             });
             this.stats.init(this.renderer);
             canvas.parentElement?.appendChild(this.stats.dom);
@@ -209,10 +213,10 @@ class Demo {
         const hash4 = Var(hash(instanceIndex.add(4)));
         const hash5 = Var(hash(instanceIndex.add(5)));
 
-        const position = this.positionsBuffer.element(instanceIndex);
-        const velocity = this.velocitiesBuffer.element(instanceIndex);
-
         const initCompute = Fn(() => {
+            const position = this.positionsBuffer.element(instanceIndex);
+            const velocity = this.velocitiesBuffer.element(instanceIndex);
+
             velocity.xyz.assign(0);
 
             If(isAttractor, () => {
@@ -228,7 +232,10 @@ class Demo {
 
         this.renderer.computeAsync(initCompute);
 
-        this.computeUpdate = Fn(() => {
+        this.computeAttractions = Fn(() => {
+            const position = this.positionsBuffer.element(instanceIndex);
+            const velocity = this.velocitiesBuffer.element(instanceIndex);
+
             /**
              * Read from buffers
              */
@@ -236,56 +243,17 @@ class Demo {
             const pos = position.xyz.toVar('pos');
             const vel = velocity.xyz.toVar('vel');
 
-            /**
-             * Attractions
-             */
-
             If(not(isAttractor), () => {
                 const toAttractorVec = attractorPosition.sub(position.xyz).toVar('toAttractorVec');
                 const objSize = position.w.mul(size).toVar('objSize');
                 const intensity = max(objSize.mul(objSize), 0.1);
-                vel.xyz.addAssign(toAttractorVec.normalize().mul(0.005).mul(intensity));
+                // vel.xyz.addAssign(toAttractorVec.normalize().mul(0.005).mul(intensity));
+                vel.xyz.addAssign(toAttractorVec.normalize().mul(deltaTime).mul(intensity));
                 vel.xyz.mulAssign(0.999);
                 vel.xyz.assign(min(vel.xyz, maxVelocity));
-                pos.addAssign(velocity);
+                pos.addAssign(vel);
             }).Else(() => {
                 pos.assign(attractorPosition);
-            });
-
-            /**
-             * Collisions
-             */
-
-            const count = uint(this.amount);
-
-            Loop(count, ({ i }) => {
-                If(uint(i).notEqual(instanceIndex), () => {
-                    const neighbourPosition = this.positionsBuffer.element(i);
-                    const toNeighbourVec = Var(neighbourPosition.xyz.sub(position.xyz), 'toNeighbourVec');
-                    const toNeighbourDirection = toNeighbourVec.normalize();
-                    const distance = Var(length(toNeighbourVec), 'dist');
-                    const minDistance = Var(position.w.mul(size).add(neighbourPosition.w.mul(size)), 'minDist');
-
-                    If(distance.lessThan(minDistance), () => {
-                        const stiffness = 0.3;
-
-                        const velocity2 = this.velocitiesBuffer.element(i);
-                        const diff = minDistance.sub(distance);
-                        const correction = Var(toNeighbourDirection.mul(diff.mul(stiffness)), 'correction');
-
-                        If(not(isAttractor), () => {
-                            const velocityCorrection1 = correction.mul(max(length(vel), 2));
-                            pos.subAssign(correction);
-                            vel.subAssign(velocityCorrection1);
-                        });
-
-                        If(uint(i).greaterThan(0), () => {
-                            const velocityCorrection2 = correction.mul(max(length(velocity2.xyz), 2));
-                            neighbourPosition.xyz.addAssign(correction);
-                            velocity2.xyz.addAssign(velocityCorrection2);
-                        });
-                    });
-                });
             });
 
             /**
@@ -294,6 +262,46 @@ class Demo {
 
             position.xyz.assign(pos);
             velocity.xyz.assign(vel);
+        })().compute(this.amount);
+
+        this.computeСollisions = Fn(() => {
+            const position = this.positionsBuffer.element(instanceIndex);
+            const velocity = this.velocitiesBuffer.element(instanceIndex);
+
+            const count = uint(this.amount);
+
+            // Loop(count, ({ i }) => {
+            Loop({ start: uint(0), end: count, type: 'uint', condition: '<' }, ({ i }) => {
+                If(uint(i).notEqual(instanceIndex), () => {
+                    const neighbourPosition = this.positionsBuffer.element(i);
+                    // const neighbourVelocity = this.velocitiesBuffer.element(i);
+                    const toNeighbourVec = Var(neighbourPosition.xyz.sub(position.xyz), 'toNeighbourVec');
+                    const distance = Var(length(toNeighbourVec), 'dist');
+                    const minDistance = Var(position.w.mul(size).add(neighbourPosition.w.mul(size)), 'minDist');
+
+                    If(distance.lessThan(minDistance), () => {
+                        const stiffness = 0.3;
+
+                        const toNeighbourDirection = toNeighbourVec.normalize();
+                        const diff = minDistance.sub(distance);
+                        const correction = Var(toNeighbourDirection.mul(diff.mul(stiffness)), 'correction');
+                        const velocityCorrection1 = correction.mul(max(length(velocity), 2));
+                        // const velocityCorrection2 = correction.mul(max(length(neighbourVelocity.xyz), 2));
+
+                        If(not(isAttractor), () => {
+                            position.xyz.subAssign(correction);
+                            // position.xyz.subAssign(correction.mul(float(2).sub(step(neighbourVelocity.w, 1))));
+                            velocity.xyz.subAssign(velocityCorrection1);
+                        });
+
+                        // If(uint(i).greaterThan(0), () => {
+                        //     // neighbourPosition.xyz.addAssign(correction);
+                        //     neighbourPosition.xyz.addAssign(correction.mul(float(2).sub(step(velocity.w, 1))));
+                        //     neighbourVelocity.xyz.addAssign(velocityCorrection2);
+                        // });
+                    });
+                });
+            });
         })().compute(this.amount);
 
         /**
@@ -307,6 +315,7 @@ class Demo {
 
         material.positionNode = Fn(() => {
             const position = this.positionsBuffer.element(instanceIndex);
+
             const rMat = rotationXYZ(vec3(0));
             const iMat = compose(position.xyz, rMat, vec3(position.w).mul(size));
             return iMat.mul(positionLocal);
@@ -414,19 +423,30 @@ class Demo {
     }
 
     async render() {
-        this.stats?.update();
         this.pointerHandler.update();
-
         this.uniforms.attractorPosition.value.lerp(this.pointerHandler.uPointer.value, 0.1);
 
-        if (this.computeUpdate instanceof ComputeNode) {
-            await this.renderer.computeAsync(this.computeUpdate);
+        if (this.computeAttractions instanceof ComputeNode) {
+            await this.renderer.computeAsync(this.computeAttractions);
+        }
+
+        if (this.computeСollisions instanceof ComputeNode) {
+            await this.renderer.computeAsync(this.computeСollisions);
+        }
+
+        if (this.stats) {
+            this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
         }
 
         if (this.params.usePostprocessing) {
             await this.postProcessing.renderAsync();
         } else {
             await this.renderer.renderAsync(this.scene, this.camera);
+        }
+
+        if (this.stats) {
+            this.renderer.resolveTimestampsAsync();
+            this.stats.update();
         }
     }
 
