@@ -130,7 +130,7 @@ class Demo {
     attractor?: Mesh;
     mesh?: Mesh;
     tweakPane?: Pane;
-    amount = 700;
+    amount = 600;
     pointerHandler: Pointer;
 
     positionsBuffer: ShaderNodeObject<StorageBufferNode>;
