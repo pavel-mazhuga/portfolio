@@ -247,11 +247,10 @@ class Demo {
                 const toAttractorVec = attractorPosition.sub(position.xyz).toVar('toAttractorVec');
                 const objSize = position.w.mul(size).toVar('objSize');
                 const intensity = max(objSize.mul(objSize), 0.1);
-                // vel.xyz.addAssign(toAttractorVec.normalize().mul(0.005).mul(intensity));
                 vel.xyz.addAssign(toAttractorVec.normalize().mul(deltaTime).mul(intensity));
                 vel.xyz.mulAssign(0.999);
                 vel.xyz.assign(min(vel.xyz, maxVelocity));
-                pos.addAssign(vel);
+                pos.addAssign(vel.mul(deltaTime.mul(60)));
             }).Else(() => {
                 pos.assign(attractorPosition);
             });
@@ -284,7 +283,10 @@ class Demo {
 
                         const toNeighbourDirection = toNeighbourVec.normalize();
                         const diff = minDistance.sub(distance);
-                        const correction = Var(toNeighbourDirection.mul(diff.mul(stiffness)), 'correction');
+                        const correction = Var(
+                            toNeighbourDirection.mul(diff.mul(stiffness).mul(deltaTime.mul(60))),
+                            'correction',
+                        );
                         const velocityCorrection1 = correction.mul(max(length(velocity), 2));
                         // const velocityCorrection2 = correction.mul(max(length(neighbourVelocity.xyz), 2));
 
