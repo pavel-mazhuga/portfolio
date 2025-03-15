@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Fn, If, abs, clamp, dot, float, floor, fract, max, mod, mul, step, sub, vec2, vec3, vec4 } from 'three/webgpu';
+import { Fn, abs, clamp, dot, float, floor, fract, max, mod, mul, step, sub, vec2, vec3, vec4 } from 'three/tsl';
 
 const permute_0 = Fn(([x_immutable]) => {
     const x = vec4(x_immutable).toVar();
