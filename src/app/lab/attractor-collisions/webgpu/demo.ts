@@ -266,41 +266,29 @@ class Demo {
         this.computeСollisions = Fn(() => {
             const position = this.positionsBuffer.element(instanceIndex);
             const velocity = this.velocitiesBuffer.element(instanceIndex);
-
             const count = uint(this.amount);
 
-            // Loop(count, ({ i }) => {
             Loop({ start: uint(0), end: count, type: 'uint', condition: '<' }, ({ i }) => {
                 If(uint(i).notEqual(instanceIndex), () => {
                     const neighbourPosition = this.positionsBuffer.element(i);
-                    // const neighbourVelocity = this.velocitiesBuffer.element(i);
                     const toNeighbourVec = Var(neighbourPosition.xyz.sub(position.xyz), 'toNeighbourVec');
                     const distance = Var(length(toNeighbourVec), 'dist');
                     const minDistance = Var(position.w.mul(size).add(neighbourPosition.w.mul(size)), 'minDist');
 
                     If(distance.lessThan(minDistance), () => {
                         const stiffness = 0.3;
-
                         const toNeighbourDirection = toNeighbourVec.normalize();
                         const diff = minDistance.sub(distance);
                         const correction = Var(
                             toNeighbourDirection.mul(diff.mul(stiffness).mul(deltaTime.mul(60))),
                             'correction',
                         );
-                        const velocityCorrection1 = correction.mul(max(length(velocity), 2));
-                        // const velocityCorrection2 = correction.mul(max(length(neighbourVelocity.xyz), 2));
+                        const velocityCorrection = correction.mul(max(length(velocity), 2));
 
                         If(not(isAttractor), () => {
                             position.xyz.subAssign(correction);
-                            // position.xyz.subAssign(correction.mul(float(2).sub(step(neighbourVelocity.w, 1))));
-                            velocity.xyz.subAssign(velocityCorrection1);
+                            velocity.xyz.subAssign(velocityCorrection);
                         });
-
-                        // If(uint(i).greaterThan(0), () => {
-                        //     // neighbourPosition.xyz.addAssign(correction);
-                        //     neighbourPosition.xyz.addAssign(correction.mul(float(2).sub(step(velocity.w, 1))));
-                        //     neighbourVelocity.xyz.addAssign(velocityCorrection2);
-                        // });
                     });
                 });
             });
