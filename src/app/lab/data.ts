@@ -23,10 +23,17 @@ import particlesTwistPreview from '@/app/lab/particles-twist/preview.jpeg';
 import planeWavePreview from '@/app/lab/plane-wave/preview.jpeg';
 import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/preview.jpeg';
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
+import tslCustomNodeMatealPreview from '@/app/lab/tsl-custom-node-material/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'TSL custom node material',
+        slug: 'tsl-custom-node-material',
+        tags: ['webgpu', 'tsl', 'shaders'],
+        preview: tslCustomNodeMatealPreview,
+    },
     {
         name: 'Particles noised morphing',
         slug: 'particles-morphing-2/webgpu',
