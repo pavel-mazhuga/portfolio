@@ -137,7 +137,7 @@ class Demo {
         this.uniforms.attractorPosition = attractorPosition;
         const size = uniform(0.12);
         const attractorSize = uniform(8);
-        const maxVelocity = uniform(0.03);
+        const maxVelocity = uniform(0.04);
         const isAttractor = instanceIndex.equal(0);
 
         const hash0 = Var(hash(instanceIndex));
@@ -178,12 +178,12 @@ class Demo {
             const vel = velocity.xyz.toVar('vel');
 
             If(not(isAttractor), () => {
-                const toAttractorVec = attractorPosition.sub(position.xyz).toVar('toAttractorVec');
-                const objSize = position.w.mul(size).toVar('objSize');
+                const toAttractorVec = attractorPosition.sub(pos.xyz).toVar('toAttractorVec');
+                const objSize = pos.w.mul(size).toVar('objSize');
                 const intensity = max(objSize.mul(objSize), 0.1);
                 vel.xyz.addAssign(toAttractorVec.normalize().mul(deltaTime).mul(intensity));
+                vel.xyz.minAssign(maxVelocity);
                 vel.xyz.mulAssign(0.999);
-                vel.xyz.assign(min(vel.xyz, maxVelocity));
                 pos.addAssign(vel.mul(deltaTime.mul(60)));
             }).Else(() => {
                 pos.assign(attractorPosition);
@@ -210,13 +210,9 @@ class Demo {
                     const minDistance = Var(position.w.mul(size).add(neighbourPosition.w.mul(size)), 'minDist');
 
                     If(distance.lessThan(minDistance), () => {
-                        const stiffness = 0.3;
                         const toNeighbourDirection = toNeighbourVec.normalize();
                         const diff = minDistance.sub(distance);
-                        const correction = Var(
-                            toNeighbourDirection.mul(diff.mul(stiffness).mul(deltaTime.mul(60))),
-                            'correction',
-                        );
+                        const correction = Var(toNeighbourDirection.mul(diff.mul(0.5)), 'correction');
                         const velocityCorrection = correction.mul(max(length(velocity), 2));
 
                         If(not(isAttractor), () => {
