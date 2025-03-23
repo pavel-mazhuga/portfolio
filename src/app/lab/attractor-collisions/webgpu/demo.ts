@@ -13,7 +13,6 @@ import {
     instanceIndex,
     length,
     max,
-    min,
     mrt,
     mx_fractal_noise_vec3,
     normalView,
@@ -36,7 +35,6 @@ import {
     InstancedMesh,
     Mesh,
     MeshStandardNodeMaterial,
-    Node,
     PerspectiveCamera,
     Plane,
     PostProcessing,
@@ -124,11 +122,7 @@ class Demo {
         this.positionsBuffer = storage(new StorageInstancedBufferAttribute(this.amount, 4), 'vec4', this.amount).setPBO(
             true,
         );
-        this.velocitiesBuffer = storage(
-            new StorageInstancedBufferAttribute(this.amount, 4),
-            'vec4',
-            this.amount,
-        ).setPBO(true);
+        this.velocitiesBuffer = storage(new StorageInstancedBufferAttribute(this.amount, 4), 'vec4', this.amount);
 
         const geometry = new SphereGeometry(1, 32, 32);
         geometry.deleteAttribute('uv');
@@ -177,14 +171,16 @@ class Demo {
             const pos = position.xyz.toVar('pos');
             const vel = velocity.xyz.toVar('vel');
 
+            const clampedDeltaTime = deltaTime.min(0.02).toVar();
+
             If(not(isAttractor), () => {
                 const toAttractorVec = attractorPosition.sub(pos.xyz).toVar('toAttractorVec');
                 const objSize = pos.w.mul(size).toVar('objSize');
                 const intensity = max(objSize.mul(objSize), 0.1);
-                vel.xyz.addAssign(toAttractorVec.normalize().mul(deltaTime).mul(intensity));
+                vel.xyz.addAssign(toAttractorVec.normalize().mul(clampedDeltaTime).mul(intensity));
                 vel.xyz.minAssign(maxVelocity);
                 vel.xyz.mulAssign(0.999);
-                pos.addAssign(vel.mul(deltaTime.mul(60)));
+                pos.addAssign(vel.mul(clampedDeltaTime.mul(60)));
             }).Else(() => {
                 pos.assign(attractorPosition);
             });
@@ -209,16 +205,14 @@ class Demo {
                     const distance = Var(length(toNeighbourVec), 'dist');
                     const minDistance = Var(position.w.mul(size).add(neighbourPosition.w.mul(size)), 'minDist');
 
-                    If(distance.lessThan(minDistance), () => {
+                    If(distance.lessThan(minDistance).and(not(isAttractor)), () => {
                         const toNeighbourDirection = toNeighbourVec.normalize();
                         const diff = minDistance.sub(distance);
                         const correction = Var(toNeighbourDirection.mul(diff.mul(0.5)), 'correction');
                         const velocityCorrection = correction.mul(max(length(velocity), 2));
 
-                        If(not(isAttractor), () => {
-                            position.xyz.subAssign(correction);
-                            velocity.xyz.subAssign(velocityCorrection);
-                        });
+                        position.xyz.subAssign(correction);
+                        velocity.xyz.subAssign(velocityCorrection);
                     });
                 });
             });
