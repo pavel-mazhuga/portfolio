@@ -134,12 +134,12 @@ class Demo {
         const maxVelocity = uniform(0.04);
         const isAttractor = instanceIndex.equal(0);
 
-        const hash0 = Var(hash(instanceIndex));
-        const hash1 = Var(hash(instanceIndex.add(1)));
-        const hash2 = Var(hash(instanceIndex.add(2)));
-        const hash3 = Var(hash(instanceIndex.add(3)));
-        const hash4 = Var(hash(instanceIndex.add(4)));
-        const hash5 = Var(hash(instanceIndex.add(5)));
+        const hash0 = Var(hash(instanceIndex), 'hash0');
+        const hash1 = Var(hash(instanceIndex.add(1)), 'hash1');
+        const hash2 = Var(hash(instanceIndex.add(2)), 'hash2');
+        const hash3 = Var(hash(instanceIndex.add(3)), 'hash3');
+        const hash4 = Var(hash(instanceIndex.add(4)), 'hash4');
+        const hash5 = Var(hash(instanceIndex.add(5)), 'hash5');
 
         const initCompute = Fn(() => {
             const position = this.positionsBuffer.element(instanceIndex);
