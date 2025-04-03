@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const ExperimentPage = () => {
     return (
         <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/attractor-collisions/webgpu">
-            <div className="canvas-wrapper">
+            <div className="canvas-wrapper overscroll-behavior-none">
                 <Experience />
             </div>
         </ExperimentLayout>

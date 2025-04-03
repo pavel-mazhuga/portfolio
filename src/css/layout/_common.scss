@@ -177,3 +177,7 @@ body:not(.sb-show-main) {
         bottom: 55px;
     }
 }
+
+html:has(.overscroll-behavior-none) {
+    overscroll-behavior: none;
+}
