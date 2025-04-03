@@ -48,6 +48,8 @@ import {
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
 import { rotationXYZ } from '@/app/tsl-utils/rotation/rotation-xyz';
+import { clamp } from '@/utils/clamp';
+import { lerp } from '@/utils/lerp';
 import { Pointer } from '@/utils/webgpu/Pointer';
 import { compose } from '@/utils/webgpu/nodes/compose';
 
@@ -64,6 +66,18 @@ class Demo {
     tweakPane?: Pane;
     amount = 600;
     pointerHandler: Pointer;
+
+    initialDeviceOrientation = {
+        alpha: 0,
+        beta: 0,
+        gamma: 0,
+    };
+
+    deviceOrientation = {
+        alpha: 0,
+        beta: 0,
+        gamma: 0,
+    };
 
     positionsBuffer: ShaderNodeObject<StorageBufferNode>;
     velocitiesBuffer: ShaderNodeObject<StorageBufferNode>;
@@ -82,6 +96,7 @@ class Demo {
     constructor(canvas: HTMLCanvasElement) {
         this.render = this.render.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
+        this.onDeviceOrientation = this.onDeviceOrientation.bind(this);
 
         this.canvas = canvas;
         this.renderer = new WebGPURenderer({
@@ -299,6 +314,36 @@ class Demo {
         this.postProcessing.outputNode = scenePassColor.mul(denoisePass);
 
         this.renderer.setAnimationLoop(this.render);
+
+        /**
+         * Gyroscope
+         */
+
+        const requestAccessAsync = async (): Promise<boolean> => {
+            if (!window.DeviceOrientationEvent) {
+                return false;
+            }
+
+            if (
+                (window.DeviceOrientationEvent as any).requestPermission &&
+                typeof (DeviceMotionEvent as any).requestPermission === 'function'
+            ) {
+                let permission: PermissionState;
+
+                try {
+                    permission = await (window.DeviceOrientationEvent as any).requestPermission();
+                } catch (err) {
+                    return false;
+                }
+                if (permission !== 'granted') {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        requestAccessAsync();
     }
 
     get dpr() {
@@ -315,12 +360,20 @@ class Demo {
         this.controls?.update();
     }
 
+    onDeviceOrientation(event: DeviceOrientationEvent) {
+        this.initialDeviceOrientation.alpha = event.alpha || 0;
+        this.initialDeviceOrientation.beta = event.beta || 0;
+        this.initialDeviceOrientation.gamma = event.gamma || 0;
+    }
+
     #initEvents() {
         window.addEventListener('resize', this.onWindowResize);
+        window.addEventListener('deviceorientation', this.onDeviceOrientation, { once: true });
     }
 
     #destroyEvents() {
         window.removeEventListener('resize', this.onWindowResize);
+        window.removeEventListener('deviceorientation', this.onDeviceOrientation);
     }
 
     #initTweakPane() {
@@ -339,6 +392,24 @@ class Demo {
     async render() {
         this.pointerHandler.update();
         this.uniforms.attractorPosition.value.lerp(this.pointerHandler.uPointer.value, 0.1);
+
+        const lerpValue = 0.1;
+        const bound = Math.PI / 32;
+
+        const beta = clamp(
+            ((this.deviceOrientation.beta || 0) - (this.initialDeviceOrientation.beta || 0)) * 0.003,
+            -bound,
+            bound,
+        );
+        const gamma = clamp(
+            ((this.deviceOrientation.gamma || 0) - (this.initialDeviceOrientation.gamma || 0)) * 0.003,
+            -bound,
+            bound,
+        );
+
+        this.uniforms.attractorPosition.value.x = lerp(this.uniforms.attractorPosition.value.x, beta, lerpValue);
+        this.uniforms.attractorPosition.value.y = lerp(this.uniforms.attractorPosition.value.y, gamma, lerpValue);
+        // this.uniforms.attractorPosition.value.z = lerp(this.uniforms.attractorPosition.value.z, 0, lerpValue);
 
         if (this.computeAttractions instanceof ComputeNode) {
             await this.renderer.computeAsync(this.computeAttractions);
