@@ -1,4 +1,5 @@
 import animatedBlobPreview from '@/app/lab/animated-blob/preview.jpeg';
+import attractorCollisionsPreview from '@/app/lab/attractor-collisions/webgpu/preview.jpeg';
 import displacedSphere2Preview from '@/app/lab/displaced-sphere-2/preview.jpeg';
 import displacedSphereCsmPreview from '@/app/lab/displaced-sphere-csm/preview.jpeg';
 import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
@@ -28,6 +29,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Attraction and collisions',
+        slug: 'attractor-collisions/webgpu',
+        tags: ['webgpu', 'tsl', 'shaders', 'compute'],
+        preview: attractorCollisionsPreview,
+    },
     {
         name: 'TSL custom node material',
         slug: 'tsl-custom-node-material',
