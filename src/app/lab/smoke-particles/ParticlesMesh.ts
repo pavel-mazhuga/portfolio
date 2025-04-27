@@ -1,21 +1,16 @@
-import { AdditiveBlending, Color, InstancedMesh, PlaneGeometry, Vector3 } from 'three';
+import { InstancedMesh, PlaneGeometry, Vector3 } from 'three';
 import {
     Fn,
     If,
     ShaderNodeObject,
-    add,
     deltaTime,
     float,
     hash,
     instanceIndex,
     min,
-    mul,
-    rand,
-    select,
     storage,
     time,
     uniform,
-    uniformArray,
     uv,
     vec3,
     vec4,
@@ -25,7 +20,6 @@ import {
     SpriteNodeMaterial,
     StorageBufferNode,
     StorageInstancedBufferAttribute,
-    UniformNode,
     WebGPURenderer,
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
@@ -34,17 +28,12 @@ import { simplexNoise3d } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
 
 type Parameters = {
     amount: number;
-    startPositions: number[] | ShaderNodeObject<StorageBufferNode>;
     renderer: WebGPURenderer;
-    pointerPosition: ShaderNodeObject<UniformNode<Vector3>>;
-    pointerVelocity: ShaderNodeObject<UniformNode<Vector3>>;
 };
 
 class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
     renderer: Parameters['renderer'];
     amount: Parameters['amount'];
-    pointerPosition: Parameters['pointerPosition'];
-    pointerVelocity: Parameters['pointerVelocity'];
 
     buffers: {
         startPositions?: ShaderNodeObject<StorageBufferNode>;
@@ -56,8 +45,6 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
     } = {};
 
     updateCompute: ComputeNode;
-
-    tweakPane?: Pane;
 
     windTime = 0;
 
@@ -73,13 +60,12 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         wind: uniform(this.params.wind),
     };
 
-    constructor({ amount, pointerPosition, pointerVelocity, startPositions, renderer }: Parameters) {
+    constructor({ amount, renderer }: Parameters) {
         const geometry = new PlaneGeometry();
         const material = new SpriteNodeMaterial({
             transparent: true,
             depthWrite: false,
             sizeAttenuation: true,
-            // blending: AdditiveBlending,
         });
 
         super(geometry, material, amount);
@@ -87,16 +73,12 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         this.frustumCulled = false;
         this.renderer = renderer;
         this.amount = amount;
-        this.pointerPosition = pointerPosition;
-        this.pointerVelocity = pointerVelocity;
 
-        this.buffers.startPositions = Array.isArray(startPositions)
-            ? storage(
-                  new StorageInstancedBufferAttribute(new Float32Array(startPositions), 3),
-                  'vec3',
-                  this.amount,
-              ).setPBO(true)
-            : startPositions;
+        this.buffers.startPositions = storage(
+            new StorageInstancedBufferAttribute(this.amount, 3),
+            'vec3',
+            this.amount,
+        ).setPBO(true);
 
         this.buffers.positions = storage(
             new StorageInstancedBufferAttribute(this.amount, 3),
@@ -135,9 +117,16 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             return vec4(1, 1, 1, alpha);
         })();
 
-        const generateLifeDuration = () => hash(instanceIndex.add(time)).mul(0.8).add(0.7);
-
         const initCompute = Fn(() => {
+            this.buffers.startPositions
+                ?.element(instanceIndex)
+                .assign(
+                    vec3(
+                        hash(instanceIndex).sub(0.5).mul(30),
+                        hash(instanceIndex.add(1)).sub(0.5).mul(30),
+                        hash(instanceIndex.add(2)).negate().mul(30),
+                    ),
+                );
             this.buffers.positions?.element(instanceIndex).assign(this.buffers.startPositions!.element(instanceIndex));
             this.buffers.velocities?.element(instanceIndex).assign(vec3(0));
             this.buffers.lifes?.element(instanceIndex).assign(-1);
@@ -180,7 +169,7 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             If(newLife.lessThanEqual(0), () => {
                 newPosition.assign(respawnPos);
                 newVelocity.assign(vec3(0));
-                newLife.assign(generateLifeDuration());
+                newLife.assign(hash(instanceIndex.add(time)).mul(0.8).add(0.7));
             });
 
             position.assign(newPosition);
