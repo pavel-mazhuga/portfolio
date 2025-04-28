@@ -4,12 +4,15 @@ import Snowflakes from './Snowflakes';
 
 class Demo extends BaseExperience {
     snowflakes: Snowflakes;
-    maxCount = 10000;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.snowflakes = new Snowflakes({ amount: this.maxCount, renderer: this.renderer, viewport: this.viewport });
+        this.snowflakes = new Snowflakes({
+            amount: 5000,
+            renderer: this.renderer,
+            viewport: this.viewport,
+        });
         this.scene.add(this.snowflakes);
 
         if (window.location.search.includes('debug')) {

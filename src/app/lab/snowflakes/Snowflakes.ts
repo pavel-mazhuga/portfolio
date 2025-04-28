@@ -1,4 +1,4 @@
-import { InstancedMesh, PlaneGeometry, SRGBColorSpace, TextureLoader, Vector3 } from 'three';
+import { InstancedMesh, PlaneGeometry, SRGBColorSpace, Texture, TextureLoader, Vector3 } from 'three';
 import {
     Fn,
     If,
@@ -25,7 +25,6 @@ type Parameters = {
 
 class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
     renderer: Parameters['renderer'];
-    amount: Parameters['amount'];
     viewport: Parameters['viewport'];
 
     buffers: {
@@ -45,9 +44,17 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
 
     static geometry = new PlaneGeometry();
 
+    static snowflakeTexture: Texture | null = null;
+
     constructor({ amount, renderer, viewport }: Parameters) {
-        const snowflakeTexture = new TextureLoader().load('/img/snowflake.webp');
-        snowflakeTexture.colorSpace = SRGBColorSpace;
+        const snowflakeTexture =
+            Snowflakes.snowflakeTexture ||
+            (() => {
+                const texture = new TextureLoader().load('/img/snowflake.webp');
+                texture.colorSpace = SRGBColorSpace;
+                Snowflakes.snowflakeTexture = texture;
+                return texture;
+            })();
 
         const material = new SpriteNodeMaterial({
             transparent: true,
@@ -60,14 +67,13 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         super(Snowflakes.geometry, material, amount);
 
         this.renderer = renderer;
-        this.amount = amount;
         this.viewport = viewport;
 
         this.buffers = {
-            positions: storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount)
+            positions: storage(new StorageInstancedBufferAttribute(this.count, 3), 'vec3', this.count)
                 .label('positionsBuffer')
                 .setPBO(true),
-            velocities: storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount)
+            velocities: storage(new StorageInstancedBufferAttribute(this.count, 3), 'vec3', this.count)
                 .label('velocitiesBuffer')
                 .setPBO(true),
         };
@@ -125,7 +131,7 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             velocity.assign(newVelocity);
 
             return position;
-        })().compute(this.amount);
+        })().compute(this.count);
 
         material.scaleNode = float(0.03).add(hash(instanceIndex).mul(0.03));
 
@@ -137,15 +143,15 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
                     .sub(0.5)
                     .mul(this.viewport.width * 3),
                 hash(instanceIndex.add(1))
-                    .mul(30)
+                    .mul(this.viewport.height * 4)
                     .add(this.viewport.top * 2.8),
-                hash(instanceIndex.add(2)).negate().mul(20),
+                hash(instanceIndex.add(2)).negate().mul(10),
             );
 
         this.renderer.computeAsync(
             Fn(() => {
                 this.buffers.positions.element(instanceIndex).assign(getStartPosition());
-            })().compute(this.amount),
+            })().compute(this.count),
         );
     }
 
