@@ -19,7 +19,7 @@ export function computeSimplex2DNoiseTexture(
 
     // @ts-ignore
     const computeTexture = Fn(({ storageTexture }) => {
-        const posX = instanceIndex.modInt(params.width);
+        const posX = instanceIndex.mod(params.width);
         const posY = instanceIndex.div(params.width);
         const indexUV = uvec2(posX, posY);
         const r = snoise(vec2(posX, posY));

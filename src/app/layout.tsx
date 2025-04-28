@@ -57,11 +57,11 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                     <Header />
                     <main className="main">{children}</main>
                     <Footer />
-                    {process.env.NODE_ENV === 'development' && (
-                        <>
-                            <HideInterface />
-                        </>
-                    )}
+                    {/* {process.env.NODE_ENV === 'development' && ( */}
+                    <>
+                        <HideInterface />
+                    </>
+                    {/* )} */}
                 </body>
             </Html>
         </Providers>
