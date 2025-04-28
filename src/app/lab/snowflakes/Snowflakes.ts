@@ -7,12 +7,12 @@ import {
     float,
     hash,
     instanceIndex,
-    storage,
+    instancedArray,
     time,
     uniform,
     vec3,
 } from 'three/tsl';
-import { SpriteNodeMaterial, StorageBufferNode, StorageInstancedBufferAttribute, WebGPURenderer } from 'three/webgpu';
+import { SpriteNodeMaterial, StorageBufferNode, WebGPURenderer } from 'three/webgpu';
 import { Pane } from 'tweakpane';
 import { simplexNoise3d } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
 import BaseExperience from '../BaseExperience';
@@ -70,12 +70,8 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         this.viewport = viewport;
 
         this.buffers = {
-            positions: storage(new StorageInstancedBufferAttribute(this.count, 3), 'vec3', this.count)
-                .label('positionsBuffer')
-                .setPBO(true),
-            velocities: storage(new StorageInstancedBufferAttribute(this.count, 3), 'vec3', this.count)
-                .label('velocitiesBuffer')
-                .setPBO(true),
+            positions: instancedArray(this.count, 'vec3').label('positionsBuffer').setPBO(true),
+            velocities: instancedArray(this.count, 'vec3').label('velocitiesBuffer').setPBO(true),
         };
 
         material.positionNode = Fn(() => {
@@ -185,9 +181,12 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
     initTweakPane(tweakPane: Pane) {
         const folder = tweakPane.addFolder({ title: 'Particles' });
 
+        folder.addBinding(this, 'count', { min: 0, max: this.count, step: 1 });
+
         folder.addBinding(this.params, 'gravity', { min: 0, max: 3, step: 0.001 }).on('change', () => {
             this.uniforms.gravity.value = this.params.gravity;
         });
+
         folder.addBinding(this.params, 'wind', { min: -10, max: 10, step: 0.01 }).on('change', () => {
             this.uniforms.wind.value.copy(this.params.wind);
         });

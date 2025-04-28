@@ -15,9 +15,9 @@ class Demo extends BaseExperience {
         });
         this.scene.add(this.snowflakes);
 
-        if (window.location.search.includes('debug')) {
-            this.initTweakPane();
-        }
+        // if (window.location.search.includes('debug')) {
+        this.initTweakPane();
+        // }
     }
 
     async render() {
