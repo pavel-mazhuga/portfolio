@@ -35,7 +35,7 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
 
     params = {
         gravity: 0.098,
-        wind: new Vector3(0, -0.1, 0),
+        wind: new Vector3(0, -0.2, 0),
     };
 
     uniforms = {
