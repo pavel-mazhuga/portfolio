@@ -2,6 +2,7 @@ import { InstancedMesh, PlaneGeometry, SRGBColorSpace, Texture, TextureLoader, V
 import {
     Fn,
     If,
+    PI2,
     ShaderNodeObject,
     deltaTime,
     float,
@@ -33,13 +34,15 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
     };
 
     params = {
+        friction: 0.99,
         gravity: 0.098,
-        wind: new Vector3(0, -0.2, 0),
+        wind: new Vector3(0, -0.003, 0),
     };
 
     uniforms = {
         gravity: uniform(this.params.gravity).label('gravity'),
         wind: uniform(this.params.wind).label('wind'),
+        friction: uniform(this.params.friction).label('friction'),
     };
 
     static geometry = new PlaneGeometry();
@@ -74,6 +77,26 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             velocities: instancedArray(this.count, 'vec3').label('velocitiesBuffer').setPBO(true),
         };
 
+        const getStartPosition = () =>
+            vec3(
+                hash(instanceIndex.add(time))
+                    .sub(0.5)
+                    .mul(this.viewport.width * 2),
+                hash(instanceIndex.add(time).add(1))
+                    .mul(this.viewport.height * 1.5)
+                    .add(this.viewport.height / 2),
+                hash(instanceIndex.add(time).add(2)).negate().mul(5),
+            );
+
+        this.renderer.computeAsync(
+            Fn(() => {
+                this.buffers.positions.element(instanceIndex).assign(getStartPosition());
+            })().compute(this.count),
+        );
+
+        const size = float(0.01).add(hash(instanceIndex).mul(0.01));
+        const mass = size;
+
         material.positionNode = Fn(() => {
             /**
              * Read from buffers
@@ -85,8 +108,6 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             const newPosition = position.toVar('newPosition');
             const newVelocity = velocity.toVar('newVelocity');
 
-            const mass = float(0.8).add(hash(instanceIndex).mul(0.2));
-            const respawnPos = getStartPosition();
             const clampedDeltaTime = deltaTime.min(0.02).toVar('clampedDeltaTime');
 
             /**
@@ -100,8 +121,9 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
              */
 
             newVelocity.addAssign(wind);
-            newVelocity.xz.addAssign(simplexNoise3d(position).mul(0.1));
+            newVelocity.xz.addAssign(simplexNoise3d(position).div(mass.mul(1000)));
             newVelocity.y.subAssign(this.uniforms.gravity);
+            newVelocity.y.mulAssign(this.uniforms.friction);
             newVelocity.mulAssign(clampedDeltaTime);
 
             /**
@@ -114,9 +136,8 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
              * Life
              */
 
-            If(newPosition.y.lessThan(this.viewport.bottom * 5), () => {
-                newPosition.assign(respawnPos);
-                newVelocity.assign(vec3(0));
+            If(newPosition.y.lessThan(this.viewport.bottom), () => {
+                newPosition.assign(getStartPosition());
             });
 
             /**
@@ -129,26 +150,9 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             return position;
         })().compute(this.count);
 
-        material.scaleNode = float(0.03).add(hash(instanceIndex).mul(0.03));
+        material.scaleNode = size;
 
-        material.rotationNode = hash(instanceIndex).mul(time).mul(this.uniforms.wind.x);
-
-        const getStartPosition = () =>
-            vec3(
-                hash(instanceIndex)
-                    .sub(0.5)
-                    .mul(this.viewport.width * 3),
-                hash(instanceIndex.add(1))
-                    .mul(this.viewport.height * 4)
-                    .add(this.viewport.top * 2.8),
-                hash(instanceIndex.add(2)).negate().mul(10),
-            );
-
-        this.renderer.computeAsync(
-            Fn(() => {
-                this.buffers.positions.element(instanceIndex).assign(getStartPosition());
-            })().compute(this.count),
-        );
+        material.rotationNode = hash(instanceIndex).mul(PI2).add(time.mul(mass).mul(100));
     }
 
     /**
@@ -187,7 +191,7 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             this.uniforms.gravity.value = this.params.gravity;
         });
 
-        folder.addBinding(this.params, 'wind', { min: -10, max: 10, step: 0.01 }).on('change', () => {
+        folder.addBinding(this.params, 'wind', { min: -10, max: 10, step: 0.0001 }).on('change', () => {
             this.uniforms.wind.value.copy(this.params.wind);
         });
     }

@@ -7,6 +7,7 @@ class Demo extends BaseExperience {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
+        this.camera.position.set(0, 0, 1);
 
         this.snowflakes = new Snowflakes({
             amount: 5000,

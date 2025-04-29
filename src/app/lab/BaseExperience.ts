@@ -1,4 +1,5 @@
 import Stats from 'stats-gl';
+import { WebGPURendererParameters } from 'three/src/renderers/webgpu/WebGPURenderer.js';
 import {
     ACESFilmicToneMapping,
     Clock,
@@ -33,16 +34,15 @@ class BaseExperience {
         bottom: 0,
     };
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, rendererParams: WebGPURendererParameters = {}) {
         this.render = this.render.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
 
         this.canvas = canvas;
         this.renderer = new WebGPURenderer({
-            alpha: true,
             canvas,
-            antialias: false,
             powerPreference: 'high-performance',
+            ...rendererParams,
         });
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
