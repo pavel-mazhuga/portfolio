@@ -23,12 +23,19 @@ import particlesPhotoMouseTrailPreview from '@/app/lab/particles-photo-mouse-tra
 import particlesTwistPreview from '@/app/lab/particles-twist/preview.jpeg';
 import planeWavePreview from '@/app/lab/plane-wave/preview.jpeg';
 import refractionAndDispersionPreview from '@/app/lab/refraction-and-dispersion/preview.jpeg';
+import snowflakesPreview from '@/app/lab/snowflakes/preview.jpeg';
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
 import tslCustomNodeMatealPreview from '@/app/lab/tsl-custom-node-material/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Snowflakes',
+        slug: 'snowflakes',
+        tags: ['webgl', 'particles', 'shaders'],
+        preview: snowflakesPreview,
+    },
     {
         name: 'Attraction and collisions',
         slug: 'attractor-collisions/webgpu',
