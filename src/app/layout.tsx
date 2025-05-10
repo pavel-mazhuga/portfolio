@@ -13,10 +13,7 @@ const WEBSITE_DESCRIPTION =
 const WEBSITE_OG_IMAGE = '/img/og-image.jpg';
 
 export const metadata: Metadata = {
-    title: {
-        default: WEBSITE_NAME,
-        template: `%s — ${WEBSITE_NAME}`,
-    },
+    title: { default: WEBSITE_NAME, template: `%s — ${WEBSITE_NAME}` },
     description: WEBSITE_DESCRIPTION,
     icons: {
         icon: '/favicon.png',
@@ -26,27 +23,13 @@ export const metadata: Metadata = {
         title: WEBSITE_NAME,
         description: WEBSITE_DESCRIPTION,
         siteName: WEBSITE_NAME,
-        images: [
-            {
-                url: WEBSITE_OG_IMAGE,
-                width: 1200,
-                height: 628,
-            },
-        ],
+        images: [{ url: WEBSITE_OG_IMAGE, width: 1200, height: 628 }],
         type: 'website',
     },
-    twitter: {
-        card: 'summary',
-        title: WEBSITE_NAME,
-        description: WEBSITE_DESCRIPTION,
-        images: [WEBSITE_OG_IMAGE],
-    },
+    twitter: { card: 'summary', title: WEBSITE_NAME, description: WEBSITE_DESCRIPTION, images: [WEBSITE_OG_IMAGE] },
 };
 
-export const viewport: Viewport = {
-    width: 'device-width',
-    initialScale: 1,
-};
+export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
     return (
