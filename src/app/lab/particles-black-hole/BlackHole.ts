@@ -154,10 +154,6 @@ class BlackHole extends InstancedMesh<SphereGeometry, MeshStandardNodeMaterial> 
         folder.addBinding(this.params, 'size', { min: 0, max: 3, step: 0.001 }).on('change', () => {
             this.uniforms.size.value = this.params.size;
         });
-
-        folder.addBinding(this.params, 'radius', { min: 1, max: 20, step: 0.1 }).on('change', () => {
-            this.uniforms.radius.value = this.params.radius;
-        });
     }
 }
 

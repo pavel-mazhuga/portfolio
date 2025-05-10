@@ -4,6 +4,7 @@ import {
     ACESFilmicToneMapping,
     Clock,
     PerspectiveCamera,
+    PostProcessing,
     Scene,
     TimestampQuery,
     Vector3,
@@ -25,25 +26,14 @@ class BaseExperience {
     delta = 0;
     tweakPane?: Pane;
 
-    viewport = {
-        width: 0,
-        height: 0,
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    };
+    viewport = { width: 0, height: 0, top: 0, left: 0, right: 0, bottom: 0 };
 
     constructor(canvas: HTMLCanvasElement, rendererParams: WebGPURendererParameters = {}) {
         this.render = this.render.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
 
         this.canvas = canvas;
-        this.renderer = new WebGPURenderer({
-            canvas,
-            powerPreference: 'high-performance',
-            ...rendererParams,
-        });
+        this.renderer = new WebGPURenderer({ canvas, powerPreference: 'high-performance', ...rendererParams });
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
@@ -56,17 +46,13 @@ class BaseExperience {
         this.viewport = this.getViewport();
 
         if (process.env.NODE_ENV === 'development') {
-            this.stats = new Stats({
-                precision: 3,
-                trackGPU: true,
-                trackCPT: true,
-            });
+            this.stats = new Stats({ precision: 3, trackGPU: true, trackCPT: true });
             this.stats.init(this.renderer);
             canvas.parentElement?.appendChild(this.stats.dom);
         }
 
         this.initEvents();
-        this.renderer.setAnimationLoop(this.render);
+        this.renderer.setAnimationLoop(() => this.render());
     }
 
     get dpr() {
@@ -80,14 +66,7 @@ class BaseExperience {
         const aspect = this.canvas.width / this.canvas.height;
         const w = aspect * h;
 
-        return {
-            height: h,
-            width: w,
-            top: h / 2,
-            left: -w / 2,
-            right: w / 2,
-            bottom: -h / 2,
-        };
+        return { height: h, width: w, top: h / 2, left: -w / 2, right: w / 2, bottom: -h / 2 };
     }
 
     onWindowResize() {
@@ -108,12 +87,16 @@ class BaseExperience {
         window.removeEventListener('resize', this.onWindowResize);
     }
 
-    async render() {
+    async render(postProcessing?: PostProcessing) {
         const elapsedTime = this.clock.getElapsedTime();
         this.delta = elapsedTime - this.prevTime;
         this.prevTime = elapsedTime;
 
-        this.renderer.renderAsync(this.scene, this.camera);
+        if (postProcessing) {
+            postProcessing.renderAsync();
+        } else {
+            this.renderer.renderAsync(this.scene, this.camera);
+        }
 
         if (this.stats) {
             this.renderer.resolveTimestampsAsync(TimestampQuery.RENDER);
@@ -134,10 +117,7 @@ class BaseExperience {
     }
 
     protected initTweakPane() {
-        this.tweakPane = new Pane({
-            title: 'Parameters',
-            expanded: matchMedia('(min-width: 1200px)').matches,
-        });
+        this.tweakPane = new Pane({ title: 'Parameters', expanded: matchMedia('(min-width: 1200px)').matches });
     }
 
     protected destroyTweakPane() {
