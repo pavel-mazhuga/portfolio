@@ -86,7 +86,6 @@
         "postcss-font-display": "^0.3.0",
         "prettier": "^3.3.2",
         "sass": "^1.77.5",
-        "sort-css-media-queries": "^2.2.0",
         "tsconfig-paths-webpack-plugin": "^4.1.0"
     }
 }

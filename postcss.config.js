@@ -1,4 +1,3 @@
-const sortCSSmq = require('sort-css-media-queries');
 
 const { browserslist } = require('./package.json');
 
