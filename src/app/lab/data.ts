@@ -15,6 +15,7 @@ import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
 import infiniteWaterPreview from '@/app/lab/infinite-water/webgpu/preview.jpeg';
 import magicWandCursorPreview from '@/app/lab/magic-wand-cursor/webgpu/preview.jpeg';
 import nightingaleHoverEffectRecreatedPreview from '@/app/lab/nightingale-hover-effect-recreated/webgpu/preview.jpeg';
+import particlesBlackHolePreview from '@/app/lab/particles-black-hole/preview.jpeg';
 import particlesFollowingCursorPositionPreview from '@/app/lab/particles-following-cursor-position/preview.jpeg';
 import particlesModelShapePreview from '@/app/lab/particles-model-shape/preview.jpeg';
 import particlesMorphing2Preview from '@/app/lab/particles-morphing-2/webgpu/preview.jpeg';
@@ -31,11 +32,12 @@ import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     {
-        name: 'Snowflakes',
-        slug: 'snowflakes',
+        name: 'Particles black hole',
+        slug: 'particles-black-hole',
         tags: ['webgl', 'particles', 'shaders'],
-        preview: snowflakesPreview,
+        preview: particlesBlackHolePreview,
     },
+    { name: 'Snowflakes', slug: 'snowflakes', tags: ['webgl', 'particles', 'shaders'], preview: snowflakesPreview },
     {
         name: 'Attraction and collisions',
         slug: 'attractor-collisions/webgpu',
@@ -156,12 +158,7 @@ export const experiments: { name: string; slug: string; tags: string[]; preview?
         tags: ['webgl', 'shaders', 'displacement'],
         preview: vertexWavePreview,
     },
-    {
-        name: 'Endless',
-        slug: 'endless-1',
-        tags: ['webgl', 'shaders'],
-        preview: endless1Preview,
-    },
+    { name: 'Endless', slug: 'endless-1', tags: ['webgl', 'shaders'], preview: endless1Preview },
     {
         name: 'Infinite UV animation',
         slug: 'sphere-infinite-uv',
@@ -174,34 +171,14 @@ export const experiments: { name: string; slug: string; tags: string[]; preview?
         tags: ['webgl', 'particles'],
         preview: particlesOnModelSurfacePreview,
     },
-    {
-        name: 'Flower-ish',
-        slug: 'flower-ish',
-        tags: ['webgl', 'shaders', 'displacement'],
-        preview: flowerishPreview,
-    },
+    { name: 'Flower-ish', slug: 'flower-ish', tags: ['webgl', 'shaders', 'displacement'], preview: flowerishPreview },
     {
         name: 'Refraction & dispersion',
         slug: 'refraction-and-dispersion',
         tags: ['webgl', 'shaders', 'refraction'],
         preview: refractionAndDispersionPreview,
     },
-    {
-        name: 'Animated blob',
-        slug: 'animated-blob',
-        tags: ['webgl', 'shaders'],
-        preview: animatedBlobPreview,
-    },
-    {
-        name: 'Displaced torus',
-        slug: 'displaced-torus',
-        tags: ['webgl', 'shaders'],
-        preview: displacedTorusPreview,
-    },
-    {
-        name: 'Plane wave',
-        slug: 'plane-wave',
-        tags: ['webgl', 'shaders'],
-        preview: planeWavePreview,
-    },
+    { name: 'Animated blob', slug: 'animated-blob', tags: ['webgl', 'shaders'], preview: animatedBlobPreview },
+    { name: 'Displaced torus', slug: 'displaced-torus', tags: ['webgl', 'shaders'], preview: displacedTorusPreview },
+    { name: 'Plane wave', slug: 'plane-wave', tags: ['webgl', 'shaders'], preview: planeWavePreview },
 ];
