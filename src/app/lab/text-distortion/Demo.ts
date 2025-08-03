@@ -1,17 +1,18 @@
 import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import { ShaderNodeObject, pass, vec3, uv, time, mx_noise_float } from 'three/tsl';
-import {  PostProcessing, TimestampQuery, Fog, Color, Vector2 } from 'three/webgpu';
+import {  PostProcessing, TimestampQuery, Fog, Color, Vector2, Raycaster } from 'three/webgpu';
 import BaseExperience from '../BaseExperience';
 import Text from './Text';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 class Demo extends BaseExperience {
-    text: Text;
+    text?: Text;
     postProcessing: PostProcessing;
     bloomPass: ShaderNodeObject<BloomNode>;
     mouse: Vector2;
     isPressed: boolean;
     controls: OrbitControls | undefined;
+    raycaster!: Raycaster;
 
     params = { 
         usePostprocessing: true, 
@@ -26,21 +27,21 @@ class Demo extends BaseExperience {
 
         this.mouse = new Vector2(0, 0);
         this.isPressed = false;
+        this.raycaster = new Raycaster();
 
-        // OrbitControls
-        // this.controls = new OrbitControls(this.camera, canvas);
-        // this.controls.enableDamping = true;
-        // this.controls.dampingFactor = 0.1;
-        // this.controls.enablePan = false;
-        // this.controls.minDistance = 2;
-        // this.controls.maxDistance = 20;
 
-        // Create text
-        this.text = new Text({ renderer: this.renderer, viewport: this.viewport });
-        this.scene.add(this.text);
+        Text.fontLoader.loadAsync('/fonts/Inter_18pt_Medium_Regular.json').then(font => {
 
-        // Wait for text to initialize
-        this.text.initialize();
+            this.text = new Text({ text: 'Text'.toUpperCase(), renderer: this.renderer, viewport: this.viewport, font });
+            this.scene.add(this.text);
+
+            if (this.tweakPane) {
+
+                this.text.initTweakPane(this.tweakPane);
+            }
+    
+        })
+
 
         // Setup scene environment
         this.scene.fog = new Fog(new Color('#41444c'), 0.0, 8.5);
@@ -76,41 +77,37 @@ class Demo extends BaseExperience {
 
     setupMouseEvents() {
         const canvas = this.renderer.domElement;
-
-        const updateMousePosition = (event: MouseEvent) => {
-            const rect = canvas.getBoundingClientRect();
-            // Normalize mouse coordinates to NDC (-1 to 1)
-            this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            
-            // Convert to world space
-            const worldX = this.mouse.x * 3; // Adjust scale as needed
-            const worldY = this.mouse.y * 3;
-            
-            this.text.updateMousePosition(worldX, worldY, this.isPressed);
+        const sizes = {
+            width: canvas.width,
+            height: canvas.height,
         };
 
-        canvas.addEventListener('mousemove', updateMousePosition);
-        
-        canvas.addEventListener('mousedown', (event) => {
-            this.isPressed = true;
-            updateMousePosition(event);
-        });
-        
-        canvas.addEventListener('mouseup', () => {
-            this.isPressed = false;
-            this.text.updateMousePosition(this.mouse.x * 3, this.mouse.y * 3, false);
+        const updateMousePosition = (event: PointerEvent) => {
+
+            if (!this.text) return;
+
+            const x = event.clientX / sizes.width - 0.5;
+            const y = event.clientY / sizes.height - 0.5;
+
+            const _p = new Vector2(x, -y).multiplyScalar(2.0);
+            this.raycaster.setFromCamera(_p, this.camera);
+            const intersect = this.raycaster.intersectObject(this.text, true);
+            
+            if (intersect.length) {
+                this.text?.updateMousePosition(intersect[0].point.x, intersect[0].point.y, true);
+            }
+        };
+
+        window.addEventListener('pointerup', () => {
+            this.text?.updateMousePosition(0, 0, false);
         });
 
-        canvas.addEventListener('mouseleave', () => {
-            this.isPressed = false;
-            this.text.updateMousePosition(0, 0, false);
-        });
+        window.addEventListener('pointermove', updateMousePosition);
     }
 
     async render() {
         // Update text deformation
-        this.text.update();
+        this.text?.update();
 
         // OrbitControls update
         if (this.controls) this.controls.update();
@@ -124,7 +121,7 @@ class Demo extends BaseExperience {
 
     destroy() {
         if (this.controls) this.controls.dispose();
-        this.text.dispose();
+        this.text?.dispose();
         super.destroy();
     }
 
@@ -132,7 +129,7 @@ class Demo extends BaseExperience {
         super.initTweakPane();
 
         if (this.tweakPane) {
-            this.text.initTweakPane(this.tweakPane);
+           
 
             const postProcessingFolder = this.tweakPane.addFolder({ title: 'Postprocessing' });
             postProcessingFolder.addBinding(this.params, 'usePostprocessing');
