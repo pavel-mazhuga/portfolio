@@ -23,7 +23,7 @@ import BaseExperience from '../BaseExperience';
 
 type Parameters = { amount: number; renderer: WebGPURenderer; viewport: BaseExperience['viewport'] };
 
-class ParticlesBlackHole extends InstancedMesh<SphereGeometry, MeshStandardNodeMaterial> {
+class BlackHole extends InstancedMesh<SphereGeometry, MeshStandardNodeMaterial> {
     renderer: Parameters['renderer'];
     viewport: Parameters['viewport'];
     light: PointLight;
@@ -40,7 +40,7 @@ class ParticlesBlackHole extends InstancedMesh<SphereGeometry, MeshStandardNodeM
     constructor({ amount, renderer, viewport }: Parameters) {
         const material = new MeshStandardNodeMaterial();
 
-        super(ParticlesBlackHole.geometry, material, amount);
+        super(BlackHole.geometry, material, amount);
 
         this.renderer = renderer;
         this.viewport = viewport;
@@ -84,27 +84,26 @@ class ParticlesBlackHole extends InstancedMesh<SphereGeometry, MeshStandardNodeM
             const objSize = newPosition.w.mul(this.uniforms.size).mul(2).toVar('objSize');
             const intensity = max(objSize, 0.1);
             intensity.mulAssign(toAttractorVec.length().sub(0.1).mul(0.5));
-            // newVelocity.xyz.addAssign(toAttractorVec.normalize().mul(intensity.mul(0.1)));
-            // newVelocity.mulAssign(clampedDeltaTime);
-            // newPosition.xyz.addAssign(newVelocity);
+            newVelocity.xyz.addAssign(toAttractorVec.normalize().mul(intensity));
+            newVelocity.mulAssign(clampedDeltaTime);
+            newPosition.xyz.addAssign(newVelocity);
 
             /**
              * Velocity
              */
 
-            const flowField = curlNoise4d(vec4(newPosition.add(hash(instanceIndex)).mul(1), 0))
-                .mul(10)
+            const flowField = curlNoise4d(vec4(newPosition.add(time.mul(0.05)).mul(5), 0))
+                .mul(0.1)
                 .toVar();
 
-            newVelocity.addAssign(flowField /* .mul(hash(instanceIndex.add(1)).add(1)) */);
-            // newVelocity.mulAssign(clampedDeltaTime);
+            newVelocity.addAssign(flowField.div(intensity.mul(20)).mul(hash(instanceIndex.add(1)).mul(1).add(1)));
+            newVelocity.mulAssign(clampedDeltaTime);
 
             /**
              * Position
              */
 
             newPosition.xyz.addAssign(newVelocity);
-            newPosition.mulAssign(clampedDeltaTime);
 
             /**
              * Write to buffers
@@ -148,18 +147,14 @@ class ParticlesBlackHole extends InstancedMesh<SphereGeometry, MeshStandardNodeM
      * @param {Pane} tweakPane - The pane to add the folder to.
      */
     initTweakPane(tweakPane: Pane) {
-        const folder = tweakPane.addFolder({ title: 'ParticlesBlackHole' });
+        const folder = tweakPane.addFolder({ title: 'BlackHole' });
 
         folder.addBinding(this, 'count', { min: 0, max: this.count, step: 1 });
 
         folder.addBinding(this.params, 'size', { min: 0, max: 3, step: 0.001 }).on('change', () => {
             this.uniforms.size.value = this.params.size;
         });
-
-        folder.addBinding(this.params, 'radius', { min: 1, max: 20, step: 0.1 }).on('change', () => {
-            this.uniforms.radius.value = this.params.radius;
-        });
     }
 }
 
-export default ParticlesBlackHole;
+export default BlackHole;

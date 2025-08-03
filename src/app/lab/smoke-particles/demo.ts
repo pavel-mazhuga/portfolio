@@ -1,16 +1,16 @@
 import { TimestampQuery } from 'three/webgpu';
 import BaseExperience from '../BaseExperience';
-import ParticlesMesh from './ParticlesMesh';
+import Snowflakes from './Snowflakes';
 
 class Demo extends BaseExperience {
-    mesh: ParticlesMesh;
+    snowflakes: Snowflakes;
     maxCount = 10000;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
-        this.mesh = new ParticlesMesh({ amount: this.maxCount, renderer: this.renderer });
-        this.scene.add(this.mesh);
+        this.snowflakes = new Snowflakes({ amount: this.maxCount, renderer: this.renderer, viewport: this.viewport });
+        this.scene.add(this.snowflakes);
 
         if (window.location.search.includes('debug')) {
             this.initTweakPane();
@@ -18,7 +18,7 @@ class Demo extends BaseExperience {
     }
 
     async render() {
-        this.mesh.update(this.delta);
+        this.snowflakes.update(this.delta);
 
         if (this.stats) {
             this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
@@ -28,7 +28,7 @@ class Demo extends BaseExperience {
     }
 
     destroy() {
-        this.mesh.dispose();
+        this.snowflakes.dispose();
         super.destroy();
     }
 
@@ -36,7 +36,7 @@ class Demo extends BaseExperience {
         super.initTweakPane();
 
         if (this.tweakPane) {
-            this.mesh.initTweakPane(this.tweakPane);
+            this.snowflakes.initTweakPane(this.tweakPane);
         }
     }
 }

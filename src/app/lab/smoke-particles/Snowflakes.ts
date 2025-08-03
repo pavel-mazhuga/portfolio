@@ -1,4 +1,4 @@
-import { InstancedMesh, PlaneGeometry, Vector3 } from 'three';
+import { InstancedMesh, PlaneGeometry, SRGBColorSpace, TextureLoader, Vector3 } from 'three';
 import {
     Fn,
     If,
@@ -7,13 +7,10 @@ import {
     float,
     hash,
     instanceIndex,
-    min,
     storage,
     time,
     uniform,
-    uv,
     vec3,
-    vec4,
 } from 'three/tsl';
 import {
     ComputeNode,
@@ -23,26 +20,27 @@ import {
     WebGPURenderer,
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
-import { curlNoise4d } from '@/utils/webgpu/nodes/noise/curlNoise4d';
 import { simplexNoise3d } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
+import BaseExperience from '../BaseExperience';
 
 type Parameters = {
     amount: number;
     renderer: WebGPURenderer;
+    viewport: BaseExperience['viewport'];
 };
 
-class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
+class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
     renderer: Parameters['renderer'];
     amount: Parameters['amount'];
+    viewport: Parameters['viewport'];
 
     buffers: {
-        startPositions?: ShaderNodeObject<StorageBufferNode>;
-        positions?: ShaderNodeObject<StorageBufferNode>;
-        velocities?: ShaderNodeObject<StorageBufferNode>;
-        lifes?: ShaderNodeObject<StorageBufferNode>;
-        masses?: ShaderNodeObject<StorageBufferNode>;
-        sizes?: ShaderNodeObject<StorageBufferNode>;
-    } = {};
+        startPositions: ShaderNodeObject<StorageBufferNode>;
+        positions: ShaderNodeObject<StorageBufferNode>;
+        velocities: ShaderNodeObject<StorageBufferNode>;
+        masses: ShaderNodeObject<StorageBufferNode>;
+        sizes: ShaderNodeObject<StorageBufferNode>;
+    };
 
     updateCompute: ComputeNode;
 
@@ -60,12 +58,17 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         wind: uniform(this.params.wind),
     };
 
-    constructor({ amount, renderer }: Parameters) {
+    constructor({ amount, renderer, viewport }: Parameters) {
+        const snowflakeTexture = new TextureLoader().load('/img/snowflake.webp');
+        snowflakeTexture.colorSpace = SRGBColorSpace;
+
         const geometry = new PlaneGeometry();
         const material = new SpriteNodeMaterial({
             transparent: true,
             depthWrite: false,
             sizeAttenuation: true,
+            map: snowflakeTexture,
+            alphaTest: 0.5,
         });
 
         super(geometry, material, amount);
@@ -73,81 +76,64 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         this.frustumCulled = false;
         this.renderer = renderer;
         this.amount = amount;
+        this.viewport = viewport;
 
-        this.buffers.startPositions = storage(
-            new StorageInstancedBufferAttribute(this.amount, 3),
-            'vec3',
-            this.amount,
-        ).setPBO(true);
-
-        this.buffers.positions = storage(
-            new StorageInstancedBufferAttribute(this.amount, 3),
-            'vec3',
-            this.amount,
-        ).setPBO(true);
-
-        this.buffers.velocities = storage(
-            new StorageInstancedBufferAttribute(this.amount, 3),
-            'vec3',
-            this.amount,
-        ).setPBO(true);
-
-        this.buffers.lifes = storage(new StorageInstancedBufferAttribute(this.amount, 1), 'float', this.amount).setPBO(
-            true,
-        );
-
-        this.buffers.masses = storage(new StorageInstancedBufferAttribute(this.amount, 1), 'float', this.amount).setPBO(
-            true,
-        );
-
-        this.buffers.sizes = storage(new StorageInstancedBufferAttribute(this.amount, 1), 'float', this.amount).setPBO(
-            true,
-        );
+        this.buffers = {
+            startPositions: storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount).setPBO(
+                true,
+            ),
+            positions: storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount).setPBO(true),
+            velocities: storage(new StorageInstancedBufferAttribute(this.amount, 3), 'vec3', this.amount).setPBO(true),
+            masses: storage(new StorageInstancedBufferAttribute(this.amount, 1), 'float', this.amount).setPBO(true),
+            sizes: storage(new StorageInstancedBufferAttribute(this.amount, 1), 'float', this.amount).setPBO(true),
+        };
 
         material.positionNode = this.buffers.positions.element(instanceIndex);
 
-        material.scaleNode = this.buffers.sizes!.element(instanceIndex);
+        material.scaleNode = this.buffers.sizes.element(instanceIndex);
 
-        material.colorNode = Fn(() => {
-            const life = this.buffers.lifes!.element(instanceIndex);
-            const alpha = min(life.smoothstep(0, 0.3), life.smoothstep(0.7, 1).oneMinus());
-
-            uv().sub(0.5).length().greaterThan(0.5).discard();
-
-            return vec4(1, 1, 1, alpha);
-        })();
+        material.rotationNode = hash(instanceIndex).mul(time).mul(this.uniforms.wind.x);
 
         const initCompute = Fn(() => {
-            this.buffers.startPositions
-                ?.element(instanceIndex)
-                .assign(
-                    vec3(
-                        hash(instanceIndex).sub(0.5).mul(30),
-                        hash(instanceIndex.add(1)).sub(0.5).mul(30),
-                        hash(instanceIndex.add(2)).negate().mul(30),
-                    ),
-                );
-            this.buffers.positions?.element(instanceIndex).assign(this.buffers.startPositions!.element(instanceIndex));
-            this.buffers.velocities?.element(instanceIndex).assign(vec3(0));
-            this.buffers.lifes?.element(instanceIndex).assign(-1);
-            this.buffers.masses?.element(instanceIndex).assign(float(0.8).add(hash(instanceIndex).mul(0.2)));
-            this.buffers.sizes?.element(instanceIndex).assign(float(0.02).add(hash(instanceIndex).mul(0.02)));
+            this.buffers.startPositions.element(instanceIndex).assign(
+                vec3(
+                    hash(instanceIndex)
+                        .sub(0.5)
+                        .mul(this.viewport.width * 3),
+                    hash(instanceIndex.add(1))
+                        .mul(30)
+                        .add(this.viewport.top * 3),
+                    hash(instanceIndex.add(2)).negate().mul(20),
+                ),
+            );
+            this.buffers.positions.element(instanceIndex).assign(this.buffers.startPositions.element(instanceIndex));
+            this.buffers.velocities.element(instanceIndex).assign(vec3(0));
+            this.buffers.masses.element(instanceIndex).assign(float(0.8).add(hash(instanceIndex).mul(0.2)));
+            this.buffers.sizes.element(instanceIndex).assign(float(0.03).add(hash(instanceIndex).mul(0.03)));
         })().compute(this.amount);
 
-        this.renderer.computeAsync(initCompute);
+        this.renderer.computeAsync(initCompute).then(() => {
+            initCompute.dispose();
+        });
 
         this.updateCompute = Fn(() => {
-            const position = this.buffers.positions!.element(instanceIndex);
-            const velocity = this.buffers.velocities!.element(instanceIndex);
-            const respawnPos = this.buffers.startPositions!.element(instanceIndex);
-            const life = this.buffers.lifes!.element(instanceIndex);
-            const mass = this.buffers.masses!.element(instanceIndex);
+            /**
+             * Read from buffers
+             */
+
+            const position = this.buffers.positions.element(instanceIndex);
+            const velocity = this.buffers.velocities.element(instanceIndex);
+            const respawnPos = this.buffers.startPositions.element(instanceIndex);
+            const mass = this.buffers.masses.element(instanceIndex);
 
             const newPosition = position.toVar('newPosition');
             const newVelocity = velocity.toVar('newVelocity');
-            const newLife = life.toVar('newLife');
 
             const clampedDeltaTime = deltaTime.min(0.02).toVar('clampedDeltaTime');
+
+            /**
+             * Wind
+             */
 
             const windDirection = this.uniforms.wind.normalize();
             // const wind = this.uniforms.wind.add(simplexNoise3d(position).mul(this.uniforms.wind.length()));
@@ -156,31 +142,44 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
             // .mul(simplexNoise3d(position).mul(windDirection));
             // .mul(0);
 
+            /**
+             * Velocity
+             */
+
             // newVelocity.addAssign(this.uniforms.wind.div(mass));
             newVelocity.addAssign(wind);
+            newVelocity.xz.addAssign(simplexNoise3d(position).mul(0.1));
             newVelocity.mulAssign(this.uniforms.friction);
-            newVelocity.y.subAssign(this.uniforms.gravity);
+            newVelocity.y.subAssign(this.uniforms.gravity.mul(10));
             newVelocity.mulAssign(clampedDeltaTime);
+
+            /**
+             * Position
+             */
 
             newPosition.addAssign(newVelocity);
 
-            newLife.subAssign(clampedDeltaTime.mul(0.1));
+            /**
+             * Life
+             */
 
-            If(newLife.lessThanEqual(0), () => {
+            If(newPosition.y.lessThan(this.viewport.bottom * 5), () => {
                 newPosition.assign(respawnPos);
                 newVelocity.assign(vec3(0));
-                newLife.assign(hash(instanceIndex.add(time)).mul(0.8).add(0.7));
             });
+
+            /**
+             * Write to buffers
+             */
 
             position.assign(newPosition);
             velocity.assign(newVelocity);
-            life.assign(newLife);
         })().compute(this.amount);
     }
 
     /**
      * Update the simulation by one frame.
-     * @param {number} [delta=1/60] The time in seconds since the last frame.
+     * @param {number} delta The time in seconds since the last frame.
      */
     update(delta = 1 / 60) {
         this.windTime += delta;
@@ -232,7 +231,11 @@ class ParticlesMesh extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
         folder.addBinding(this.params, 'wind', { min: -10, max: 10, step: 0.01 }).on('change', () => {
             this.uniforms.wind.value.copy(this.params.wind);
         });
+        // folder.addBinding(this, 'amount', { min: 0, max: 30000, step: 1 }).on('change', () => {
+        //     this.dispose();
+        //     this.constructor({ amount: this.amount, renderer: this.renderer, viewport: this.viewport });
+        // });
     }
 }
 
-export default ParticlesMesh;
+export default Snowflakes;

@@ -50,3 +50,6 @@ bsync.sh
 get_preview.sh
 
 .cursorrules
+*.log
+logs/
+context_portal/
