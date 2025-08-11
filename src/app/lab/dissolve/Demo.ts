@@ -1,45 +1,39 @@
-import { Discard, Fn, If, positionLocal, select, uniform, vec3, vec4 } from 'three/tsl';
-import { Color, Mesh, MeshBasicNodeMaterial, PlaneGeometry, TimestampQuery } from 'three/webgpu';
-import { simplexNoise3d } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { Fn, mx_fractal_noise_vec3, screenUV, time, uniform, vec3, vec4 } from 'three/tsl';
+import { MeshPhysicalNodeMaterial, PMREMGenerator, SphereGeometry, Texture, TimestampQuery } from 'three/webgpu';
 import BaseExperience from '../BaseExperience';
+import { DissolveMesh } from './DissolveMesh';
 
 class Dissolve extends BaseExperience {
-    uniforms = {
-        progress: uniform(0),
-        edge: uniform(0.03),
-        edgeColor: uniform(new Color('#fff')),
-        frequency: uniform(1),
-        amplitude: uniform(1),
-    };
+    mesh: DissolveMesh;
+    pmrem: PMREMGenerator;
+    environmentTexture: Texture;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.camera.position.set(0, 0, 5);
 
-        const material = new MeshBasicNodeMaterial({ color: 0x00ff00 });
+        this.scene.backgroundNode = Fn(() => {
+            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
+            color.mulAssign(0.1);
 
-        const getNoise = Fn(() => {
-            const { frequency, amplitude } = this.uniforms;
-            return simplexNoise3d(positionLocal.mul(frequency)).mul(amplitude);
-        });
-
-        material.colorNode = Fn(() => {
-            const { progress, edge, edgeColor } = this.uniforms;
-            const mappedProgress = progress.remap(0, 1, -0.3, 0.7).toVar('mappedProgress');
-            const noise = getNoise();
-            const edgeWidth = mappedProgress.add(edge).toVar('edgeWidth');
-
-            Discard(noise.lessThan(mappedProgress));
-
-            return select(
-                noise.greaterThan(mappedProgress).and(noise.lessThan(edgeWidth)),
-                vec4(edgeColor, noise),
-                vec4(material.color, 1),
-            );
+            return vec4(color, 1);
         })();
 
-        const mesh = new Mesh(new PlaneGeometry(1, 1), material);
-        this.scene.add(mesh);
+        this.pmrem = new PMREMGenerator(this.renderer);
+        this.environmentTexture = this.pmrem.fromScene(new RoomEnvironment()).texture;
+        this.scene.environment = this.environmentTexture;
+        this.scene.environmentIntensity = 0.3;
+        this.pmrem.dispose();
+
+        const material = new MeshPhysicalNodeMaterial();
+
+        this.mesh = new DissolveMesh(new SphereGeometry(1, 32, 32), material, {
+            count: 15000,
+            color: uniform(material.color),
+            renderer: this.renderer,
+        });
+        this.scene.add(this.mesh);
 
         this.initTweakPane();
     }
@@ -54,42 +48,65 @@ class Dissolve extends BaseExperience {
 
     destroy() {
         super.destroy();
+        this.environmentTexture.dispose();
     }
 
     initTweakPane() {
         super.initTweakPane();
 
         if (this.tweakPane) {
-            this.tweakPane.addBinding(this.uniforms.progress, 'value', {
+            this.tweakPane.addBinding(this.mesh.uniforms.progress, 'value', {
                 min: 0,
                 max: 1,
                 step: 0.001,
                 label: 'Progress',
             });
 
-            this.tweakPane.addBinding(this.uniforms.edge, 'value', {
+            this.tweakPane.addBinding(this.mesh.uniforms.edge, 'value', {
                 min: 0,
-                max: 0.06,
+                max: 0.25,
                 step: 0.001,
                 label: 'Edge',
             });
 
-            this.tweakPane.addBinding(this.uniforms.edgeColor, 'value', {
-                label: 'Edge Color',
-            });
+            const proxy = {
+                color: '#00d4e8',
+            };
 
-            this.tweakPane.addBinding(this.uniforms.frequency, 'value', {
+            this.tweakPane
+                .addBinding(proxy, 'color', {
+                    label: 'Edge Color',
+                })
+                .on('change', (value) => {
+                    this.mesh.uniforms.edgeColor.value.set(value.value);
+                });
+
+            this.tweakPane.addBinding(this.mesh.uniforms.frequency, 'value', {
                 min: 0,
                 max: 10,
                 step: 0.001,
                 label: 'Frequency',
             });
 
-            this.tweakPane.addBinding(this.uniforms.amplitude, 'value', {
+            this.tweakPane.addBinding(this.mesh.uniforms.particles.size, 'value', {
                 min: 0,
-                max: 10,
+                max: 2,
                 step: 0.001,
-                label: 'Amplitude',
+                label: 'Particles Size',
+            });
+
+            this.tweakPane.addBinding(this.mesh.uniforms.particles.speed, 'value', {
+                min: 0,
+                max: 0.01,
+                step: 0.001,
+                label: 'Particles Speed',
+            });
+
+            this.tweakPane.addBinding(this.mesh.uniforms.particles.decayFrequency, 'value', {
+                min: 0,
+                max: 2,
+                step: 0.001,
+                label: 'Particles Decay Frequency',
             });
         }
     }
