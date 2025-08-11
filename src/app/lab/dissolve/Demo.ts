@@ -1,5 +1,5 @@
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
+import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import { Fn, emissive, mrt, mx_fractal_noise_vec3, output, pass, screenUV, time, uniform, vec3, vec4 } from 'three/tsl';
 import {
     MeshPhysicalNodeMaterial,
@@ -17,6 +17,7 @@ class Dissolve extends BaseExperience {
     pmrem: PMREMGenerator;
     environmentTexture: Texture;
     postProcessing: PostProcessing;
+    bloomPass: BloomNode;
 
     usePostprocessing = true;
 
@@ -47,8 +48,6 @@ class Dissolve extends BaseExperience {
         });
         this.scene.add(this.mesh);
 
-        this.initTweakPane();
-
         /**
          * Post processing
          */
@@ -67,10 +66,16 @@ class Dissolve extends BaseExperience {
         const scenePassEmissive = scenePass.getTextureNode('emissive');
 
         // Bloom
-        const bloomPass = bloom(scenePassEmissive, 1.5, 0.5, 0.1);
+        this.bloomPass = bloom(scenePassEmissive, 1.5, 0.2, 0.1);
 
         // Output
-        this.postProcessing.outputNode = outputColor.add(bloomPass);
+        this.postProcessing.outputNode = outputColor.add(this.bloomPass);
+
+        /**
+         * Tweak pane
+         */
+
+        this.initTweakPane();
     }
 
     async render() {
@@ -94,6 +99,27 @@ class Dissolve extends BaseExperience {
                 label: 'Postprocessing',
             });
 
+            this.tweakPane.addBinding(this.bloomPass.strength, 'value', {
+                min: 0,
+                max: 3,
+                step: 0.001,
+                label: 'Bloom Strength',
+            });
+
+            this.tweakPane.addBinding(this.bloomPass.radius, 'value', {
+                min: 0,
+                max: 1,
+                step: 0.001,
+                label: 'Bloom Radius',
+            });
+
+            this.tweakPane.addBinding(this.bloomPass.threshold, 'value', {
+                min: 0,
+                max: 1,
+                step: 0.001,
+                label: 'Bloom Threshold',
+            });
+
             this.tweakPane.addBinding(this.mesh.uniforms.progress, 'value', {
                 min: 0,
                 max: 1,
@@ -108,24 +134,24 @@ class Dissolve extends BaseExperience {
                 label: 'Edge',
             });
 
-            const proxy = {
-                color: '#00d4e8',
-            };
-
-            this.tweakPane
-                .addBinding(proxy, 'color', {
-                    label: 'Edge Color',
-                })
-                .on('change', (value) => {
-                    this.mesh.uniforms.particles.color.value.set(value.value);
-                });
-
             this.tweakPane.addBinding(this.mesh.uniforms.frequency, 'value', {
                 min: 0,
                 max: 10,
                 step: 0.001,
                 label: 'Frequency',
             });
+
+            const proxy = {
+                color: '#00d4e8',
+            };
+
+            this.tweakPane
+                .addBinding(proxy, 'color', {
+                    label: 'Particles Color',
+                })
+                .on('change', (value) => {
+                    this.mesh.uniforms.particles.color.value.set(value.value);
+                });
 
             this.tweakPane.addBinding(this.mesh.uniforms.particles.size, 'value', {
                 min: 0,
