@@ -1,6 +1,14 @@
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { Fn, mx_fractal_noise_vec3, screenUV, time, uniform, vec3, vec4 } from 'three/tsl';
-import { MeshPhysicalNodeMaterial, PMREMGenerator, SphereGeometry, Texture, TimestampQuery } from 'three/webgpu';
+import { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
+import { Fn, emissive, mrt, mx_fractal_noise_vec3, output, pass, screenUV, time, uniform, vec3, vec4 } from 'three/tsl';
+import {
+    MeshPhysicalNodeMaterial,
+    PMREMGenerator,
+    PostProcessing,
+    SphereGeometry,
+    Texture,
+    TimestampQuery,
+} from 'three/webgpu';
 import BaseExperience from '../BaseExperience';
 import { DissolveMesh } from './DissolveMesh';
 
@@ -8,9 +16,13 @@ class Dissolve extends BaseExperience {
     mesh: DissolveMesh;
     pmrem: PMREMGenerator;
     environmentTexture: Texture;
+    postProcessing: PostProcessing;
+
+    usePostprocessing = true;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
+
         this.camera.position.set(0, 0, 5);
 
         this.scene.backgroundNode = Fn(() => {
@@ -36,6 +48,29 @@ class Dissolve extends BaseExperience {
         this.scene.add(this.mesh);
 
         this.initTweakPane();
+
+        /**
+         * Post processing
+         */
+
+        this.postProcessing = new PostProcessing(this.renderer);
+
+        // Color
+        const scenePass = pass(this.scene, this.camera);
+        scenePass.setMRT(
+            mrt({
+                output,
+                emissive,
+            }),
+        );
+        const outputColor = scenePass.getTextureNode('output');
+        const scenePassEmissive = scenePass.getTextureNode('emissive');
+
+        // Bloom
+        const bloomPass = bloom(scenePassEmissive, 1.5, 0.5, 0.1);
+
+        // Output
+        this.postProcessing.outputNode = outputColor.add(bloomPass);
     }
 
     async render() {
@@ -43,7 +78,7 @@ class Dissolve extends BaseExperience {
             this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
         }
 
-        super.render();
+        super.render(this.usePostprocessing ? this.postProcessing : undefined);
     }
 
     destroy() {
@@ -55,6 +90,10 @@ class Dissolve extends BaseExperience {
         super.initTweakPane();
 
         if (this.tweakPane) {
+            this.tweakPane.addBinding(this, 'usePostprocessing', {
+                label: 'Postprocessing',
+            });
+
             this.tweakPane.addBinding(this.mesh.uniforms.progress, 'value', {
                 min: 0,
                 max: 1,
@@ -78,7 +117,7 @@ class Dissolve extends BaseExperience {
                     label: 'Edge Color',
                 })
                 .on('change', (value) => {
-                    this.mesh.uniforms.edgeColor.value.set(value.value);
+                    this.mesh.uniforms.particles.color.value.set(value.value);
                 });
 
             this.tweakPane.addBinding(this.mesh.uniforms.frequency, 'value', {

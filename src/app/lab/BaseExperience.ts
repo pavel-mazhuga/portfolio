@@ -33,7 +33,11 @@ class BaseExperience {
         this.onWindowResize = this.onWindowResize.bind(this);
 
         this.canvas = canvas;
-        this.renderer = new WebGPURenderer({ canvas, powerPreference: 'high-performance', ...rendererParams });
+        this.renderer = new WebGPURenderer({
+            canvas,
+            powerPreference: 'high-performance',
+            ...rendererParams,
+        });
         this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.setPixelRatio(this.dpr);
         this.renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);

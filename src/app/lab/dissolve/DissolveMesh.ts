@@ -11,8 +11,10 @@ import {
     instancedArray,
     length,
     min,
+    output,
     positionLocal,
     select,
+    sin,
     uniform,
     uv,
     vec3,
@@ -25,6 +27,7 @@ import {
     DoubleSide,
     InstancedMesh,
     Mesh,
+    MeshStandardNodeMaterial,
     NodeMaterial,
     PlaneGeometry,
     SpriteNodeMaterial,
@@ -39,14 +42,13 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
     uniforms = {
         progress: uniform(0.5),
         edge: uniform(0.05),
-        edgeColor: uniform(new Color('#00d4e8')),
         frequency: uniform(1.3),
         particles: {
             size: uniform(1),
             speed: uniform(0.001),
             decayFrequency: uniform(1),
             decayDistance: uniform(0.2),
-            color: uniform(new Color('#00d4e8')),
+            color: uniform(new Color('#1fbcff')),
         },
     };
 
@@ -81,12 +83,13 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
         const edgeWidth = mappedProgress.add(this.uniforms.edge).toVar('edgeWidth');
         const isEdge = noise.greaterThan(mappedProgress).and(noise.lessThan(edgeWidth)).toVar('edge');
 
+        if (material instanceof MeshStandardNodeMaterial) {
+            material.emissiveNode = select(isEdge, this.uniforms.particles.color, output);
+        }
+
         material.colorNode = Fn(() => {
-            const { edgeColor } = this.uniforms;
-
             Discard(noise.lessThan(mappedProgress));
-
-            return select(isEdge, vec4(edgeColor, noise), color);
+            return select(isEdge, vec4(this.uniforms.particles.color, noise), color);
         })();
 
         /**
@@ -141,7 +144,13 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
              * Velocity
              */
 
-            newVelocity.addAssign(vec3(0, deltaTime.mul(0.001), 0).mul(hash(instanceIndex).mul(0.5).add(0.5)));
+            const xwave1 = sin(newPosition.y.mul(2)).mul(0.8);
+            // const ywave1 = sin(newPosition.x.mul(2)).mul(0.6);
+
+            const xwave2 = sin(newPosition.y.mul(5)).mul(0.2);
+            // const ywave2 = sin(newPosition.x.mul(1)).mul(0.9);
+
+            newVelocity.addAssign(vec3(xwave1.add(xwave2), 1, 0).mul(deltaTime.mul(0.001)));
 
             newPosition.addAssign(newVelocity);
 
