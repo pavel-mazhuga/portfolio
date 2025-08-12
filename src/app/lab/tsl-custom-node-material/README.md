@@ -2,4 +2,6 @@
 
 ## Demo
 
+![Preview](preview.jpeg)
+
 [https://pavelmazhuga.com/lab/tsl-custom-node-material](https://pavelmazhuga.com/lab/tsl-custom-node-material)

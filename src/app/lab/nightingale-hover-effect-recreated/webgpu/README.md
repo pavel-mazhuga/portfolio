@@ -4,4 +4,6 @@ All the credits to [Unseen Studio](https://unseen.co/).
 
 ## Demo
 
+![Preview](preview.jpeg)
+
 [https://pavelmazhuga.com/lab/nightingale-hover-effect-recreated/webgpu](https://pavelmazhuga.com/lab/nightingale-hover-effect-recreated/webgpu)
