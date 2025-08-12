@@ -4,6 +4,7 @@ import displacedSphere2Preview from '@/app/lab/displaced-sphere-2/preview.jpeg';
 import displacedSphereCsmPreview from '@/app/lab/displaced-sphere-csm/preview.jpeg';
 import displacedSpherePreview from '@/app/lab/displaced-sphere/preview.jpeg';
 import displacedTorusPreview from '@/app/lab/displaced-torus/preview.jpeg';
+import dissolvePreview from '@/app/lab/dissolve/preview.jpeg';
 import distortedScrollerPreview from '@/app/lab/distorted-scroller/preview.jpeg';
 import endless1Preview from '@/app/lab/endless-1/preview.jpeg';
 import fboParticlesMorphingPreview from '@/app/lab/fbo-particles-morphing/preview.jpeg';
@@ -31,6 +32,12 @@ import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Dissolve',
+        slug: 'dissolve',
+        tags: ['webgpu', 'tsl', 'shaders', 'particles'],
+        preview: dissolvePreview,
+    },
     {
         name: 'Particles black hole',
         slug: 'particles-black-hole',

@@ -58,6 +58,11 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
     particlesVelocitiesBuffer: ShaderNodeObject<StorageBufferNode>;
     particlesLifeBuffer: ShaderNodeObject<StorageBufferNode>;
 
+    noiseNode = Fn(() => {
+        const { frequency, noiseOffset } = this.uniforms;
+        return simplexNoise3d(positionLocal.add(noiseOffset).mul(frequency));
+    })();
+
     constructor(
         geometry: BufferGeometry,
         material: NodeMaterial,
@@ -75,10 +80,7 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
 
         material.side = DoubleSide;
 
-        const noise = Fn(() => {
-            const { frequency } = this.uniforms;
-            return simplexNoise3d(positionLocal.add(this.uniforms.noiseOffset).mul(frequency));
-        })();
+        const noise = this.noiseNode;
 
         const mappedProgress = this.uniforms.progress.remap(0, 1, -1, 1).toVar('mappedProgress');
         const edgeWidth = mappedProgress.add(this.uniforms.edge).toVar('edgeWidth');
