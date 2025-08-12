@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { useEffect, useRef } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import { v4 as uuidv4 } from 'uuid';
+import { useMounted } from '@/hooks/use-mounted';
 import Demo from './Demo';
 
 const Experience = () => {
@@ -11,6 +12,7 @@ const Experience = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const isHover = useMediaQuery('(any-hover: hover), (hover: hover) and (pointer: fine)');
     const isMobile = useMediaQuery('(max-width: 1199px)');
+    const isMounted = useMounted();
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -27,10 +29,10 @@ const Experience = () => {
             <canvas ref={canvasRef} className="responsive__item"></canvas>
             <div
                 className={classNames('tip', {
-                    'tip--top': isMobile,
+                    'tip--top': isMounted && isMobile,
                 })}
             >
-                {isHover ? 'Press SPACE' : 'CLICK'}
+                {isMounted && isHover ? 'Press SPACE' : 'CLICK'}
             </div>
         </>
     );

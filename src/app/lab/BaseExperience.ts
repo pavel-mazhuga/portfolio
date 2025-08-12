@@ -84,6 +84,7 @@ class BaseExperience {
     }
 
     protected initEvents() {
+        this.onWindowResize();
         window.addEventListener('resize', this.onWindowResize);
     }
 

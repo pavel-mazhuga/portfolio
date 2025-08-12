@@ -34,7 +34,6 @@ class Dissolve extends BaseExperience {
 
     usePostprocessing = true;
 
-    // Event handling properties
     progressButton?: any;
     isVisible = true;
     animateProgress = () => {};
@@ -42,8 +41,6 @@ class Dissolve extends BaseExperience {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
-
-        this.camera.position.set(0, 0, 5);
 
         this.controls = new OrbitControls(this.camera, this.canvas);
         this.controls.enableDamping = true;
@@ -155,12 +152,16 @@ class Dissolve extends BaseExperience {
         }
     }
 
+    onWindowResize() {
+        super.onWindowResize();
+        this.camera.position.z = window.innerWidth > 1199 ? 5 : 8;
+    }
+
     destroy() {
         super.destroy();
         this.mesh?.dispose();
         this.controls.dispose();
 
-        // Cleanup event listeners
         this.canvas.removeEventListener('click', this.animateProgress);
         document.removeEventListener('keydown', this.handleKeydown);
         if (this.progressButton) {
