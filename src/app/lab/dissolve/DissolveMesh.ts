@@ -201,4 +201,11 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
             return vec4(this.uniforms.particles.color, alpha);
         })();
     }
+
+    dispose() {
+        this.particlesBasePositionsBuffer.dispose();
+        this.particlesPositionsBuffer.dispose();
+        this.particlesVelocitiesBuffer.dispose();
+        this.particlesLifeBuffer.dispose();
+    }
 }

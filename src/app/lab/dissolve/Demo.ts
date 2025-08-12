@@ -151,6 +151,7 @@ class Dissolve extends BaseExperience {
 
     destroy() {
         super.destroy();
+        this.mesh?.dispose();
         this.controls.dispose();
     }
 
