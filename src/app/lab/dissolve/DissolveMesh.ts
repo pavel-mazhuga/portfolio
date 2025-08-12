@@ -144,11 +144,8 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
              * Velocity
              */
 
-            const xwave1 = sin(newPosition.y.mul(2)).mul(0.8);
-            // const ywave1 = sin(newPosition.x.mul(2)).mul(0.6);
-
-            const xwave2 = sin(newPosition.y.mul(5)).mul(0.2);
-            // const ywave2 = sin(newPosition.x.mul(1)).mul(0.9);
+            const xwave1 = sin(newPosition.y.mul(20)).mul(0.8);
+            const xwave2 = sin(newPosition.y.mul(50)).mul(0.7);
 
             newVelocity.addAssign(vec3(xwave1.add(xwave2), 1, 0).mul(deltaTime.mul(0.001)));
 

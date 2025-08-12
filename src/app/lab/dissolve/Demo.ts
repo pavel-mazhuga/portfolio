@@ -109,6 +109,13 @@ class Dissolve extends BaseExperience {
 
         if (!this.tweakPane || !this.mesh) return;
 
+        this.tweakPane.addBinding(this.mesh.uniforms.progress, 'value', {
+            min: 0,
+            max: 1,
+            step: 0.001,
+            label: 'Progress',
+        });
+
         this.tweakPane.addBinding(this, 'usePostprocessing', {
             label: 'Postprocessing',
         });
@@ -132,13 +139,6 @@ class Dissolve extends BaseExperience {
             max: 1,
             step: 0.001,
             label: 'Bloom Threshold',
-        });
-
-        this.tweakPane.addBinding(this.mesh.uniforms.progress, 'value', {
-            min: 0,
-            max: 1,
-            step: 0.001,
-            label: 'Progress',
         });
 
         this.tweakPane.addBinding(this.mesh.uniforms.edge, 'value', {
