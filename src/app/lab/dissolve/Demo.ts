@@ -34,6 +34,12 @@ class Dissolve extends BaseExperience {
 
     usePostprocessing = true;
 
+    // Event handling properties
+    progressButton?: any;
+    isVisible = true;
+    animateProgress = () => {};
+    handleKeydown = (event: KeyboardEvent) => {};
+
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
@@ -153,6 +159,13 @@ class Dissolve extends BaseExperience {
         super.destroy();
         this.mesh?.dispose();
         this.controls.dispose();
+
+        // Cleanup event listeners
+        this.canvas.removeEventListener('click', this.animateProgress);
+        document.removeEventListener('keydown', this.handleKeydown);
+        if (this.progressButton) {
+            this.progressButton.off('click', this.animateProgress);
+        }
     }
 
     initTweakPane() {
@@ -167,15 +180,15 @@ class Dissolve extends BaseExperience {
             label: 'Progress',
         });
 
-        const progressButton = this.tweakPane.addButton({ title: 'Animate Progress' });
-        let isVisible = true;
+        this.progressButton = this.tweakPane.addButton({ title: 'Animate Progress' });
+        this.isVisible = true;
 
-        const animateProgress = () => {
+        this.animateProgress = () => {
             if (this.mesh) {
                 animate(
                     this.mesh.uniforms.progress,
                     {
-                        value: isVisible ? 1 : 0,
+                        value: this.isVisible ? 1 : 0,
                     },
                     {
                         duration: 2,
@@ -185,18 +198,19 @@ class Dissolve extends BaseExperience {
                         },
                     },
                 );
-                isVisible = !isVisible;
+                this.isVisible = !this.isVisible;
             }
         };
 
-        progressButton.on('click', animateProgress);
-        this.canvas.addEventListener('click', animateProgress);
-
-        document.addEventListener('keydown', (event) => {
+        this.handleKeydown = (event: KeyboardEvent) => {
             if (event.key === ' ') {
-                animateProgress();
+                this.animateProgress();
             }
-        });
+        };
+
+        this.progressButton.on('click', this.animateProgress);
+        this.canvas.addEventListener('click', this.animateProgress);
+        document.addEventListener('keydown', this.handleKeydown);
 
         this.tweakPane.addBinding(this, 'usePostprocessing', {
             label: 'Postprocessing',
