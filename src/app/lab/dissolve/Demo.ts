@@ -265,7 +265,7 @@ class Dissolve extends BaseExperience {
 
         this.tweakPane.addBinding(this.mesh.uniforms.particles.speed, 'value', {
             min: 0,
-            max: 0.01,
+            max: 0.005,
             step: 0.001,
             label: 'Particles Speed',
         });
