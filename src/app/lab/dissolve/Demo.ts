@@ -190,6 +190,7 @@ class Dissolve extends BaseExperience {
         };
 
         progressButton.on('click', animateProgress);
+        this.canvas.addEventListener('click', animateProgress);
 
         document.addEventListener('keydown', (event) => {
             if (event.key === ' ') {
