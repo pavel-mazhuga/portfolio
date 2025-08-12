@@ -1,6 +1,7 @@
+import { animate } from 'framer-motion';
+import { Clock } from 'three';
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import {
@@ -17,17 +18,19 @@ import {
     vec3,
     vec4,
 } from 'three/tsl';
-import { MeshPhysicalNodeMaterial, PMREMGenerator, PostProcessing, Texture, TimestampQuery } from 'three/webgpu';
+import { DirectionalLight, MeshPhysicalNodeMaterial, PointLight, PostProcessing, TimestampQuery } from 'three/webgpu';
+import { easeInOutCubic } from '@/easings';
 import BaseExperience from '../BaseExperience';
 import { DissolveMesh } from './DissolveMesh';
 
 class Dissolve extends BaseExperience {
     mesh?: DissolveMesh;
-    pmrem: PMREMGenerator;
-    environmentTexture: Texture;
     postProcessing: PostProcessing;
     bloomPass: BloomNode;
     controls: OrbitControls;
+    pointLight1: PointLight;
+    pointLight2: PointLight;
+    clock = new Clock();
 
     usePostprocessing = true;
 
@@ -42,16 +45,20 @@ class Dissolve extends BaseExperience {
 
         this.scene.backgroundNode = Fn(() => {
             const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
-            color.mulAssign(0.1);
+            color.mulAssign(0.05);
 
             return vec4(color, 1);
         })();
 
-        this.pmrem = new PMREMGenerator(this.renderer);
-        this.environmentTexture = this.pmrem.fromScene(new RoomEnvironment()).texture;
-        this.scene.environment = this.environmentTexture;
-        this.scene.environmentIntensity = 0.3;
-        this.pmrem.dispose();
+        const directionalLight = new DirectionalLight(0xffffff, 1.4);
+        directionalLight.position.set(1, 1, 1);
+        this.scene.add(directionalLight);
+
+        // Point lights flying in figure-8 pattern
+        this.pointLight1 = new PointLight(0xff6b6b, 1.5, 10);
+        this.pointLight2 = new PointLight(0x4ecdc4, 1.5, 10);
+        this.scene.add(this.pointLight1);
+        this.scene.add(this.pointLight2);
 
         const material = new MeshPhysicalNodeMaterial({
             roughness: 0.2,
@@ -67,7 +74,7 @@ class Dissolve extends BaseExperience {
                 suzanneMesh.scale.setScalar(0.5);
 
                 this.mesh = new DissolveMesh(suzanneMesh.geometry, material, {
-                    count: 20000,
+                    count: 25000,
                     color: uniform(material.color),
                     renderer: this.renderer,
                 });
@@ -115,11 +122,27 @@ class Dissolve extends BaseExperience {
     }
 
     async render() {
+        const elapsedTime = this.clock.getElapsedTime();
+
         if (this.stats) {
             this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
         }
 
         this.controls.update();
+
+        // Animate point lights in figure-8 pattern
+        const time = elapsedTime * 0.8;
+        const radius = 4;
+
+        // First light: figure-8 pattern
+        this.pointLight1.position.x = radius * Math.sin(time);
+        this.pointLight1.position.y = radius * Math.sin(time) * Math.cos(time);
+        this.pointLight1.position.z = 0;
+
+        // Second light: offset figure-8 pattern with slight delay
+        this.pointLight2.position.x = radius * Math.sin(time + Math.PI + 0.3);
+        this.pointLight2.position.y = radius * Math.sin(time + Math.PI + 0.3) * Math.cos(time + Math.PI + 0.3);
+        this.pointLight2.position.z = 0;
 
         if (this.mesh) {
             super.render(this.usePostprocessing ? this.postProcessing : undefined);
@@ -129,7 +152,6 @@ class Dissolve extends BaseExperience {
     destroy() {
         super.destroy();
         this.controls.dispose();
-        this.environmentTexture.dispose();
     }
 
     initTweakPane() {
@@ -142,6 +164,36 @@ class Dissolve extends BaseExperience {
             max: 1,
             step: 0.001,
             label: 'Progress',
+        });
+
+        const progressButton = this.tweakPane.addButton({ title: 'Animate Progress' });
+        let isVisible = true;
+
+        const animateProgress = () => {
+            if (this.mesh) {
+                animate(
+                    this.mesh.uniforms.progress,
+                    {
+                        value: isVisible ? 1 : 0,
+                    },
+                    {
+                        duration: 2,
+                        ease: easeInOutCubic,
+                        onUpdate: () => {
+                            this.tweakPane?.refresh();
+                        },
+                    },
+                );
+                isVisible = !isVisible;
+            }
+        };
+
+        progressButton.on('click', animateProgress);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === ' ') {
+                animateProgress();
+            }
         });
 
         this.tweakPane.addBinding(this, 'usePostprocessing', {
@@ -181,6 +233,13 @@ class Dissolve extends BaseExperience {
             max: 10,
             step: 0.001,
             label: 'Frequency',
+        });
+
+        this.tweakPane.addBinding(this.mesh.uniforms.noiseOffset, 'value', {
+            min: -10,
+            max: 10,
+            step: 0.001,
+            label: 'Noise Offset',
         });
 
         const proxy = {

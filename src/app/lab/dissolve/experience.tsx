@@ -18,7 +18,12 @@ const Experience = () => {
         }
     }, [hash]);
 
-    return <canvas ref={canvasRef} className="responsive__item"></canvas>;
+    return (
+        <>
+            <canvas ref={canvasRef} className="responsive__item"></canvas>
+            <div className="tip">Press SPACE</div>
+        </>
+    );
 };
 
 export default Experience;

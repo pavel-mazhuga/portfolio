@@ -40,15 +40,16 @@ import { simplexNoise3d } from '@/utils/webgpu/nodes/noise/simplexNoise3d';
 
 export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
     uniforms = {
-        progress: uniform(0.5),
+        progress: uniform(0),
         edge: uniform(0.05),
         frequency: uniform(1.3),
+        noiseOffset: uniform(vec3(0, 3, 0)),
         particles: {
             size: uniform(1),
             speed: uniform(0.001),
             decayFrequency: uniform(1),
             decayDistance: uniform(0.2),
-            color: uniform(new Color('#1fbcff')),
+            color: uniform(new Color('#bc6dff')),
         },
     };
 
@@ -76,7 +77,7 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
 
         const noise = Fn(() => {
             const { frequency } = this.uniforms;
-            return simplexNoise3d(positionLocal.mul(frequency));
+            return simplexNoise3d(positionLocal.add(this.uniforms.noiseOffset).mul(frequency));
         })();
 
         const mappedProgress = this.uniforms.progress.remap(0, 1, -1, 1).toVar('mappedProgress');
