@@ -165,6 +165,11 @@ body:not(.sb-show-main) {
     @include mobile {
         bottom: 60px;
     }
+
+    &.tip--top {
+        bottom: auto;
+        top: calc(var(--header-height) + 20px + 42px / 2 - 8px);
+    }
 }
 
 .tp-dfwv {

@@ -209,8 +209,11 @@ class Dissolve extends BaseExperience {
         };
 
         this.progressButton.on('click', this.animateProgress);
-        this.canvas.addEventListener('click', this.animateProgress);
         document.addEventListener('keydown', this.handleKeydown);
+
+        if (!matchMedia('(any-hover: hover), (hover: hover) and (pointer: fine)').matches) {
+            this.canvas.addEventListener('click', this.animateProgress);
+        }
 
         this.tweakPane.addBinding(this, 'usePostprocessing', {
             label: 'Postprocessing',
