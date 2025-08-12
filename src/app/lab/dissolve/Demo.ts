@@ -1,7 +1,22 @@
+import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
-import { Fn, emissive, mrt, mx_fractal_noise_vec3, output, pass, screenUV, time, uniform, vec3, vec4 } from 'three/tsl';
+import {
+    Fn,
+    emissive,
+    mrt,
+    mx_fractal_noise_vec3,
+    output,
+    pass,
+    renderOutput,
+    screenUV,
+    time,
+    uniform,
+    vec3,
+    vec4,
+} from 'three/tsl';
 import { MeshPhysicalNodeMaterial, PMREMGenerator, PostProcessing, Texture, TimestampQuery } from 'three/webgpu';
 import BaseExperience from '../BaseExperience';
 import { DissolveMesh } from './DissolveMesh';
@@ -12,6 +27,7 @@ class Dissolve extends BaseExperience {
     environmentTexture: Texture;
     postProcessing: PostProcessing;
     bloomPass: BloomNode;
+    controls: OrbitControls;
 
     usePostprocessing = true;
 
@@ -19,6 +35,10 @@ class Dissolve extends BaseExperience {
         super(canvas);
 
         this.camera.position.set(0, 0, 5);
+
+        this.controls = new OrbitControls(this.camera, this.canvas);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.05;
 
         this.scene.backgroundNode = Fn(() => {
             const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
@@ -70,6 +90,9 @@ class Dissolve extends BaseExperience {
          */
 
         this.postProcessing = new PostProcessing(this.renderer);
+        // ignore default output color transform ( toneMapping and outputColorSpace )
+        // use renderOutput() for control the sequence
+        this.postProcessing.outputColorTransform = false;
 
         // Color
         const scenePass = pass(this.scene, this.camera);
@@ -79,20 +102,24 @@ class Dissolve extends BaseExperience {
                 emissive,
             }),
         );
-        const outputColor = scenePass.getTextureNode('output');
+
+        const outputPass = renderOutput(scenePass);
+        const fxaaPass = fxaa(outputPass);
         const scenePassEmissive = scenePass.getTextureNode('emissive');
 
         // Bloom
         this.bloomPass = bloom(scenePassEmissive, 1.5, 0.2, 0.1);
 
         // Output
-        this.postProcessing.outputNode = outputColor.add(this.bloomPass);
+        this.postProcessing.outputNode = fxaaPass.add(this.bloomPass);
     }
 
     async render() {
         if (this.stats) {
             this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
         }
+
+        this.controls.update();
 
         if (this.mesh) {
             super.render(this.usePostprocessing ? this.postProcessing : undefined);
@@ -101,6 +128,7 @@ class Dissolve extends BaseExperience {
 
     destroy() {
         super.destroy();
+        this.controls.dispose();
         this.environmentTexture.dispose();
     }
 
