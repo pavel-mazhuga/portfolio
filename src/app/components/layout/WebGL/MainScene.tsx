@@ -10,6 +10,11 @@ import Walls from './Walls';
 
 const portfolio = [
     {
+        imgSrc: '/timeless.webp',
+        href: 'https://timeless.club',
+        color: '#f2f5f7',
+    },
+    {
         imgSrc: '/samokat-museum.webp',
         href: 'https://museum.samokat.ru',
         color: '#f2f5f7',
@@ -43,11 +48,6 @@ const portfolio = [
         imgSrc: '/sportex.webp',
         href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
         color: '#666',
-    },
-    {
-        imgSrc: '/malinovka.webp',
-        href: 'https://24fermer.ru/',
-        color: '#c5c5c5',
     },
 ];
 
