@@ -10,12 +10,12 @@ const templateDir = path.join(labRoot, 'demo');
 const nameKebab = process.argv[2];
 
 if (!nameKebab) {
-    console.error('Укажи имя демо: npm run demo <demo-name-kebab-case>');
+    console.error('Specify the demo name: npm run demo <demo-name-kebab-case>');
     process.exit(1);
 }
 
 if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(nameKebab)) {
-    console.error('Имя должно быть в kebab-case: только строчные буквы, цифры и тире.');
+    console.error('The name must be in kebab-case: only lowercase letters, numbers and dashes.');
     process.exit(1);
 }
 
@@ -36,12 +36,12 @@ const nameTitle = toTitle(nameKebab);
 const targetDir = path.join(labRoot, nameKebab);
 
 if (fs.existsSync(targetDir)) {
-    console.error(`Папка уже существует: ${targetDir}`);
+    console.error(`Folder already exists: ${targetDir}`);
     process.exit(1);
 }
 
 if (!fs.existsSync(templateDir)) {
-    console.error(`Не найден шаблон: ${templateDir}`);
+    console.error(`Template not found: ${templateDir}`);
     process.exit(1);
 }
 
@@ -56,7 +56,7 @@ const writeUtf8 = (p, c) => fs.writeFileSync(p, c, 'utf8');
     writeUtf8(path.join(targetDir, 'Demo.ts'), src);
 })();
 
-// experience.tsx (всегда импорт и использование Demo)
+// experience.tsx (always import and use Demo)
 (() => {
     const src = readUtf8(path.join(templateDir, 'experience.tsx'));
     writeUtf8(path.join(targetDir, 'experience.tsx'), src);
@@ -77,10 +77,10 @@ const writeUtf8 = (p, c) => fs.writeFileSync(p, c, 'utf8');
     let src = readUtf8(path.join(templateDir, 'README.md'));
     src = src
         .replace(/^#\s.*$/m, `# ${nameTitle}`)
-        // второй заголовок фиксированный
+        // second fixed heading
         .replace(/^##\s.*$/m, `## Demo`)
         .replace(/\/lab\/demo/g, `/lab/${nameKebab}`);
     writeUtf8(path.join(targetDir, 'README.md'), src);
 })();
 
-console.log(`Демо создано: ${path.relative(root, targetDir)}`);
+console.log(`Demo has been created: ${path.relative(root, targetDir)}`);
