@@ -17,7 +17,6 @@ import {
     positionViewDirection,
     pow,
     storage,
-    timerLocal,
     uniform,
     varyingProperty,
     vec3,
@@ -163,8 +162,6 @@ const Demo = () => {
             blending: AdditiveBlending,
             depthWrite: false,
         });
-
-        const timer = timerLocal();
 
         const colorNode = Fn(() => {
             return vec4(uniforms.color, 1);

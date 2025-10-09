@@ -21,7 +21,7 @@ import {
     sin,
     step,
     storage,
-    timerLocal,
+    time,
     uniform,
     uv,
     varying,
@@ -130,8 +130,6 @@ class Demo {
 
         this.renderer.compute(computeInit);
 
-        const time = timerLocal();
-
         const rotation3dY = Fn<[number]>(([angle]) => {
             const s = float(sin(angle)).toVar();
             const c = float(cos(angle)).toVar();
@@ -175,7 +173,7 @@ class Demo {
             blending: AdditiveBlending,
         });
 
-        const vAlpha = varying(1, 'alpha');
+        const vAlpha = varying(float(1), 'alpha');
 
         material.positionNode = Fn<[any]>(([position]) => {
             const lifespan = position.w;

@@ -22,7 +22,7 @@ export const taylorInvSqrt = /*#__PURE__*/ Fn(([r_immutable]) => {
     inputs: [{ name: 'r', type: 'vec4' }],
 });
 
-export const simplexNoise3d = /*#__PURE__*/ Fn(([v_immutable]) => {
+export const simplexNoise3d = /*#__PURE__*/ Fn<ShaderNodeObject<Node>>(([v_immutable]) => {
     const v = vec3(v_immutable).toVar();
     const C = vec2(1.0 / 6.0, 1.0 / 3.0);
     const D = vec4(0.0, 0.5, 1.0, 2.0);

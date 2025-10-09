@@ -35,7 +35,7 @@ export const fade = /*#__PURE__*/ Fn(([t_immutable]) => {
     inputs: [{ name: 't', type: 'vec3' }],
 });
 
-export const cnoise3d = /*#__PURE__*/ Fn(([P_immutable]) => {
+export const cnoise3d = /*#__PURE__*/ Fn<ShaderNodeObject<Node>>(([P_immutable]) => {
     const P = vec3(P_immutable).toVar();
     const Pi0 = vec3(floor(P)).toVar();
     const Pi1 = vec3(Pi0.add(vec3(1.0))).toVar();

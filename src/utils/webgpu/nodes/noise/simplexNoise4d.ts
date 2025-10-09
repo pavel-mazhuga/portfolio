@@ -54,7 +54,7 @@ const grad4 = Fn(([j_immutable, ip_immutable]) => {
     return p;
 });
 
-const simplexNoise4d = Fn(([v_immutable]) => {
+const simplexNoise4d = Fn<ShaderNodeObject<Node>>(([v_immutable]) => {
     const v = vec4(v_immutable).toVar();
     const C = vec2(0.138196601125010504, 0.309016994374947451);
     const i = vec4(floor(v.add(dot(v, C.yyyy)))).toVar();

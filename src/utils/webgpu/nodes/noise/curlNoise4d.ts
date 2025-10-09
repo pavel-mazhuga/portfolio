@@ -3,7 +3,7 @@
 import { Fn, div, float, mul, normalize, vec3, vec4 } from 'three/tsl';
 import { simplexNoise3d as snoise3 } from './simplexNoise3d';
 
-export const curlNoise4d = /*#__PURE__*/ Fn(([p_immutable]) => {
+export const curlNoise4d = /*#__PURE__*/ Fn<ShaderNodeObject<Node>>(([p_immutable]) => {
     const p = vec4(p_immutable).toVar();
     const e = float(0.1);
     const dx = vec4(e, 0.0, 0.0, 1.0).toVar();

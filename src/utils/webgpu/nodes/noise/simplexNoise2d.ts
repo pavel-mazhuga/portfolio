@@ -12,7 +12,7 @@ export const permute = /*#__PURE__*/ Fn(([x_immutable]) => {
     inputs: [{ name: 'x', type: 'vec3' }],
 });
 
-export const snoise = /*#__PURE__*/ Fn(([v_immutable]) => {
+export const snoise = /*#__PURE__*/ Fn<[ShaderNodeObject<Node>]>(([v_immutable]) => {
     const v = vec2(v_immutable).toVar();
     const C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
     const i = vec2(floor(v.add(dot(v, C.yy)))).toVar();

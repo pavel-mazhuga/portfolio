@@ -2,7 +2,9 @@
 // Three.js Transpiler r171
 import { Fn, float, select, uv, vec2 } from 'three/tsl';
 
-export const coverTextureUv = /*#__PURE__*/ Fn(([imgSize_immutable, planeSize_immutable, ouv_immutable]) => {
+export const coverTextureUv = /*#__PURE__*/ Fn<
+    [ShaderNodeObject<Node>, ShaderNodeObject<Node>, ShaderNodeObject<Node>]
+>(([imgSize_immutable, planeSize_immutable, ouv_immutable]) => {
     const ouv = vec2(ouv_immutable).toVar();
     const planeSize = vec2(planeSize_immutable).toVar();
     const imgSize = vec2(imgSize_immutable).toVar();

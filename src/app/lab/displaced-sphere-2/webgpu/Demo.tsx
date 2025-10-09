@@ -13,7 +13,7 @@ import {
     positionLocal,
     positionViewDirection,
     pow,
-    timerLocal,
+    time,
     uniform,
     varyingProperty,
     vec3,
@@ -180,7 +180,7 @@ const Demo = ({ isMobile }: { isMobile: boolean }) => {
     const nodeMaterial = useMemo(() => {
         const material = new MeshBasicNodeMaterial();
 
-        const timer = timerLocal();
+        const timer = time;
 
         const vPattern = varyingProperty('float');
         const vNormal = varyingProperty('vec3');
