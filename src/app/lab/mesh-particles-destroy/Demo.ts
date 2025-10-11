@@ -1,5 +1,5 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { vec3 } from 'three/tsl';
+import { Fn, mx_fractal_noise_vec3, screenUV, time, vec3, vec4 } from 'three/tsl';
 import {
     DirectionalLight,
     MeshNormalNodeMaterial,
@@ -33,6 +33,13 @@ class MeshParticlesDestroy extends BaseExperience {
         this.pointLight2 = new PointLight(0x4ecdc4, 1, 50);
         this.scene.add(this.pointLight1);
         this.scene.add(this.pointLight2);
+
+        this.scene.backgroundNode = Fn(() => {
+            const color = vec3(mx_fractal_noise_vec3(vec3(screenUV, time.mul(0.3)))).toVar();
+            color.mulAssign(0.05);
+
+            return vec4(color, 1);
+        })();
 
         const loader = new GLTFLoader();
         loader.load('/gltf/suzanne.glb', (gltf) => {
@@ -92,6 +99,36 @@ class MeshParticlesDestroy extends BaseExperience {
             this.tweakPane.addButton({ title: 'Reset' }).on('click', () => {
                 this.mesh?.reset();
             });
+
+            if (this.mesh) {
+                this.tweakPane.addBinding(this.mesh.uniforms.speedMin, 'value', {
+                    min: 0,
+                    max: 2,
+                    step: 0.01,
+                    label: 'Speed Min',
+                });
+
+                this.tweakPane.addBinding(this.mesh.uniforms.speedMax, 'value', {
+                    min: 0,
+                    max: 2,
+                    step: 0.01,
+                    label: 'Speed Max',
+                });
+
+                this.tweakPane.addBinding(this.mesh.uniforms.lifeMin, 'value', {
+                    min: 0,
+                    max: 0.5,
+                    step: 0.01,
+                    label: 'Life Min',
+                });
+
+                this.tweakPane.addBinding(this.mesh.uniforms.lifeMax, 'value', {
+                    min: 0.5,
+                    max: 1,
+                    step: 0.01,
+                    label: 'Life Max',
+                });
+            }
         }
     }
 }

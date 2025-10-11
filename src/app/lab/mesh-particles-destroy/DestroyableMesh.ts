@@ -22,6 +22,13 @@ export class DestroyableMesh extends Group {
     startTime = uniform(0);
     #animationControls: AnimationPlaybackControls | null = null;
 
+    uniforms = {
+        speedMin: uniform(1),
+        speedMax: uniform(2),
+        lifeMin: uniform(0.1),
+        lifeMax: uniform(0.3),
+    };
+
     constructor(geometry: BufferGeometry, material: NodeMaterial, particlesGeometry = geometry) {
         super();
 
@@ -40,8 +47,8 @@ export class DestroyableMesh extends Group {
 
         const particlesMaterial = this.mesh.material.clone();
 
-        const lifeRange = range(0.1, 0.3);
-        const speed = range(1, 2);
+        const lifeRange = range(this.uniforms.lifeMin, this.uniforms.lifeMax);
+        const speed = range(this.uniforms.speedMin, this.uniforms.speedMax);
         const scaledTime = time.sub(this.startTime).mul(speed);
         const lifeTime = varying(scaledTime.mul(lifeRange), 'lifeTime');
         const life = varying(lifeTime.div(lifeRange), 'life');
