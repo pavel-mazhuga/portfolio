@@ -1,15 +1,6 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Fn, mx_fractal_noise_vec3, screenUV, time, vec3, vec4 } from 'three/tsl';
-import {
-    DirectionalLight,
-    MeshNormalNodeMaterial,
-    MeshStandardNodeMaterial,
-    PlaneGeometry,
-    PointLight,
-    SphereGeometry,
-    TimestampQuery,
-    TorusKnotGeometry,
-} from 'three/webgpu';
+import { DirectionalLight, MeshStandardNodeMaterial, PointLight, SphereGeometry, TimestampQuery } from 'three/webgpu';
 import BaseExperience from '../BaseExperience';
 import { DestroyableMesh } from './DestroyableMesh';
 
@@ -22,7 +13,7 @@ class MeshParticlesDestroy extends BaseExperience {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas, { antialias: true });
-        this.camera.position.set(0, 0, 5);
+        this.camera.position.z = window.innerWidth <= 576 ? 7 : 5;
 
         const directionalLight = new DirectionalLight('#fff', 0.1);
         directionalLight.position.set(0, 0.5, 1);
@@ -86,6 +77,11 @@ class MeshParticlesDestroy extends BaseExperience {
         this.pointLight2.position.z = radius * Math.cos(time + Math.PI + 0.3);
 
         super.render();
+    }
+
+    onWindowResize(): void {
+        super.onWindowResize();
+        this.camera.position.z = window.innerWidth <= 576 ? 7 : 5;
     }
 
     destroy() {
