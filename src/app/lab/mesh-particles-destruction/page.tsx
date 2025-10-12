@@ -3,13 +3,13 @@ import ExperimentLayout from '../ExperimentLayout';
 import Experience from './experience';
 
 export const metadata: Metadata = {
-    title: 'Mesh Particles Destroying',
-    description: 'Mesh Particles Destroying using TSL',
+    title: 'Mesh Particles Destruction',
+    description: 'Mesh Particles Destruction using TSL',
 };
 
 const ExperimentPage = () => {
     return (
-        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/mesh-particles-destroy">
+        <ExperimentLayout sourceLink="https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/mesh-particles-destruction">
             <div className="canvas-wrapper">
                 <Experience />
             </div>

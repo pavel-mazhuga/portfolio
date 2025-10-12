@@ -15,7 +15,7 @@ import gpuParticlesPreview from '@/app/lab/gpu-particles/preview.jpeg';
 import imageTransitionPreview from '@/app/lab/image-transition/preview.jpeg';
 import infiniteWaterPreview from '@/app/lab/infinite-water/webgpu/preview.jpeg';
 import magicWandCursorPreview from '@/app/lab/magic-wand-cursor/webgpu/preview.jpeg';
-import meshParticlesDestroyPreview from '@/app/lab/mesh-particles-destroy/preview.jpeg';
+import meshParticlesDestructionPreview from '@/app/lab/mesh-particles-destruction/preview.jpeg';
 import nightingaleHoverEffectRecreatedPreview from '@/app/lab/nightingale-hover-effect-recreated/webgpu/preview.jpeg';
 import particlesBlackHolePreview from '@/app/lab/particles-black-hole/preview.jpeg';
 import particlesFollowingCursorPositionPreview from '@/app/lab/particles-following-cursor-position/preview.jpeg';
@@ -34,10 +34,10 @@ import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
     {
-        name: 'Mesh particles destroying',
-        slug: 'mesh-particles-destroy',
+        name: 'Mesh particles destruction',
+        slug: 'mesh-particles-destruction',
         tags: ['webgpu', 'tsl', 'shaders', 'particles'],
-        preview: meshParticlesDestroyPreview,
+        preview: meshParticlesDestructionPreview,
     },
     {
         name: 'Dissolve',
