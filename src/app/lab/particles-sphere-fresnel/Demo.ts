@@ -116,8 +116,7 @@ class ParticlesSphereFresnel extends BaseWebglExperience {
                     vec3 normal = normalize(gpuPosition);
                     vFresnel = pow(1.0 - abs(dot(viewDirection, normal)), 2.0);
                     gl_PointSize += vFresnel * 10.0;
-                    // gl_PointSize /= vFresnel; // magic: black hole inside the sphere
-
+                    
                     // Color based on position
                     vColor = vec3(
                         0.5 + 0.5 * sin(gpuPosition.x * 3.0 + uTime),
