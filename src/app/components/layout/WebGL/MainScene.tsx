@@ -10,6 +10,11 @@ import Walls from './Walls';
 
 const portfolio = [
     {
+        imgSrc: '/chillbase.webp',
+        href: 'https://chillbase.net/',
+        color: '#f2f5f7',
+    },
+    {
         imgSrc: '/timeless.webp',
         href: 'https://timeless.club',
         color: '#f2f5f7',
@@ -44,11 +49,11 @@ const portfolio = [
         href: 'https://biotech.artlife.ru/',
         color: '#f5f5f5',
     },
-    {
-        imgSrc: '/sportex.webp',
-        href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
-        color: '#666',
-    },
+    // {
+    //     imgSrc: '/sportex.webp',
+    //     href: 'https://xn--j1ahcfcef2g.xn--p1ai/',
+    //     color: '#666',
+    // },
 ];
 
 const MainScene = () => {
