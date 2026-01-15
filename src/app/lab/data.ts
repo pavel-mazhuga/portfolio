@@ -30,9 +30,16 @@ import snowflakesPreview from '@/app/lab/snowflakes/preview.jpeg';
 import sphereInfiniteUvPreview from '@/app/lab/sphere-infinite-uv/preview.jpeg';
 import tslCustomNodeMatealPreview from '@/app/lab/tsl-custom-node-material/preview.jpeg';
 import vertexWavePreview from '@/app/lab/vertex-wave-animation/preview.jpeg';
+// import grassSpherePreview from '@/app/lab/grass-sphere/preview.jpeg';
 import { ImageShape } from '@/types';
 
 export const experiments: { name: string; slug: string; tags: string[]; preview?: ImageShape }[] = [
+    {
+        name: 'Grass sphere',
+        slug: 'grass-sphere',
+        tags: ['webgpu', 'tsl', 'shaders'],
+        // preview: meshParticlesDestructionPreview,
+    },
     {
         name: 'Mesh particles destruction',
         slug: 'mesh-particles-destruction',
