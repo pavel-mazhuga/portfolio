@@ -36,7 +36,7 @@ const portfolio = [
     },
     {
         imgSrc: '/control.webp',
-        href: 'https://control.chipsa.design/',
+        href: 'https://control.chipsa.ru/',
         color: '#f2f5f7',
     },
     {
