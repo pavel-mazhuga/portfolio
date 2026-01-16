@@ -93,8 +93,7 @@ class SphereSpiralSpikes extends BaseExperience {
         // Золотистый цвет сферы и белое свечение спиралей
         const baseColor = vec3(1.0, 0.7, 0.1);
 
-        let color = baseColor.toVar('color');
-        color = mix(color, vec3(1, 1, 1), displacedPos.sub(positionLocal).length().div(0.05).toVar('mask'));
+        const color = mix(baseColor, vec3(1, 1, 1), displacedPos.sub(positionLocal).length().div(0.05).toVar('mask'));
 
         material.colorNode = color;
         // material.emissiveNode = baseColor.mul(mask).mul(1);
