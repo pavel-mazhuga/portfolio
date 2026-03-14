@@ -41,7 +41,7 @@ class Metaballs extends BaseExperience {
         return Math.min(window.devicePixelRatio, 1.25);
     }
     params = {
-        k: 0.3,
+        smoothing: 0.3,
         speed: 0.65,
         colorA: '#cc3380',
         colorB: '#3380cc',
@@ -56,7 +56,7 @@ class Metaballs extends BaseExperience {
         const geometry = new PlaneGeometry(2, 2);
         const material = new NodeMaterial();
 
-        const uK = uniform(this.params.k);
+        const uK = uniform(this.params.smoothing);
         const uSpeed = uniform(this.params.speed);
         const uColorA = uniform(new Color(this.params.colorA));
         const uColorB = uniform(new Color(this.params.colorB));
@@ -188,8 +188,8 @@ class Metaballs extends BaseExperience {
             const folder = this.tweakPane.addFolder({ title: 'Raymarching' });
             const { uK, uSpeed, uColorA, uColorB, uCameraDist } = this.uniforms;
 
-            folder.addBinding(this.params, 'k', { min: 0.1, max: 2.0 }).on('change', () => {
-                uK.value = this.params.k;
+            folder.addBinding(this.params, 'smoothing', { min: 0.1, max: 2.0 }).on('change', () => {
+                uK.value = this.params.smoothing;
             });
 
             folder.addBinding(this.params, 'speed', { min: 0, max: 5 }).on('change', () => {
