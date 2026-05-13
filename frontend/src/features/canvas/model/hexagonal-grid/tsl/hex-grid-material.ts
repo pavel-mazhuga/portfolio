@@ -20,7 +20,7 @@ import {
     vec3,
     vec4,
 } from 'three/tsl';
-import { MeshPhysicalNodeMaterial, type Node, UniformNode } from 'three/webgpu';
+import { MeshPhysicalNodeMaterial, UniformNode } from 'three/webgpu';
 import { coverTextureUv } from '../../../utils/tsl/uv-cover';
 import { buildVideoSizeVec2, buildVideoTextureNode } from '../lib/video-texture-select';
 import type { GridLayout, HexGridMaterialDeps } from '../types';
@@ -49,12 +49,12 @@ export function applyHexGridMaterial(
 
     const { uCentralWidth, uCentralHeight } = layout;
 
-    const vLocalPos = varying(vec3(0) as Node<'vec3'>);
-    const vNormal = varying(vec3(0) as Node<'vec3'>);
-    const vGridPos = varying(vec2(0) as Node<'vec2'>);
-    const vBackGridPos = varying(vec2(0) as Node<'vec2'>);
-    const vCoveredUvFront = varying(vec2(0) as Node<'vec2'>);
-    const vCoveredUvBack = varying(vec2(0) as Node<'vec2'>);
+    const vLocalPos = varying(vec3(0));
+    const vNormal = varying(vec3(0));
+    const vGridPos = varying(vec2(0));
+    const vBackGridPos = varying(vec2(0));
+    const vCoveredUvFront = varying(vec2(0));
+    const vCoveredUvBack = varying(vec2(0));
 
     const planeSize = vec2(uCentralWidth, uCentralHeight);
 
@@ -142,14 +142,10 @@ export function applyHexGridMaterial(
         const cPhase = colorPhaseStorage.element(instanceIndex);
 
         const t = sin(time.mul(Math.PI).mul(cPhase.y).add(cPhase.x)).mul(0.3).add(0.5);
-        const mixedColor = (mix as any)(baseColor, instColor, t);
+        const mixedColor = mix(baseColor, instColor, t);
 
-        const borderA = (smoothstep as any)(
-            0.06,
-            float(0.08).add(float(1.0).sub(t).mul(0.03)),
-            abs((vLocalPos as any).y),
-        );
-        const baseRGB = (mix as any)((mixedColor as any).rgb, (baseColor as any).rgb, borderA);
+        const borderA = smoothstep(0.06, float(0.08).add(float(1.0).sub(t).mul(0.03)), abs(vLocalPos.y));
+        const baseRGB = mix(mixedColor.rgb, baseColor.rgb, borderA);
 
         const frontVideoIndexNode = frontVideoIndexStorage.element(instanceIndex);
         const backVideoIndexNode = backVideoIndexStorage.element(instanceIndex);
@@ -157,12 +153,12 @@ export function applyHexGridMaterial(
         const frontVideoNode = buildVideoTextureNode(videoTextures, frontVideoIndexNode, vCoveredUvFront);
         const backVideoNode = buildVideoTextureNode(videoTextures, backVideoIndexNode, vCoveredUvBack);
         const faceBlend = vNormal.z.mul(float(0.5)).add(float(0.5)).clamp(float(0), float(1));
-        const activeVideoNode = mix(backVideoNode, frontVideoNode, faceBlend) as any;
+        const activeVideoNode = mix(backVideoNode, frontVideoNode, faceBlend);
 
         const finalGridRGB = baseRGB.add(blendScreen(baseRGB, uniforms.trailColor)).clamp(0, 1).mul(0.55);
-        const finalVideoRGB = (activeVideoNode as any).rgb.mul(0.5);
+        const finalVideoRGB = activeVideoNode.rgb.mul(0.5);
 
-        const finalRGB = (mix as any)((mix as any)(baseRGB, finalGridRGB, factor), finalVideoRGB, videoTransition);
+        const finalRGB = mix(mix(baseRGB, finalGridRGB, factor), finalVideoRGB, videoTransition);
 
         return vec4(finalRGB, 1);
     })();
@@ -176,9 +172,9 @@ export function applyHexGridMaterial(
         const frontVideoNode = buildVideoTextureNode(videoTextures, frontVideoIndexNode, vCoveredUvFront);
         const backVideoNode = buildVideoTextureNode(videoTextures, backVideoIndexNode, vCoveredUvBack);
         const faceBlend = vNormal.z.mul(float(0.5)).add(float(0.5)).clamp(float(0), float(1));
-        const activeVideoNode = mix(backVideoNode, frontVideoNode, faceBlend) as any;
+        const activeVideoNode = mix(backVideoNode, frontVideoNode, faceBlend);
 
-        return (activeVideoNode as any).rgb.mul(1.5).mul(videoTransition).mul(0.5);
+        return activeVideoNode.rgb.mul(1.5).mul(videoTransition).mul(0.5);
     })();
 
     material.mrtNode = mrt({

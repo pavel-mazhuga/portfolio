@@ -393,10 +393,10 @@ export class HexagonalGrid {
         cu.uCentralWidth.value = cw;
         cu.uCentralHeight.value = ch;
 
-        const posArr = this.posStorage.value?.array as Float32Array | undefined;
-        const originArr = this.originStorage.value?.array as Float32Array | undefined;
-        const velArr = this.velStorage.value?.array as Float32Array | undefined;
-        const isCentralArr = this.isCentralStorage.value?.array as Float32Array | undefined;
+        const posArr = this.posStorage.value?.array;
+        const originArr = this.originStorage.value?.array;
+        const velArr = this.velStorage.value?.array;
+        const isCentralArr = this.isCentralStorage.value?.array;
 
         if (posArr) {
             posArr.set(hexLayout.initialPositionsData);
@@ -437,8 +437,8 @@ export class HexagonalGrid {
         const cur = Math.min(this.currentVideoIndex, slotCount - 1);
         const back = slotCount <= 1 ? cur : (cur + 1) % slotCount;
 
-        const frontArr = this.frontVideoIndexStorage.value?.array as Float32Array | undefined;
-        const backArr = this.backVideoIndexStorage.value?.array as Float32Array | undefined;
+        const frontArr = this.frontVideoIndexStorage.value?.array;
+        const backArr = this.backVideoIndexStorage.value?.array;
 
         if (!frontArr || !backArr) {
             return;
@@ -470,9 +470,9 @@ export class HexagonalGrid {
 
     #applyProjectModeEnterStorageReset(): void {
         const instCount = this.mesh?.count ?? 0;
-        const targetAngles = this.targetAngleStorage.value?.array as Float32Array | undefined;
-        const frontIdx = this.frontVideoIndexStorage.value?.array as Float32Array | undefined;
-        const backIdx = this.backVideoIndexStorage.value?.array as Float32Array | undefined;
+        const targetAngles = this.targetAngleStorage.value?.array;
+        const frontIdx = this.frontVideoIndexStorage.value?.array;
+        const backIdx = this.backVideoIndexStorage.value?.array;
 
         if (targetAngles && frontIdx && backIdx) {
             for (let i = 0; i < instCount; i++) {
@@ -564,7 +564,7 @@ export class HexagonalGrid {
         const skipLayoutRebuild = this.mesh !== undefined && fromLayout.equals(toLayout);
 
         if (!active) {
-            const targetAngles = this.targetAngleStorage.value?.array as Float32Array | undefined;
+            const targetAngles = this.targetAngleStorage.value?.array;
             const currentFlipped = targetAngles !== undefined && Math.round(targetAngles[0] / Math.PI) % 2 !== 0;
 
             if (currentFlipped) {
@@ -623,7 +623,7 @@ export class HexagonalGrid {
             this.#clearSlidePlaybackSettleTimer();
             this.playback.ensurePlaying(this.currentVideoIndex);
             const settledForIndex = this.currentVideoIndex;
-            const settleMs = slideWaveSettleDurationMs(this.uniforms.flipSpeed.value as number);
+            const settleMs = slideWaveSettleDurationMs(this.uniforms.flipSpeed.value);
 
             this.slidePlaybackSettleTimer = setTimeout(() => {
                 this.slidePlaybackSettleTimer = undefined;

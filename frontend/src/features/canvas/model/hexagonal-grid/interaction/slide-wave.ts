@@ -72,7 +72,7 @@ export class SlideWaveController {
     }
 
     private applyFlipAtInstance(i: number, targetVideo: number): void {
-        const targetAngles = this.deps.targetAngleStorage.value?.array as Float32Array | undefined;
+        const targetAngles = this.deps.targetAngleStorage.value?.array;
 
         if (!targetAngles) return;
 
@@ -92,8 +92,8 @@ export class SlideWaveController {
                 this.timeouts.splice(idx, 1);
             }
 
-            const backArr = this.deps.backVideoIndexStorage.value?.array as Float32Array | undefined;
-            const frontArr = this.deps.frontVideoIndexStorage.value?.array as Float32Array | undefined;
+            const backArr = this.deps.backVideoIndexStorage.value?.array;
+            const frontArr = this.deps.frontVideoIndexStorage.value?.array;
 
             if (!backArr || !frontArr) return;
 

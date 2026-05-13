@@ -136,12 +136,9 @@ export class World implements IWorld {
             // Blur is faster than bloom with the same visual effect
             this.glowBlurPass = gaussianBlur(outputPass.mul(max(bloomIntensityPass.r, float(0))), null, 8, {
                 resolutionScale: 0.5,
-            } as { resolutionScale?: number; premultipliedAlpha?: boolean });
+            });
 
-            this.postProcessing.outputNode = add(
-                fxaaPass as unknown as Node<'vec4'>,
-                this.glowBlurPass as unknown as Node<'vec4'>,
-            );
+            this.postProcessing.outputNode = add(fxaaPass as unknown as Node<'vec4'>, this.glowBlurPass);
 
             if (process.env.NODE_ENV === 'development' && options.isWorker && options.onStatsData) {
                 this.statsProfiler = new StatsProfiler({

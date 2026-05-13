@@ -1,4 +1,5 @@
 import Stats, { type StatsData } from 'stats-gl';
+// eslint-disable-next-line fsd/layer-import-restrictions
 import { projects } from '@/app/data/projects';
 import type { World } from './World';
 import { GridVideoBridge } from './grid-video-bridge';
