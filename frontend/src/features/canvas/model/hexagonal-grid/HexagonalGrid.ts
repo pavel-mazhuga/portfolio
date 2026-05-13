@@ -7,6 +7,7 @@ import {
     Group,
     InstancedMesh,
     MeshPhysicalNodeMaterial,
+    type StorageBufferNode,
     Vector2,
     Vector3,
     type VideoTexture,
@@ -33,7 +34,7 @@ import { type HexLayoutResult, buildHexLayout, hexLayoutToGridLayout } from './l
 import { slideWaveSettleDurationMs } from './lib/flip-timing';
 import { applyHexGridMaterial } from './tsl/hex-grid-material';
 import { setupHexGridTweaks } from './tweaks/hex-grid-tweaks';
-import type { AnyStorageBuffer, GridLayout, HexGridGpuDeps, HexGridMaterialDeps } from './types';
+import type { GridLayout, HexGridGpuDeps, HexGridMaterialDeps } from './types';
 import { type GridVideoSetup, setupGridVideos } from './video/setup-grid-videos';
 import { setupGridVideosForWorker } from './video/setup-grid-videos-worker';
 
@@ -100,15 +101,15 @@ export class HexagonalGrid {
     };
 
     public currentVideoIndex = 0;
-    private targetAngleStorage!: AnyStorageBuffer;
-    private currentAngleStorage!: AnyStorageBuffer;
-    private posStorage!: AnyStorageBuffer;
-    private velStorage!: AnyStorageBuffer;
-    private originStorage!: AnyStorageBuffer;
-    private frontVideoIndexStorage!: AnyStorageBuffer;
-    private backVideoIndexStorage!: AnyStorageBuffer;
+    private targetAngleStorage!: StorageBufferNode<'float'>;
+    private currentAngleStorage!: StorageBufferNode<'float'>;
+    private posStorage!: StorageBufferNode<'vec3'>;
+    private velStorage!: StorageBufferNode<'vec3'>;
+    private originStorage!: StorageBufferNode<'vec3'>;
+    private frontVideoIndexStorage!: StorageBufferNode<'float'>;
+    private backVideoIndexStorage!: StorageBufferNode<'float'>;
     private isCentralData!: Float32Array;
-    private isCentralStorage!: AnyStorageBuffer;
+    private isCentralStorage!: StorageBufferNode<'float'>;
     private initialPositionsData!: Float32Array;
     private layoutWorldExtentY?: number;
     private centralRegionUniforms?: Pick<GridLayout, 'uCentralWidth' | 'uCentralHeight'>;
@@ -350,7 +351,7 @@ export class HexagonalGrid {
             targetAngleStorage: this.targetAngleStorage,
             frontVideoIndexStorage: this.frontVideoIndexStorage,
             backVideoIndexStorage: this.backVideoIndexStorage,
-            getFlipSpeed: () => this.uniforms.flipSpeed.value as number,
+            getFlipSpeed: () => this.uniforms.flipSpeed.value,
         });
 
         this.#syncVideoIndicesToCurrentSlide(hexLayout.instCount);

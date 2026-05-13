@@ -1,18 +1,18 @@
 import { instancedArray } from 'three/tsl';
 import type { HexLayoutResult } from '../layout/build-hex-layout';
-import type { AnyStorageBuffer } from '../types';
+import type { StorageBufferNode } from 'three/webgpu';
 
 export type GridStorages = {
-    posStorage: AnyStorageBuffer;
-    velStorage: AnyStorageBuffer;
-    originStorage: AnyStorageBuffer;
-    targetAngleStorage: AnyStorageBuffer;
-    currentAngleStorage: AnyStorageBuffer;
-    frontVideoIndexStorage: AnyStorageBuffer;
-    backVideoIndexStorage: AnyStorageBuffer;
-    isCentralStorage: AnyStorageBuffer;
-    colorPhaseStorage: AnyStorageBuffer;
-    rotPhaseStorage: AnyStorageBuffer;
+    posStorage: StorageBufferNode<'vec3'>;
+    velStorage: StorageBufferNode<'vec3'>;
+    originStorage: StorageBufferNode<'vec3'>;
+    targetAngleStorage: StorageBufferNode<'float'>;
+    currentAngleStorage: StorageBufferNode<'float'>;
+    frontVideoIndexStorage: StorageBufferNode<'float'>;
+    backVideoIndexStorage: StorageBufferNode<'float'>;
+    isCentralStorage: StorageBufferNode<'float'>;
+    colorPhaseStorage: StorageBufferNode<'vec2'>;
+    rotPhaseStorage: StorageBufferNode<'vec3'>;
 };
 
 export function createGridStorage(layout: HexLayoutResult): GridStorages {

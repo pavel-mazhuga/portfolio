@@ -1,6 +1,11 @@
-import type { AnyStorageBuffer } from '../types';
+import type { StorageBufferNode } from 'three/webgpu';
 
-export function markStorageCpuWrite(storage: AnyStorageBuffer): void {
+type HexGpuStorageForCpuMark =
+    | StorageBufferNode<'float'>
+    | StorageBufferNode<'vec2'>
+    | StorageBufferNode<'vec3'>;
+
+export function markStorageCpuWrite(storage: HexGpuStorageForCpuMark): void {
     const attr = storage.value as ({ needsUpdate?: boolean } & { pbo?: { needsUpdate?: boolean } }) | null | undefined;
 
     if (!attr) return;

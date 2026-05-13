@@ -1,15 +1,14 @@
 import { Fn, instanceIndex, vec3 } from 'three/tsl';
-import type { WebGPURenderer } from 'three/webgpu';
-import type { AnyStorageBuffer } from '../types';
+import type { StorageBufferNode, WebGPURenderer } from 'three/webgpu';
 
 export function runResetCompute(
     renderer: WebGPURenderer,
     instCount: number,
     storages: {
-        posStorage: AnyStorageBuffer;
-        velStorage: AnyStorageBuffer;
-        originStorage: AnyStorageBuffer;
-        currentAngleStorage: AnyStorageBuffer;
+        posStorage: StorageBufferNode<'vec3'>;
+        velStorage: StorageBufferNode<'vec3'>;
+        originStorage: StorageBufferNode<'vec3'>;
+        currentAngleStorage: StorageBufferNode<'float'>;
     },
 ): void {
     const { posStorage, velStorage, originStorage, currentAngleStorage } = storages;

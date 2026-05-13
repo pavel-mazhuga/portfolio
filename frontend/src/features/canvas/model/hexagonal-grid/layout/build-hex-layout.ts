@@ -1,4 +1,5 @@
 import { uniform } from 'three/tsl';
+import type { UniformNode } from 'three/webgpu';
 import { Vector2, Vector3 } from 'three/webgpu';
 import { GRID_SPACING_FACTOR, HEX_RADIUS, centralRegionDimensions } from '../constants';
 import type { GridLayout } from '../types';
@@ -7,8 +8,8 @@ export type HexLayoutResult = {
     instCount: number;
     colorPhaseData: Float32Array;
     rotationPhaseData: Float32Array;
-    uCentralWidth: any;
-    uCentralHeight: any;
+    uCentralWidth: UniformNode<'float', number>;
+    uCentralHeight: UniformNode<'float', number>;
     targetAngleData: Float32Array;
     frontVideoIndexData: Float32Array;
     backVideoIndexData: Float32Array;

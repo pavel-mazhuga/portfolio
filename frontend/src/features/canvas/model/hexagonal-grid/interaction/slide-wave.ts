@@ -1,16 +1,15 @@
-import type { InstancedMesh } from 'three/webgpu';
+import type { InstancedMesh, StorageBufferNode } from 'three/webgpu';
 import { SLIDE_CENTER_PHYSICS_MS, SLIDE_WAVE_DURATION_MS } from '../constants';
-import { secondsToReachHalfFlip, smoothDelay01 } from '../lib/flip-timing';
 import { markStorageCpuWrite } from '../gpu/mark-storage-cpu-write';
-import type { AnyStorageBuffer } from '../types';
+import { secondsToReachHalfFlip, smoothDelay01 } from '../lib/flip-timing';
 
 export type SlideWaveDeps = {
     mesh: InstancedMesh;
     isCentralData: Float32Array;
     initialPositionsData: Float32Array;
-    targetAngleStorage: AnyStorageBuffer;
-    frontVideoIndexStorage: AnyStorageBuffer;
-    backVideoIndexStorage: AnyStorageBuffer;
+    targetAngleStorage: StorageBufferNode<'float'>;
+    frontVideoIndexStorage: StorageBufferNode<'float'>;
+    backVideoIndexStorage: StorageBufferNode<'float'>;
     getFlipSpeed: () => number;
 };
 
