@@ -14,7 +14,6 @@ export type GridLayout = {
     uCentralHeight: any;
 };
 
-/** TSL uniform nodes (`.value` on CPU, nodes in shader) */
 export type HexGridShaderUniforms = {
     projectTransition: any;
     videoTransition: any;
@@ -28,10 +27,8 @@ export type HexGridShaderUniforms = {
     flipSpeed: any;
     maxDist: any;
     minDist: any;
-    // 0–1 press distortion strength (decays on coarse pointer after release).
     pressBlend: any;
     slideImpulse: any;
-    // 0 = fine pointer (hover distortion OK); 1 = coarse — cursor repel only if press or slide impulse.
     coarsePointerMix: any;
     introTransition: any;
     introStagger: any;
