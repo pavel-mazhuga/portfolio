@@ -89,8 +89,7 @@ export class DissolveMesh extends Mesh<BufferGeometry, NodeMaterial> {
         const isEdge = noise.greaterThan(mappedProgress).and(noise.lessThan(edgeWidth)).toVar('edge');
 
         if (material instanceof MeshStandardNodeMaterial) {
-            // @ts-expect-error TS2590 — three/tsl select(color) (tsgo)
-            material.emissiveNode = nodeObject(select(isEdge, this.uniforms.particles.color, output)) as unknown as Node<'color'>;
+            material.emissiveNode = select(isEdge, this.uniforms.particles.color, output);
         }
 
         material.colorNode = Fn(() => {

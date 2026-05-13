@@ -165,7 +165,6 @@ class Demo extends BaseExperience {
             const velocity = this.velocitiesBuffer.element(instanceIndex);
             const count = uint(this.amount);
 
-            // @ts-expect-error TS2590 — three/tsl Loop (tsgo)
             Loop({ start: uint(0), end: count, type: 'uint', condition: '<' }, ({ i }) => {
                 If(uint(i).notEqual(instanceIndex), () => {
                     const neighbourPosition = this.positionsBuffer.element(i);

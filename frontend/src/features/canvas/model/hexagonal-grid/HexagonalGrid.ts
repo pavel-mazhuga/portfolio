@@ -10,7 +10,6 @@ import {
     type StorageBufferNode,
     Vector2,
     Vector3,
-    type VideoTexture,
     WebGPURenderer,
 } from 'three/webgpu';
 import { type FolderApi } from 'tweakpane';
@@ -34,7 +33,7 @@ import { type HexLayoutResult, buildHexLayout, hexLayoutToGridLayout } from './l
 import { slideWaveSettleDurationMs } from './lib/flip-timing';
 import { applyHexGridMaterial } from './tsl/hex-grid-material';
 import { setupHexGridTweaks } from './tweaks/hex-grid-tweaks';
-import type { GridLayout, HexGridGpuDeps, HexGridMaterialDeps } from './types';
+import type { GridLayout, HexGridGpuDeps, HexGridMaterialDeps, HexGridVideoSlotTexture } from './types';
 import { type GridVideoSetup, setupGridVideos } from './video/setup-grid-videos';
 import { setupGridVideosForWorker } from './video/setup-grid-videos-worker';
 
@@ -53,7 +52,7 @@ export class HexagonalGrid {
     private setVideoDimensionsInternal?: (index: number, width: number, height: number) => void;
     private disposeWorkerVideoSetup?: () => void;
     private playback: GridVideoPlayback;
-    videoTextures: VideoTexture[] = [];
+    videoTextures: HexGridVideoSlotTexture[] = [];
     private timeline?: gsap.core.Timeline;
 
     private readonly videoMetadataHandlers: { video: HTMLVideoElement; listener: () => void }[] = [];

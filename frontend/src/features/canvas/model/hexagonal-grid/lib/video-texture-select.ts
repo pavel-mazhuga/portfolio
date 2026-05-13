@@ -1,21 +1,43 @@
-import { color, float, select, texture, vec2 } from 'three/tsl';
-import type { VideoTexture } from 'three/webgpu';
+import { select, texture, vec2, vec4 } from 'three/tsl';
+import type { Node, UniformNode } from 'three/webgpu';
+import type { HexGridVideoSlotTexture } from '../types';
 
-export function buildVideoSizeVec2(widthUniforms: any[], heightUniforms: any[], indexNode: any): any {
-    let node: any = vec2(float(1), float(1)) as any;
+export function buildVideoSizeVec2(
+    widthUniforms: UniformNode<'float', number>[],
+    heightUniforms: UniformNode<'float', number>[],
+    indexNode: Node<'float'>,
+): Node<'vec2'> {
+    let node: Node<'vec2'> = vec2(1);
 
     for (let j = widthUniforms.length - 1; j >= 0; j--) {
-        node = select(indexNode.equal(j), vec2(widthUniforms[j], heightUniforms[j]) as any, node) as any;
+        const w = widthUniforms[j];
+        const h = heightUniforms[j];
+
+        if (w === undefined || h === undefined) {
+            continue;
+        }
+
+        node = select(indexNode.equal(j), vec2(w, h), node);
     }
 
     return node;
 }
 
-export function buildVideoTextureNode(videoTextures: VideoTexture[], indexNode: any, uvMap: any): any {
-    let node: any = color(0x000000);
+export function buildVideoTextureNode(
+    videoTextures: HexGridVideoSlotTexture[],
+    indexNode: Node<'float'>,
+    uvMap: Node<'vec2'>,
+): Node<'vec4'> {
+    let node: Node<'vec4'> = vec4(0, 0, 0, 1);
 
     for (let j = videoTextures.length - 1; j >= 0; j--) {
-        node = (select as any)(indexNode.equal(j), texture(videoTextures[j], uvMap), node);
+        const tex = videoTextures[j];
+
+        if (tex === undefined) {
+            continue;
+        }
+
+        node = select(indexNode.equal(j), texture(tex, uvMap), node);
     }
 
     return node;

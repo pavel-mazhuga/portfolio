@@ -16,14 +16,13 @@ export const coverTextureUv = /*#__PURE__*/ Fn(
         const ri = float(i.x.div(i.y)).toVar();
         const coverWide = vec2(i.x.mul(s.y).div(i.y), s.y);
         const coverTall = vec2(s.x, i.y.mul(s.x).div(i.x));
-        // @ts-expect-error TS2590 — three/tsl `select()` (tsgo)
-        const coverPick = select(rs.lessThan(ri), coverWide, coverTall) as Node<'vec2'>;
+        const coverPick = select(rs.lessThan(ri), coverWide, coverTall);
         const newUv = coverPick.toVar();
         const offsetPick = select(
             rs.lessThan(ri),
             vec2(newUv.x.sub(s.x).div(2.0), 0.0),
             vec2(0.0, newUv.y.sub(s.y).div(2.0)),
-        ) as unknown as Node<'vec2'>;
+        );
         const offsetCenter = offsetPick.toVar();
         const offset = offsetCenter.div(newUv).toVar();
 

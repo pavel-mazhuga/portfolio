@@ -1,10 +1,6 @@
-import type {
-    Color,
-    StorageBufferNode,
-    UniformNode,
-    Vector3,
-    VideoTexture,
-} from 'three/webgpu';
+import type { Color, StorageBufferNode, UniformNode, Vector3, VideoFrameTexture, VideoTexture } from 'three/webgpu';
+
+export type HexGridVideoSlotTexture = VideoTexture | VideoFrameTexture;
 
 export type GridLayout = {
     instCount: number;
@@ -46,7 +42,7 @@ export type HexGridGpuDeps = {
     deltaUniform: UniformNode<'float', number>;
     pointerUniform: UniformNode<'vec3', Vector3>;
     uniforms: HexGridShaderUniforms;
-    videoTextures: VideoTexture[];
+    videoTextures: HexGridVideoSlotTexture[];
 };
 
 export type HexGridMaterialDeps = HexGridGpuDeps & {

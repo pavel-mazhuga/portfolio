@@ -1,5 +1,6 @@
 import { uniform } from 'three/tsl';
 import { LinearFilter, SRGBColorSpace, UniformNode, VideoFrameTexture, VideoTexture } from 'three/webgpu';
+import type { HexGridVideoSlotTexture } from '../types';
 import { canUseVideoFrameTexturePipeline } from './video-frame-pipeline';
 
 export type SetupGridVideosOptions = {
@@ -8,7 +9,7 @@ export type SetupGridVideosOptions = {
 
 export type GridVideoSetup = {
     videos: HTMLVideoElement[];
-    videoTextures: VideoTexture[];
+    videoTextures: HexGridVideoSlotTexture[];
     videoWidths: UniformNode<'float', number>[];
     videoHeights: UniformNode<'float', number>[];
     metadataHandlers: { video: HTMLVideoElement; listener: () => void }[];
@@ -77,7 +78,7 @@ export function setupGridVideos(videoUrls: string[], options?: SetupGridVideosOp
         video.playsInline = true;
         video.crossOrigin = 'anonymous';
 
-        let texture: VideoTexture;
+        let texture: HexGridVideoSlotTexture;
 
         if (canUseVideoFrameTexturePipeline()) {
             const frameTexture = new VideoFrameTexture();
@@ -85,7 +86,7 @@ export function setupGridVideos(videoUrls: string[], options?: SetupGridVideosOp
             frameTexture.generateMipmaps = false;
             frameTexture.minFilter = LinearFilter;
             frameTexture.colorSpace = SRGBColorSpace;
-            texture = frameTexture as unknown as VideoTexture;
+            texture = frameTexture;
             framePushReleases.push(pushVideoFramesToTexture(video, frameTexture));
         } else {
             texture = new VideoTexture(video);
