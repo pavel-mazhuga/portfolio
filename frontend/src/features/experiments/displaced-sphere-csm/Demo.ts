@@ -334,6 +334,7 @@ class DisplacedSphereCsmDemo {
         } else {
             mat.dispose();
         }
+
         const depthMat = this.mesh.customDepthMaterial;
 
         if (depthMat) depthMat.dispose();

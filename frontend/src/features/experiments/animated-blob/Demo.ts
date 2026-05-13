@@ -136,6 +136,7 @@ class Demo {
         } else {
             this.placeholderTexture.dispose();
         }
+
         this.renderer.dispose();
     }
 }

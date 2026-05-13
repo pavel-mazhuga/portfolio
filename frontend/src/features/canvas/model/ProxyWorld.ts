@@ -86,6 +86,7 @@ export class ProxyWorld implements IWorld {
                 if (this.worker) {
                     this.bridge = new GridVideoBridge(this.worker, projects.length);
                 }
+
                 this.onReady?.();
                 break;
             }
@@ -126,6 +127,7 @@ export class ProxyWorld implements IWorld {
                 if (pl.action === 'pauseAll') {
                     this.bridge?.pauseAll();
                 }
+
                 break;
             }
 
@@ -160,6 +162,7 @@ export class ProxyWorld implements IWorld {
             cancelAnimationFrame(this.workerStatsRaf);
             this.workerStatsRaf = 0;
         }
+
         this.workerStats?.dispose();
         this.workerStats = undefined;
     }
@@ -175,6 +178,7 @@ export class ProxyWorld implements IWorld {
             this.worker.terminate();
             this.worker = undefined;
         }
+
         this.bridge?.dispose();
         this.bridge = undefined;
     }

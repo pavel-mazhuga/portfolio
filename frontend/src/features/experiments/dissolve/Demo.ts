@@ -177,6 +177,7 @@ class Dissolve extends BaseExperience {
         if (this.mesh) {
             gsap.killTweensOf(this.mesh.uniforms.progress);
         }
+
         this.progressTween?.kill();
         super.destroy();
         this.mesh?.dispose();

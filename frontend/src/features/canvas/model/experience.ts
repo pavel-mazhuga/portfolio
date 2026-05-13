@@ -9,6 +9,7 @@ function resolveProjectListVideoUrl(video: HTMLVideoElement): string {
     if (current) {
         return current;
     }
+
     const direct = video.getAttribute('src')?.trim();
 
     if (direct) {
@@ -18,6 +19,7 @@ function resolveProjectListVideoUrl(video: HTMLVideoElement): string {
             return direct;
         }
     }
+
     const fromSource = video.querySelector('source[src]')?.getAttribute('src')?.trim();
 
     if (fromSource) {
@@ -87,6 +89,7 @@ class Experience {
         if (this.#routeWired) {
             return;
         }
+
         this.#routeWired = true;
         document.addEventListener('astro:page-load', this.#onPageLoad);
         document.addEventListener('projects-prev', this.#onPrev);
@@ -204,6 +207,7 @@ class Experience {
             document.removeEventListener('projects-next', this.#onNext);
             this.#routeWired = false;
         }
+
         this.world?.dispose();
     }
 }

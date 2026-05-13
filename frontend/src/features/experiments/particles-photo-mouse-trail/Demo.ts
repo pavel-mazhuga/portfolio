@@ -192,6 +192,7 @@ class ParticlesPhotoMouseTrailDemo {
 
                 return;
             }
+
             this.pictureTexture = pictureTexture;
             this.finishSetup();
         } catch {
@@ -199,6 +200,7 @@ class ParticlesPhotoMouseTrailDemo {
                 // eslint-disable-next-line no-console
                 console.error('ParticlesPhotoMouseTrail: failed to load assets');
             }
+
             this.safeOnReady();
         }
     }
@@ -234,6 +236,7 @@ class ParticlesPhotoMouseTrailDemo {
             intensitiesArray[i] = Math.random();
             anglesArray[i] = Math.random() * Math.PI * 2;
         }
+
         geometry.setAttribute('aIntensity', new BufferAttribute(intensitiesArray, 1));
         geometry.setAttribute('aAngle', new BufferAttribute(anglesArray, 1));
 
@@ -313,6 +316,7 @@ class ParticlesPhotoMouseTrailDemo {
         if (cursorDistance > 10 && this.prevCursorDistance === 0) {
             cursorDistance = 0;
         }
+
         this.prevCursorDistance = savedCursorDistance;
 
         this.canvasCursorPrevious.copy(this.canvasCursor);

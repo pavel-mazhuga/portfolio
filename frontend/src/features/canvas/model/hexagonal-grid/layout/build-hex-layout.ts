@@ -90,6 +90,7 @@ export function buildHexLayout(viewportSize: Vector2, hexRadius: number = HEX_RA
             }
         }
     }
+
     setData(new Vector3());
 
     let maxDist = 0;

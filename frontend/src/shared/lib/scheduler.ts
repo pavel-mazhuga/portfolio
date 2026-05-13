@@ -51,6 +51,7 @@ function createScheduler(): TaskScheduler {
 
                             return;
                         }
+
                         resolve(task());
                     } catch (error) {
                         reject(error);

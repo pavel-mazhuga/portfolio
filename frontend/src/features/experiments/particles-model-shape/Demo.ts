@@ -90,6 +90,7 @@ function prepareSampleGeometry(source: BufferGeometry): BufferGeometry {
     if (!box) {
         return geometry;
     }
+
     const offset = box.getCenter(new Vector3());
 
     geometry.translate(-offset.x, -offset.y, -offset.z);
@@ -196,6 +197,7 @@ class ParticlesModelShapeDemo {
                 if (this.disposed) {
                     return;
                 }
+
                 const geom = findPrimaryGeometry(gltf.scene);
 
                 this.buildSimulationAndPoints(geom, opts);
@@ -282,6 +284,7 @@ class ParticlesModelShapeDemo {
         if (!this.ready) {
             return;
         }
+
         const su = this.simulationMaterial.uniforms;
         const pu = this.pointsMaterial.uniforms;
 
@@ -312,6 +315,7 @@ class ParticlesModelShapeDemo {
 
             return;
         }
+
         this.applyParamsToUniforms(p);
     }
 
@@ -328,11 +332,13 @@ class ParticlesModelShapeDemo {
         if (!this.supportsTouch || !this.ready) {
             return;
         }
+
         const t = event.changedTouches[0];
 
         if (!t) {
             return;
         }
+
         this.ndcFromClient(t.clientX, t.clientY);
         this.raycaster.setFromCamera(this.pointerVec, this.camera);
         const hits = this.raycaster.intersectObject(this.dummyPlane);
@@ -348,6 +354,7 @@ class ParticlesModelShapeDemo {
         if (this.supportsTouch || !this.ready) {
             return;
         }
+
         this.ndcFromClient(event.clientX, event.clientY);
         this.raycaster.setFromCamera(this.pointerVec, this.camera);
         const hits = this.raycaster.intersectObject(this.dummyPlane);

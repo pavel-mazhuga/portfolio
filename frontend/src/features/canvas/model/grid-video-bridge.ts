@@ -34,6 +34,7 @@ export class GridVideoBridge {
 
             video.addEventListener('loadedmetadata', () => {
                 if (this.disposed) return;
+
                 this.worker.postMessage({
                     message: 'videoMetadata',
                     payload: {
@@ -100,6 +101,7 @@ export class GridVideoBridge {
             if (!url || !video || video.src) {
                 continue;
             }
+
             video.src = url;
         }
     }
@@ -138,11 +140,13 @@ export class GridVideoBridge {
 
     dispose(): void {
         if (this.disposed) return;
+
         this.disposed = true;
 
         for (const release of this.releases) {
             release();
         }
+
         this.releases.length = 0;
 
         for (const video of this.videos) {
@@ -150,6 +154,7 @@ export class GridVideoBridge {
             video.src = '';
             video.load();
         }
+
         this.videos.length = 0;
     }
 }

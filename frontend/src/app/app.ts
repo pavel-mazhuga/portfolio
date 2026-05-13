@@ -28,6 +28,7 @@ function prepareClipVtExit() {
         if (isClipVtOnceEl(el)) {
             return;
         }
+
         el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${index}`;
     });
 }
@@ -45,6 +46,7 @@ function resetClipContainers() {
         if (isClipVtOnceEl(el)) {
             return;
         }
+
         el.classList.remove('is-visible');
     });
 }

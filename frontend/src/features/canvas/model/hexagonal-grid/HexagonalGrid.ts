@@ -143,6 +143,7 @@ export class HexagonalGrid {
             if (!videoOptions.videoPlayback) {
                 throw new Error('HexagonalGrid: videoPlayback is required when useWorkerVideoPipeline is true');
             }
+
             this.playback = videoOptions.videoPlayback;
             const workerSetup = setupGridVideosForWorker(projectVideoUrls.length);
 
@@ -225,6 +226,7 @@ export class HexagonalGrid {
         const mesh = this.mesh;
 
         if (!mesh) return;
+
         this.group.remove(mesh);
         mesh.geometry.dispose();
 
@@ -507,6 +509,7 @@ export class HexagonalGrid {
         } else {
             this.pressBlendCpu = this.userPressed ? 1 : 0;
         }
+
         this.uniforms.pressBlend.value = this.pressBlendCpu;
     }
 
@@ -630,11 +633,13 @@ export class HexagonalGrid {
                 }
             }, settleMs);
         }
+
         this.slideWave.startWave(this.currentVideoIndex);
     }
 
     prevSlide(): void {
         if (this.videoTextures.length === 0) return;
+
         const prevIndex = (this.currentVideoIndex - 1 + this.videoTextures.length) % this.videoTextures.length;
 
         this.setSlide(prevIndex);
@@ -642,6 +647,7 @@ export class HexagonalGrid {
 
     nextSlide(): void {
         if (this.videoTextures.length === 0) return;
+
         const nextIndex = (this.currentVideoIndex + 1) % this.videoTextures.length;
 
         this.setSlide(nextIndex);
@@ -664,6 +670,7 @@ export class HexagonalGrid {
         for (const { video, listener } of this.videoMetadataHandlers) {
             video.removeEventListener('loadedmetadata', listener);
         }
+
         this.videoMetadataHandlers.length = 0;
 
         this.releaseVideoFramePush?.();

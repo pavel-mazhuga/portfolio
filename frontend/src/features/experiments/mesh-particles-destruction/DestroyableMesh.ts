@@ -86,6 +86,7 @@ export class DestroyableMesh extends Group {
 
     destroy(startTime: number) {
         if (this.isDead) return;
+
         this.isDead = true;
         this.startTime.value = startTime;
         this.particles.visible = true;

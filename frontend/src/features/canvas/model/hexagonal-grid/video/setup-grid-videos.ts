@@ -54,6 +54,7 @@ function pushVideoFramesToTexture(video: HTMLVideoElement, texture: VideoFrameTe
             video.cancelVideoFrameCallback(pendingHandle);
             pendingHandle = 0;
         }
+
         previousFrame?.close();
         previousFrame = undefined;
     };
@@ -73,6 +74,7 @@ export function setupGridVideos(videoUrls: string[], options?: SetupGridVideosOp
         if (deferSrc) {
             video.preload = 'none';
         }
+
         video.loop = true;
         video.muted = true;
         video.playsInline = true;
@@ -134,6 +136,7 @@ export function setupGridVideos(videoUrls: string[], options?: SetupGridVideosOp
                       for (const release of framePushReleases) {
                           release();
                       }
+
                       framePushReleases.length = 0;
                   }
                 : undefined,

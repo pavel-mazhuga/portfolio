@@ -68,6 +68,7 @@ document.addEventListener('astro:before-preparation', (event) => {
     if (!isTransitionBeforePreparationEvent(event)) {
         return;
     }
+
     pendingFromPathname = event.from.pathname;
     pendingToPathname = event.to.pathname;
 });
@@ -76,6 +77,7 @@ document.addEventListener('astro:after-preparation', () => {
     if (!isLabDetailPage(pendingFromPathname) || isLabDetailPage(pendingToPathname)) {
         return;
     }
+
     destroyActive();
     hideExperimentCanvases();
 });

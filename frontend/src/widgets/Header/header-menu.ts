@@ -8,6 +8,7 @@ function isInternalNavigationLink(link: HTMLAnchorElement): boolean {
     if (link.target === '_blank' || link.hasAttribute('download')) {
         return false;
     }
+
     try {
         const url = new URL(link.href, window.location.href);
 
@@ -62,6 +63,7 @@ export function setupHeaderMenu(): () => void {
             if (finished) {
                 return;
             }
+
             finished = true;
             menu.removeEventListener('transitionend', onTransitionEnd);
             window.clearTimeout(fallbackId);
@@ -82,6 +84,7 @@ export function setupHeaderMenu(): () => void {
             if (finished) {
                 return;
             }
+
             finished = true;
             menu.removeEventListener('transitionend', onTransitionEnd);
             window.clearTimeout(fallbackId);
@@ -129,6 +132,7 @@ export function setupHeaderMenu(): () => void {
 
             return;
         }
+
         event.preventDefault();
         closeThenNavigate(link.href);
     };

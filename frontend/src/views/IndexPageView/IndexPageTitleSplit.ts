@@ -84,6 +84,7 @@ function destroy() {
                     word.classList.remove('is-visible');
                 }
             }
+
             split.revert();
         }
     }

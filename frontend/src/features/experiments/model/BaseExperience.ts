@@ -129,6 +129,7 @@ class BaseExperience {
         if (this.disposed) {
             return;
         }
+
         this.disposed = true;
 
         this.clock.disconnect();

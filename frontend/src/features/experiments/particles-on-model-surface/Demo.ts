@@ -128,6 +128,7 @@ function computeUpness(geometry: BufferGeometry) {
     if (!normalAttr) {
         geometry.computeVertexNormals();
     }
+
     const { array, count } = geometry.attributes.normal;
     const arr = new Float32Array(count);
 
@@ -256,6 +257,7 @@ class Demo {
                         dummy.updateMatrix();
                         instancedMesh.setMatrixAt(j, dummy.matrix);
                     }
+
                     instancedMesh.instanceMatrix.needsUpdate = true;
 
                     this.scene.add(instancedMesh);
@@ -308,11 +310,13 @@ class Demo {
         for (const mesh of this.instancedMeshes) {
             this.scene.remove(mesh);
         }
+
         this.instancedMeshes = [];
 
         for (const g of this.sphereGeometries) {
             g.dispose();
         }
+
         this.sphereGeometries = [];
 
         this.material.dispose();

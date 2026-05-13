@@ -191,6 +191,7 @@ class Metaballs extends BaseExperience {
         } else {
             mat.dispose();
         }
+
         super.destroy();
     }
 

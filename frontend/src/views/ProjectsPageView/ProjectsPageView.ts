@@ -81,6 +81,7 @@ function parseTotal(root: HTMLElement): number {
     if (!raw) {
         return 0;
     }
+
     const n = Number.parseInt(raw, 10);
 
     return Number.isFinite(n) ? n : 0;

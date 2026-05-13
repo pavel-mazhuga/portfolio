@@ -114,6 +114,7 @@ function destroy() {
                     line.classList.remove('is-visible');
                 }
             }
+
             split.revert();
         }
     }

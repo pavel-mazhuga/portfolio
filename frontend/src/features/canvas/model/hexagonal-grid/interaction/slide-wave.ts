@@ -23,6 +23,7 @@ export class SlideWaveController {
         for (const id of this.timeouts) {
             clearTimeout(id);
         }
+
         this.timeouts.length = 0;
     }
 
@@ -36,6 +37,7 @@ export class SlideWaveController {
 
         for (let i = 0; i < instCount; i++) {
             if (this.deps.isCentralData[i] < 0.5) continue;
+
             const x = this.deps.initialPositionsData[i * 3 + 0];
             const y = this.deps.initialPositionsData[i * 3 + 1];
 
@@ -62,6 +64,7 @@ export class SlideWaveController {
             if (idx !== -1) {
                 this.timeouts.splice(idx, 1);
             }
+
             this.applyFlipAtInstance(instanceIdx, targetVideo);
         }, delayMs);
 
@@ -88,6 +91,7 @@ export class SlideWaveController {
             if (idx !== -1) {
                 this.timeouts.splice(idx, 1);
             }
+
             const backArr = this.deps.backVideoIndexStorage.value?.array as Float32Array | undefined;
             const frontArr = this.deps.frontVideoIndexStorage.value?.array as Float32Array | undefined;
 

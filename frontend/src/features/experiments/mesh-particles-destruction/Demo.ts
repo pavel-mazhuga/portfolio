@@ -95,6 +95,7 @@ class MeshParticlesDestroy extends BaseExperience {
             this.scene.remove(this.mesh);
             this.mesh.dispose();
         }
+
         super.destroy();
     }
 

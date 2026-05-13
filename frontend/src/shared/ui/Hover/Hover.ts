@@ -175,6 +175,7 @@ function destroy() {
         if (instance.ariaLabelAdded) {
             root.removeAttribute('aria-label');
         }
+
         registry.delete(root);
     }
 }

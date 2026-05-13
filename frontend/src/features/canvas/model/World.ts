@@ -179,6 +179,7 @@ export class World implements IWorld {
         if (!this.options.isWorker) {
             this.hexGrid?.ensureProjectVideosLoaded(state.videoUrls);
         }
+
         this.hexGrid?.setProjectMode(state.isProjectsPage, this.getVisibleWorldSize());
     }
 
@@ -251,6 +252,7 @@ export class World implements IWorld {
             if (this.stats) {
                 this.stats.update();
             }
+
             this.pointerHandler.update(delta);
 
             if (this.hexGrid) {

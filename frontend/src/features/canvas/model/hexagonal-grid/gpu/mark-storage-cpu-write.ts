@@ -9,6 +9,7 @@ export function markStorageCpuWrite(storage: HexGpuStorageForCpuMark): void {
     const attr = storage.value as ({ needsUpdate?: boolean } & { pbo?: { needsUpdate?: boolean } }) | null | undefined;
 
     if (!attr) return;
+
     attr.needsUpdate = true;
 
     if (attr.pbo) {

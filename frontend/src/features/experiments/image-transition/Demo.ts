@@ -163,6 +163,7 @@ class ImageTransitionDemo {
             for (const t of [tex1, tex2]) {
                 t.colorSpace = SRGBColorSpace;
             }
+
             this.textures = [tex1, tex2];
 
             const planeSize = new Vector2(1, 1);
@@ -209,12 +210,14 @@ class ImageTransitionDemo {
         if (this.material) {
             this.material.uniforms.uTime.value = elapsed;
         }
+
         this.experimentBackground.update(elapsed);
         this.renderer.render(this.scene, this.camera);
     }
 
     private applyParamsToUniforms() {
         if (!this.material) return;
+
         const u = this.material.uniforms;
 
         u.uProgress.value = this.params.progress;
@@ -249,6 +252,7 @@ class ImageTransitionDemo {
         if (p.fadeOffset !== undefined) this.params.fadeOffset = p.fadeOffset;
 
         if (p.innerRippleSpeed !== undefined) this.params.innerRippleSpeed = p.innerRippleSpeed;
+
         this.applyParamsToUniforms();
     }
 
@@ -282,6 +286,7 @@ class ImageTransitionDemo {
         for (const t of this.textures) {
             t.dispose();
         }
+
         this.textures = [];
         this.scene.remove(this.experimentBackground);
         this.experimentBackground.dispose();

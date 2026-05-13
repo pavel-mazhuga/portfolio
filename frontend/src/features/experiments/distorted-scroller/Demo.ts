@@ -186,6 +186,7 @@ class DistortedScrollerDemo {
 
     private syncScrollDomSize() {
         if (!this.scrollEl || !this.fillEl) return;
+
         this.pages = this.computePages();
         this.fillEl.style.width = `${this.pages * SCROLL_DISTANCE * 100}%`;
         const maxScroll = Math.max(0, this.scrollEl.scrollWidth - this.scrollEl.clientWidth);
@@ -235,6 +236,7 @@ class DistortedScrollerDemo {
 
         this.scrollHandler = () => {
             if (firstRun) return;
+
             const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
 
             if (maxScroll <= 0) this.rawScroll = 0;
@@ -369,6 +371,7 @@ class DistortedScrollerDemo {
         if (this.scrollEl?.parentElement) {
             this.scrollEl.parentElement.removeChild(this.scrollEl);
         }
+
         this.scrollEl = null;
         this.fillEl = null;
 
@@ -380,6 +383,7 @@ class DistortedScrollerDemo {
 
             tex.dispose();
         }
+
         this.slideGeometry?.dispose();
         this.slideGeometry = null;
         this.slideMeshes = [];

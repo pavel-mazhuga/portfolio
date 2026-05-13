@@ -77,6 +77,7 @@ function init() {
                     if (dial.getAttribute('data-mode') === 'modal') {
                         document.documentElement.classList.add(NO_SCROLL_CLASS);
                     }
+
                     dial.classList.add('popup--opening');
 
                     openingTimeoutsMap.set(

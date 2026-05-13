@@ -194,6 +194,7 @@ class Demo {
         if (!this.loadedTexture) {
             this.placeholderTexture.dispose();
         }
+
         this.renderer.dispose();
     }
 }
