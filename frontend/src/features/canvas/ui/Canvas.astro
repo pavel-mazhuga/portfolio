@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+export type Props = HTMLAttributes<'div'>;
+
+const { ...props } = Astro.props;
+---
+
+<div class:list={['canvas-wrapper js-canvas-wrapper', props.class]} {...props}>
+    <canvas class="canvas js-canvas"></canvas>
+</div>
+
+<style lang="scss" is:global>
+    @use './Canvas';
+</style>
+
+<script>
+    import canvas from './Canvas';
+    import { isLabDetailPage } from '@/shared/lib/router';
+
+    document.addEventListener('astro:page-load', () => {
+        canvas.syncWithRoute();
+    });
+
+    document.addEventListener('astro:before-swap', ({ to }) => {
+        if (isLabDetailPage(to.pathname)) {
+            canvas.destroy();
+        }
+    });
+</script>

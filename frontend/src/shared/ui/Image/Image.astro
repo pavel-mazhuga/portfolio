@@ -1,0 +1,72 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import imageLoader from './lib/image-loader';
+import { createSrcset } from './lib/create-srcset';
+import { widths } from './const';
+import { SSR_ENABLED } from '@/../config.js';
+import { Image as AstroImage } from 'astro:assets';
+
+export type Props = HTMLAttributes<'img'> & {
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+    format?: 'webp' | 'avif';
+    quality?: number;
+    loading?: 'lazy' | 'eager';
+    decoding?: 'async' | 'sync' | 'auto';
+    sizes?: string;
+    resize?: boolean;
+    priority?: boolean;
+    widths?: number[];
+};
+
+const {
+    src,
+    alt,
+    width,
+    height,
+    format = 'webp',
+    quality = 80,
+    loading = 'lazy',
+    decoding = 'async',
+    sizes = '100vw',
+    priority = false,
+    ...props
+} = Astro.props;
+
+const optimizedSrc = imageLoader({ src, width, quality, format });
+const srcset = createSrcset(src, widths, quality, format);
+---
+
+{
+    SSR_ENABLED || src.endsWith('.svg') ? (
+        <img
+            src={optimizedSrc}
+            srcset={src.endsWith('.svg') ? undefined : srcset}
+            alt={alt}
+            width={width}
+            height={height}
+            loading={priority ? 'eager' : loading}
+            decoding={decoding}
+            sizes={sizes}
+            fetchpriority={priority ? 'high' : undefined}
+            {...props}
+        />
+    ) : (
+        <AstroImage
+            src={{
+                src,
+                width,
+                height,
+                format,
+            }}
+            alt={alt}
+            layout="full-width"
+            loading={priority ? 'eager' : loading}
+            sizes={sizes}
+            fetchpriority={priority ? 'high' : undefined}
+            {...props}
+        />
+    )
+}

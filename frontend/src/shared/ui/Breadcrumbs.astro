@@ -1,0 +1,48 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { AppBreadcrumbs } from '@/shared/model/types';
+import { tp } from '@/shared/lib/formatting';
+import { type AppLocale } from '../config/i18n';
+
+export type Props = HTMLAttributes<'nav'> & {
+    data: AppBreadcrumbs;
+};
+
+const { data, ...props } = Astro.props;
+const locale = Astro.currentLocale as AppLocale;
+---
+
+<nav
+    class:list={['breadcrumbs visually-hidden', props.class]}
+    itemscope
+    itemtype="http://schema.org/BreadcrumbList"
+    {...props}
+>
+    <div class="breadcrumbs-inner">
+        <ul class="breadcrumbs__list list-unstyled">
+            {
+                data.map((item, i) => (
+                    <li
+                        class="breadcrumbs__list-item"
+                        itemprop="itemListElement"
+                        itemscope
+                        itemtype="http://schema.org/ListItem"
+                    >
+                        {item.href && i < data.length - 1 ? (
+                            <a class="breadcrumbs__link" href={item.href} itemprop="item">
+                                {tp(item.text, locale)}
+                            </a>
+                        ) : (
+                            <span class="breadcrumbs__link" itemprop="item">
+                                <span itemprop="name" class="breadcrumbs__link-item">
+                                    {tp(item.text, locale)}
+                                </span>
+                            </span>
+                        )}
+                        <meta itemprop="position" content={`${i + 1}`} />
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,336 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.projects-counter-odometer {
+    display: inline-flex;
+    align-items: baseline;
+    vertical-align: baseline;
+    gap: 0;
+    height: 1.2em;
+    height: 1lh;
+}
+
+.projects-counter-odometer__viewport {
+    display: inline-block;
+    height: 1.2em;
+    height: 1lh;
+    overflow: hidden;
+    vertical-align: baseline;
+}
+
+.projects-counter-odometer__track {
+    display: flex;
+    flex-direction: column;
+}
+
+.projects-counter-odometer__cell {
+    flex-shrink: 0;
+    height: 1.2em;
+    height: 1lh;
+    line-height: 1.2;
+    line-height: 1lh;
+}
+
+.projects-list-wrapper {
+    margin-top: auto;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100% + var(--offset-x));
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+    }
+}
+
+.projects-list-item {
+    width: calc(100% - var(--offset-x) * 2);
+    display: flex;
+    align-items: flex-end;
+    gap: var(--grid-gap);
+    position: absolute;
+    bottom: 0;
+
+    &.is-hidden {
+        transition: visibility 0s ease 1.2s;
+        visibility: hidden;
+
+        .clip-container {
+            --clip-container-delay: 0s;
+
+            @for $i from 1 through 6 {
+                &:nth-child(#{$i}) {
+                    // stylelint-disable-next-line max-nesting-depth
+                    .clip-container__el.is-visible {
+                        transition-delay: 0s;
+                    }
+                }
+            }
+        }
+
+        .clip-container__el {
+            transform: translateY(105%);
+        }
+    }
+
+    .clip-container {
+        --clip-container-delay: 0.08s;
+    }
+}
+
+.projects-list-item__info-button-wrapper {
+    margin-left: auto;
+    flex-shrink: 0;
+
+    @media screen and (min-width: 768px) {
+        display: none;
+    }
+}
+
+.projects-list-item__info-button {
+    @include clickable;
+}
+
+.projects-list-item__info {
+    display: contents;
+
+    @media screen and (max-width: 767px) {
+        --transition-duration: 1s;
+        --transition-delay: 0.24s;
+
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: var(--offset-x);
+        padding-top: 60px;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: max-content;
+        max-width: calc(100% - var(--offset-x) * 2);
+        max-height: calc(100% - var(--offset-x) * 2);
+        visibility: hidden;
+        transition: visibility (var(--transition-duration) + var(--transition-delay)) ease;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            transition: transform calc(var(--transition-duration) - var(--transition-delay)) easeInOutCubic
+                var(--transition-delay);
+            transform: scaleY(0);
+            transform-origin: 50% 0%;
+        }
+
+        .clip-container__el {
+            transform: translateY(105%);
+        }
+
+        &:not(.is-visible) {
+            .clip-container__el.is-visible {
+                transition-delay: 0s;
+            }
+        }
+
+        &.is-visible {
+            --transition-delay: 0s;
+
+            visibility: visible;
+
+            &::before {
+                transform: scaleY(1);
+                transition-delay: 0s;
+            }
+
+            .clip-container__el {
+                transform: none;
+            }
+        }
+    }
+
+    @include horizontal-mobile {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+.projects-list-item__info-close-wrapper {
+    display: none;
+
+    @media screen and (max-width: 767px) {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: var(--offset-x);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+    }
+}
+
+.projects-list-item__info-close {
+    @include clickable;
+}
+
+.project-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+
+    @media screen and (max-width: 767px) {
+        position: relative;
+    }
+
+    @include horizontal-mobile {
+        flex: 1 1 calc(25% - 12px);
+    }
+}
+
+.project-item__label {
+    opacity: 0.6;
+}
+
+.project-item__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    text-wrap: balance;
+}
+
+.projects-list-item__name {
+    @include grid-columns(3);
+
+    @media screen and (max-width: 767px) {
+        width: max-content;
+        max-width: 100%;
+        flex-shrink: 1;
+    }
+}
+
+.project-link {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 0.5em;
+    padding-right: 40px;
+}
+
+.project-link__name {
+    text-box: trim-both cap alphabetic;
+    text-wrap: balance;
+}
+
+.project-link__icon {
+    --size: 1.05em;
+
+    margin-bottom: -0.15em;
+}
+
+.projects-list-item__role {
+    @include grid-columns(2);
+
+    @media screen and (max-width: 767px) {
+        width: 100%;
+
+        .clip-container {
+            --clip-container-delay: 0.16s;
+        }
+    }
+}
+
+.projects-list-item__collaborators {
+    @include grid-columns(3);
+
+    @media screen and (max-width: 767px) {
+        width: 100%;
+
+        .clip-container {
+            --clip-container-delay: 0.24s;
+        }
+    }
+}
+
+.projects-list-item__recognitions {
+    @include grid-columns(3);
+
+    @include tablet {
+        @include grid-columns(4);
+    }
+
+    @media screen and (max-width: 767px) {
+        width: 100%;
+
+        .clip-container {
+            --clip-container-delay: 0.32s;
+        }
+    }
+}
+
+.projects-list-item__technologies {
+    display: none;
+
+    @media screen and (max-width: 767px) {
+        display: flex;
+
+        .clip-container {
+            --clip-container-delay: 0.4s;
+        }
+    }
+}
+
+.projects-list-item__year {
+    @include grid-columns(1);
+
+    margin-left: auto;
+    text-align: right;
+    align-items: flex-end;
+
+    @include tablet {
+        display: none;
+    }
+
+    @media screen and (max-width: 767px) {
+        display: flex;
+        width: 100%;
+        margin-left: 0;
+        align-items: flex-start;
+
+        .clip-container {
+            --clip-container-delay: 0.48s;
+        }
+    }
+}
+
+.projects-list-item__button {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.projects-list-item__button--prev {
+    left: var(--offset-x);
+
+    .projects-list-item__button-icon {
+        transform: rotate(-90deg);
+    }
+}
+
+.projects-list-item__button--next {
+    right: var(--offset-x);
+
+    .projects-list-item__button-icon {
+        transform: rotate(90deg);
+    }
+}

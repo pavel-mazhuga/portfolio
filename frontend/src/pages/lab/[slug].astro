@@ -1,0 +1,55 @@
+---
+// eslint-disable-next-line fsd/layer-import-restrictions
+import RootLayout from '@/app/layouts/RootLayout';
+import type { IExperiment } from '@/entities/experiment';
+import { experiments } from '@/entities/experiment';
+import { getCommonPageProps } from '@/shared/api/get-common-page-props';
+import type { AppBreadcrumbs } from '@/shared/model/types';
+import LabDetailPageView from '@/views/LabDetailPageView';
+import { labExperimentDemoSlugs } from '@/views/lab/lib/lab-experiment-demo-slugs';
+
+type Props = {
+    experiment: IExperiment;
+};
+
+export function getStaticPaths() {
+    return labExperimentDemoSlugs.map((slug) => {
+        const experiment = experiments.find((entry) => entry.slug === slug);
+        if (!experiment) {
+            throw new Error(`Experiment not found for slug: ${slug}`);
+        }
+        return { params: { slug }, props: { experiment } };
+    });
+}
+
+const { experiment } = Astro.props;
+const htmlClass = 'lab-detail-page';
+const breadcrumbs: AppBreadcrumbs = [
+    {
+        text: 'Home',
+        href: '/',
+    },
+    {
+        text: 'Lab',
+        href: '/lab/',
+    },
+    {
+        text: experiment.name,
+        href: `/lab/${experiment.slug}/`,
+    },
+];
+const commonPageProps = await getCommonPageProps();
+const meta = {
+    ...commonPageProps.meta,
+    title: experiment.seoTitle ?? experiment.name,
+};
+---
+
+<RootLayout htmlClass={htmlClass} meta={meta} breadcrumbs={breadcrumbs}>
+    <LabDetailPageView experiment={experiment}>
+        <div class="experiment-canvas-wrapper js-experiment-canvas-wrapper">
+            <canvas class="experiment-canvas js-experiment-canvas"></canvas>
+            {experiment.tip && <div class="tip text-m">{experiment.tip}</div>}
+        </div>
+    </LabDetailPageView>
+</RootLayout>

@@ -1,0 +1,12 @@
+---
+import DOMPurify from 'isomorphic-dompurify';
+import type { Thing, WithContext } from 'schema-dts';
+
+export type Props<T extends Thing> = {
+    data: WithContext<T>;
+};
+
+const { data } = Astro.props;
+---
+
+<script is:inline type="application/ld+json" set:html={DOMPurify.sanitize(JSON.stringify(data))} />

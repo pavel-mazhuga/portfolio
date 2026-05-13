@@ -1,0 +1,176 @@
+---
+import { TG_LINK } from '@/shared/config/const';
+import Hover from '@/shared/ui/Hover';
+import Icon from '@/shared/ui/Icon';
+import IconLink from '@/shared/ui/IconLink';
+import RoundButton from '@/shared/ui/RoundButton';
+import type { HTMLAttributes } from 'astro/types';
+
+export type Props = HTMLAttributes<'div'>;
+
+const { ...props } = Astro.props;
+const { pathname } = Astro.url;
+
+const nav = [
+    {
+        label: 'Projects',
+        href: '/projects/',
+    },
+    {
+        label: 'Lab',
+        href: '/lab/',
+    },
+];
+
+const socialLinks = [
+    {
+        label: 'Telegram',
+        href: 'https://t.me/mazhugagl',
+    },
+    {
+        label: 'X',
+        href: 'https://x.com/PMazhuga',
+    },
+    {
+        label: 'GitHub',
+        href: 'https://github.com/pavelmazhuga/',
+    },
+    {
+        label: 'LinkedIn',
+        href: 'https://linkedin.com/in/pavelmazhuga/',
+    },
+];
+---
+
+<header class:list={['header js-header', props.class]} {...props}>
+    <div class="wrapper header__wrapper">
+        <div class="header__left">
+            <Hover tag="a" href="/" class="header__logo">P.M.</Hover>
+        </div>
+
+        <div class="header__menu js-header-menu">
+            <div class="header__menu-close-wrapper clip-container">
+                <button
+                    type="button"
+                    class="header__menu-close js-header-menu-close clip-container__el"
+                    aria-label="Close menu"
+                >
+                    <Icon name="cross" />
+                </button>
+            </div>
+
+            {
+                nav.length > 0 && (
+                    <nav class="header__nav">
+                        <ul class="list-unstyled header__nav-list">
+                            <li class="header__nav-item header__nav-item--mobile clip-container clip-container--view-transition-once">
+                                <div class="clip-container__el">
+                                    <Hover
+                                        tag="a"
+                                        href="/"
+                                        class:list={[
+                                            'header__nav-link link js-header-nav-link',
+                                            { 'is-active': '/' === pathname },
+                                        ]}
+                                    >
+                                        Home
+                                    </Hover>
+                                </div>
+                            </li>
+                            {nav.map((item) => (
+                                <li class="header__nav-item clip-container clip-container--view-transition-once">
+                                    <div class="clip-container__el">
+                                        <Hover
+                                            tag="a"
+                                            href={item.href}
+                                            class:list={[
+                                                'header__nav-link link js-header-nav-link',
+                                                { 'is-active': item.href === pathname },
+                                            ]}
+                                        >
+                                            {item.label}
+                                        </Hover>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                )
+            }
+
+            <div class="header__right">
+                {
+                    socialLinks.length > 0 && (
+                        <ul class="list-unstyled social-links-list">
+                            {socialLinks.map((item) => (
+                                <li class="social-links-item clip-container clip-container--view-transition-once">
+                                    <div class="clip-container__el">
+                                        <Hover
+                                            tag="a"
+                                            href={item.href}
+                                            class="social-links-link"
+                                            target="_blank"
+                                            rel="noreferrer nofollow"
+                                        >
+                                            {item.label}
+                                        </Hover>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                }
+            </div>
+        </div>
+
+        <div class="header__right-mobile">
+            <div class="clip-container clip-container--view-transition-once header__right-mobile-link">
+                <div class="clip-container__el">
+                    <IconLink
+                        href={TG_LINK}
+                        target="_blank"
+                        rel="noreferrer nofollow"
+                        icon="telegram"
+                        class="js-hover-container"><Hover tag="span">Contact me</Hover></IconLink
+                    >
+                </div>
+            </div>
+            <RoundButton class="menu-btn js-header-menu-toggle" aria-label="Open menu" aria-expanded="false">
+                <span class="menu-btn__line"></span>
+                <span class="menu-btn__line"></span>
+            </RoundButton>
+        </div>
+    </div>
+</header>
+
+<style lang="scss" is:global>
+    @use './Header';
+</style>
+
+<script>
+    import { setupHeaderMenu } from './header-menu';
+
+    const syncHeaderNavActive = () => {
+        const pathname = window.location.pathname;
+
+        document.querySelectorAll<HTMLAnchorElement>('.js-header-nav-link[href]').forEach((link) => {
+            const href = link.getAttribute('href');
+            const active = href !== null && pathname === href;
+
+            link.classList.toggle('is-active', active);
+        });
+    };
+
+    let teardownHeaderMenu: (() => void) | undefined;
+
+    document.addEventListener('astro:page-load', () => {
+        syncHeaderNavActive();
+        teardownHeaderMenu?.();
+        teardownHeaderMenu = setupHeaderMenu();
+    });
+
+    document.addEventListener('astro:before-swap', () => {
+        teardownHeaderMenu?.();
+        teardownHeaderMenu = undefined;
+    });
+</script>

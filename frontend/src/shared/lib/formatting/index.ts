@@ -1,0 +1,1 @@
+export { tp } from './typograf';

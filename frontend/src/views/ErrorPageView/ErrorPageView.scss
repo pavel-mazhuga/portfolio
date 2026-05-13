@@ -1,0 +1,32 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.error-page-view {
+    flex: 1;
+    display: flex;
+}
+
+.error-page-view__content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+    gap: 16px;
+
+    @include tablet {
+        gap: 12px;
+    }
+}
+
+.error-page-view__error-code {
+    opacity: 0.6;
+}
+
+.error-page-view__home-page-link {
+    margin-top: 24px;
+
+    @include tablet {
+        margin-top: 16px;
+    }
+}

@@ -1,0 +1,166 @@
+@use 'sass:math';
+
+@mixin responsive-font-size($min-font-size, $max-font-size, $min-viewport-width, $max-viewport-width) {
+    $min-font-size: math.div($min-font-size, 1px);
+    $max-font-size: math.div($max-font-size, 1px);
+    $min-viewport-width: math.div($min-viewport-width, 1px);
+    $max-viewport-width: math.div($max-viewport-width, 1px);
+    $slope: math.div($max-font-size - $min-font-size, $max-viewport-width - $min-viewport-width);
+    $y-axis-intersection: -$min-viewport-width * $slope + $min-font-size;
+
+    font-size: clamp(
+        $min-font-size * 1px,
+        calc(#{$y-axis-intersection * 1px} + #{$slope * 100vw}),
+        $max-font-size * 1px
+    );
+}
+
+@mixin clickable($position: relative, $min-size: 42px) {
+    position: $position;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: $min-size;
+        width: 100%;
+        min-height: $min-size;
+        height: 100%;
+    }
+}
+
+@mixin clamp($amount) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $amount;
+    line-clamp: $amount;
+    overflow: hidden;
+}
+
+@mixin scrollbar($color: #fff) {
+    @supports (scrollbar-width: thin) {
+        scrollbar-width: thin;
+        scrollbar-color: $color transparent;
+    }
+
+    @supports selector(*::-webkit-scrollbar) {
+        scrollbar-width: revert;
+        scrollbar-color: revert;
+    }
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background-color: rgba($color, 0.01);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $color;
+        border-radius: 0px;
+    }
+}
+
+@mixin hidden-scrollbar() {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        width: 0px;
+        height: 0px;
+        display: none;
+    }
+}
+
+@mixin outline($color: currentColor) {
+    outline: 1px solid $color;
+    outline-offset: 2px;
+}
+
+@mixin recalculate-grid($columns: 16) {
+    --grid-columns: #{$columns};
+    --grid-column-width: calc(
+        (100vw - var(--scrollbar-width, 15px) - var(--offset-x) * 2) / var(--grid-columns) -
+            (var(--grid-gap) * ((var(--grid-columns) - 1) / var(--grid-columns)))
+    );
+}
+
+@function cols($num: 1) {
+    @return calc(var(--grid-column-width) * #{$num} + var(--grid-gap) * #{$num - 1});
+}
+
+@mixin grid-columns($num: 1, $prop: width) {
+    #{$prop}: calc(var(--grid-column-width) * #{$num} + var(--grid-gap) * #{$num - 1});
+    flex-shrink: 0;
+}
+
+@mixin grid-offset($prop, $num: 1) {
+    #{$prop}: calc(var(--grid-column-width) * #{$num} + var(--grid-gap) * #{$num});
+}
+
+@mixin laptop() {
+    @media screen and (max-width: 1366px) {
+        @content;
+    }
+}
+
+@mixin tablet() {
+    @media screen and (max-width: 1199px) {
+        @content;
+    }
+}
+
+@mixin vertical-tablet {
+    @media screen and (max-width: 1024px) and (orientation: portrait) {
+        @content;
+    }
+}
+
+@mixin horizontal-tablet {
+    @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin mobile() {
+    @media screen and (max-width: 767px), (max-width: 900px) and (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin vertical-mobile {
+    @media screen and (max-width: 767px) and (orientation: portrait) {
+        @content;
+    }
+}
+
+@mixin horizontal-mobile {
+    @media screen and (max-width: 900px) and (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin hover() {
+    @media (any-hover: hover), (hover: hover) and (pointer: fine) {
+        &:not(:disabled):hover {
+            @content;
+        }
+    }
+}
+
+@function vh($multiplier, $fallback: 1vh) {
+    @return calc(var(--mobile-vh, #{$fallback}) * #{$multiplier});
+}
+
+@mixin cut-corners($size: 4px) {
+    clip-path: polygon(
+        $size 0%,
+        calc(100% - $size) 0%,
+        100% $size,
+        100% calc(100% - $size),
+        calc(100% - $size) 100%,
+        $size 100%,
+        0% calc(100% - $size),
+        0% $size
+    );
+}

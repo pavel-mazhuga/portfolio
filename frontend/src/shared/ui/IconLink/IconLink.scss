@@ -1,0 +1,18 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.icon-link {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 0.5em;
+
+    &:is(a, button) {
+        @include clickable;
+    }
+}
+
+.icon-link__icon {
+    --size: 1.2em;
+
+    flex-shrink: 0;
+}

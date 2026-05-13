@@ -1,0 +1,71 @@
+/**
+  * @tokens Others
+  */
+$btn-disabled-opacity: 0.5;
+$app-default-duration: 0.25s;
+$line-transition-duration: 0.6s;
+$line-transition-easing: cubic-bezier(0.65, 0, 0.35, 1);
+
+/**
+  * @tokens-end
+  */
+
+/**
+  * @tokens Easings
+  * @presenter Easing
+  */
+$app-default-easing: cubic-bezier(0.25, 0.25, 0, 1);
+
+/**
+  * @tokens-end
+  */
+
+/**
+  * @tokens ColorPalette
+  * @presenter Color
+  */
+$primary: #000;
+
+/**
+  * @tokens-end
+  */
+
+/**
+  * @tokens Colors
+  * @presenter Color
+  */
+$body-bg: #000;
+$body-color: #fff;
+$light: #9c9c9c;
+$danger: #ff4211;
+
+/**
+  * @tokens-end
+  */
+
+/**
+  * @tokens Fonts
+  * @presenter FontFamily
+  */
+$font-fallback:
+    'OpenSans',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    'Noto Sans',
+    'Liberation Sans',
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    'Noto Color Emoji';
+$font-family: $font-fallback;
+
+$font-family-montserrat: 'Montserrat', $font-fallback;
+
+/**
+  * @tokens-end
+  */

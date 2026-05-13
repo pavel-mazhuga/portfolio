@@ -1,0 +1,17 @@
+---
+// eslint-disable-next-line fsd/layer-import-restrictions
+import RootLayout from '@/app/layouts/RootLayout';
+import { getCommonPageProps } from '@/shared/api/get-common-page-props';
+import ErrorPageView from '@/views/ErrorPageView';
+
+const htmlClass = 'index-page';
+const commonPageProps = await getCommonPageProps();
+const meta = {
+    ...commonPageProps.meta,
+    title: 'Page not found',
+};
+---
+
+<RootLayout htmlClass={htmlClass} meta={meta}>
+    <ErrorPageView title="Page not found" errorCode={404} />
+</RootLayout>

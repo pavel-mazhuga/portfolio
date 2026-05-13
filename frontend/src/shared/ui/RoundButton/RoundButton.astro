@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+export type Props = (HTMLAttributes<'button'> & HTMLAttributes<'a'>) & {
+    tag?: any;
+};
+
+const { tag = 'button', type = 'button', ...props } = Astro.props;
+
+const Element = tag;
+---
+
+<Element type={tag === 'button' ? type : undefined} class:list={['round-button', props.class]} {...props}>
+    <slot />
+</Element>
+
+<style lang="scss" is:global>
+    @use './RoundButton';
+</style>

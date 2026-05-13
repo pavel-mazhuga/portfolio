@@ -1,0 +1,86 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.popup {
+    --transition-duration: 0.3s;
+
+    transition:
+        opacity var(--transition-duration) ease,
+        visibility var(--transition-duration) ease;
+    max-width: 100%; // стиль обязателен для fullscreen
+    max-height: 100%; // стиль обязателен для fullscreen
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+    color: #000;
+    visibility: hidden;
+    display: var(--display, block);
+    inset: 0;
+    overflow: hidden;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0;
+    position: fixed;
+    z-index: 10;
+
+    @supports (transition-behavior: allow-discrete) {
+        transition:
+            opacity var(--transition-duration) ease,
+            visibility var(--transition-duration) ease,
+            display var(--transition-duration) ease-out allow-discrete,
+            overlay var(--transition-duration) ease-out allow-discrete;
+    }
+
+    html:not(.transition-behavior-allow-discrete-not-supported) & {
+        visibility: visible;
+        display: none;
+        pointer-events: auto;
+
+        &[open] {
+            display: var(--display, block);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+
+    &:modal {
+        max-width: 100%; // стиль обязателен для fullscreen
+        max-height: 100%; // стиль обязателен для fullscreen
+    }
+
+    &[open] {
+        display: var(--display, block);
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+
+        @starting-style {
+            opacity: 0;
+        }
+
+        &::backdrop {
+            opacity: 1;
+
+            @starting-style {
+                opacity: 0;
+            }
+        }
+    }
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition:
+            opacity var(--transition-duration) ease-out,
+            display var(--transition-duration) ease-out allow-discrete,
+            overlay var(--transition-duration) ease-out allow-discrete;
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none;
+        }
+    }
+}

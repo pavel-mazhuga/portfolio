@@ -1,0 +1,22 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { IconName } from '../Icon/types.generated';
+import Icon from '../Icon';
+
+export type Props = HTMLAttributes<'a'> & {
+    icon: IconName;
+    iconPosition?: 'left' | 'right';
+};
+
+const { icon, iconPosition = 'right', ...props } = Astro.props;
+---
+
+<a class:list={['icon-link', props.class]} {...props}>
+    {iconPosition === 'left' && <Icon name={icon} class="icon-link__icon" />}
+    <span class="icon-link__text"><slot /></span>
+    {iconPosition === 'right' && <Icon name={icon} class="icon-link__icon" />}
+</a>
+
+<style lang="scss" is:global>
+    @use './IconLink';
+</style>

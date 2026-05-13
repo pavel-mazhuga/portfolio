@@ -1,0 +1,89 @@
+---
+import { TG_LINK } from '@/shared/config/const';
+import Hover from '@/shared/ui/Hover';
+import IconLink from '@/shared/ui/IconLink';
+
+const skills = ['Three.js', 'GSAP / motion', 'Astro / React', 'Strapi / Payload CMS'];
+---
+
+<div class="wrapper index-page-content">
+    <h1 class="h1 index-page__title js-index-title">
+        <span
+            class="index-page__title-line index-page__title-name js-index-title-line"
+            style="--clip-container-delay: 0.32s;">Pavel Mazhuga</span
+        >
+        <span
+            class="index-page__title-line index-page__title-description js-index-title-line"
+            style="--clip-container-delay: 0.4s;">Creative Frontend Developer</span
+        >
+    </h1>
+
+    <div class="index-page__info">
+        <div class="index-page__info-description">
+            <div class="wysiwyg text-l index-page__info-description__text js-split-lines">
+                Passionate about WebGL / WebGPU and related stuff, stunning motion, animations and performance.
+            </div>
+            <div class="index-page__info__links">
+                <div class="clip-container" style="--clip-container-delay: 0.24s;">
+                    <IconLink
+                        href={TG_LINK}
+                        target="_blank"
+                        rel="noreferrer nofollow"
+                        icon="telegram"
+                        class="clip-container__el js-hover-container"><Hover tag="span">Contact me</Hover></IconLink
+                    >
+                </div>
+                <div class="clip-container" style="--clip-container-delay: 0.24s;">
+                    <IconLink href="/projects/" icon="link" class="index-page__info-mobile__link clip-container__el"
+                        >See projects</IconLink
+                    >
+                </div>
+                <div class="clip-container" style="--clip-container-delay: 0.24s;">
+                    <IconLink href="/lab/" icon="link" class="index-page__info-mobile__link clip-container__el"
+                        >Visit lab</IconLink
+                    >
+                </div>
+            </div>
+        </div>
+
+        {
+            skills.length > 0 && (
+                <div class="index-page__info-skills">
+                    <ul class="list-unstyled">
+                        {skills.map((skill) => (
+                            <li class="clip-container">
+                                <div class="clip-container__el">{skill}</div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )
+        }
+    </div>
+</div>
+
+<style lang="scss" is:global>
+    @use './IndexPageView';
+</style>
+
+<script>
+    import indexInfoLinesSplit from './IndexPageInfoLinesSplit';
+    import indexTitleSplit from './IndexPageTitleSplit';
+
+    function bootIndexPageMotion() {
+        indexTitleSplit.init();
+        indexInfoLinesSplit.init();
+    }
+
+    document.addEventListener('astro:page-load', bootIndexPageMotion);
+
+    document.addEventListener('astro:after-preparation', () => {
+        indexTitleSplit.prepareExit();
+        indexInfoLinesSplit.prepareExit();
+    });
+
+    document.addEventListener('astro:after-swap', () => {
+        indexTitleSplit.destroy();
+        indexInfoLinesSplit.destroy();
+    });
+</script>

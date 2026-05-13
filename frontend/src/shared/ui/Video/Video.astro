@@ -1,0 +1,147 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { VideoShape } from '@/shared/model/types';
+import { imageLoader } from '@/shared/ui/Image';
+import { getImage } from 'astro:assets';
+import { SSR_ENABLED } from '@/../config.js';
+
+export type Props = HTMLAttributes<'video'> & {
+    sources: VideoShape;
+    lazy?: boolean;
+    posterWidth?: number;
+    posterHeight?: number;
+};
+
+const { sources, lazy = false, poster, posterWidth, posterHeight, ...props } = Astro.props;
+
+const optimizedPosterSrc = poster
+    ?  
+      SSR_ENABLED
+        ? imageLoader({ src: poster, width: posterWidth || 1920, quality: 70 })
+        : (
+              await getImage({
+                  src: { src: poster, width: posterWidth || 1920, height: posterHeight || 1080, format: 'webp' },
+                  quality: 70,
+              })
+          ).src
+    : poster;
+---
+
+<video playsinline poster={optimizedPosterSrc} data-lazy={lazy} {...props}>
+    {
+        sources.map((source) => {
+            const src = `${source.src}${source.src.includes('#t=') ? '' : '#t=0.001'}`;
+            return (
+                <source
+                    media={source.media}
+                    src={lazy ? undefined : src}
+                    data-src={lazy ? src : undefined}
+                    type={source.type}
+                />
+            );
+        })
+    }
+</video>
+
+<script>
+    class VideoComponent {
+        private video: HTMLVideoElement;
+        private autoplayObserver: IntersectionObserver | null = null;
+        private lazyObserver: IntersectionObserver | null = null;
+
+        constructor(
+            private element: HTMLVideoElement,
+            private lazy: boolean,
+        ) {
+            this.video = element;
+
+            this.init();
+        }
+
+        private init() {
+            this.setupAutoplayObserver();
+            this.setupLazyObserver();
+        }
+
+        private setupAutoplayObserver() {
+            this.autoplayObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        const { target } = entry;
+
+                        if (target instanceof HTMLVideoElement) {
+                            if (entry.isIntersecting) {
+                                if (target.autoplay && (target.loop || (!target.loop && !target.ended))) {
+                                    target.play().catch((err) => {
+                                        if (err.name === 'NotAllowedError') {
+                                            this.autoplayObserver?.unobserve(target);
+
+                                            if (target.hasAttribute('data-fallback') && target.poster) {
+                                                const img = new Image();
+
+                                                img.src = target.poster;
+                                                img.className = target.className;
+                                                target.insertAdjacentElement('afterend', img);
+                                                target.hidden = true;
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                target.pause();
+                            }
+                        }
+                    });
+                },
+                { rootMargin: '100px' },
+            );
+
+            this.autoplayObserver.observe(this.video);
+        }
+
+        private setupLazyObserver() {
+            if (this.lazy) {
+                this.lazyObserver = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                this.lazyObserver?.unobserve(entry.target);
+                                this.loadVideo();
+                            }
+                        });
+                    },
+                    { rootMargin: '800px' },
+                );
+
+                this.lazyObserver.observe(this.video);
+            }
+        }
+
+        private loadVideo() {
+            const sources = this.video.querySelectorAll('source[data-src]');
+
+            sources.forEach((source) => {
+                const dataSrc = source.getAttribute('data-src');
+
+                if (dataSrc) {
+                    source.setAttribute('src', dataSrc);
+                    source.removeAttribute('data-src');
+                }
+            });
+            this.video.load();
+        }
+
+        destroy() {
+            this.autoplayObserver?.disconnect();
+            this.lazyObserver?.disconnect();
+        }
+    }
+
+    const videoElements = Array.from(document.querySelectorAll<HTMLVideoElement>('video[data-lazy]'));
+
+    videoElements.forEach((element) => {
+        const isLazy = element.hasAttribute('data-lazy');
+
+        new VideoComponent(element, isLazy);
+    });
+</script>

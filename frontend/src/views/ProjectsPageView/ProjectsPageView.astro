@@ -1,0 +1,204 @@
+---
+import { projects } from '@/app/data/projects';
+import Hover from '@/shared/ui/Hover';
+import Icon from '@/shared/ui/Icon';
+import IconLink from '@/shared/ui/IconLink';
+import RoundButton from '@/shared/ui/RoundButton';
+---
+
+<div class="wrapper">
+    <div class="page__header clip-container">
+        <div class="clip-container__el">
+            <h1 class="text-l">Projects</h1>
+        </div>
+        <div class="page__header-right page-counter text-l clip-container__el">
+            <span
+                class="js-projects-counter-current projects-counter-odometer"
+                data-total={projects.length}
+                aria-live="polite">01</span
+            >
+            /
+            <span>{projects.length.toString().padStart(2, '0')}</span>
+        </div>
+    </div>
+</div>
+
+{
+    projects.length > 1 && (
+        <>
+            <div
+                class="clip-container projects-list-item__button projects-list-item__button--prev"
+                style="--clip-container-delay: 0.08s;"
+            >
+                <div class="clip-container__el">
+                    <RoundButton class="js-projects-prev-button" aria-label="Previous project">
+                        <Icon name="arrow" class="projects-list-item__button-icon" />
+                    </RoundButton>
+                </div>
+            </div>
+
+            <div
+                class="clip-container projects-list-item__button projects-list-item__button--next"
+                style="--clip-container-delay: 0.08s;"
+            >
+                <div class="clip-container__el">
+                    <RoundButton class="js-projects-next-button" aria-label="Next project">
+                        <Icon name="arrow" class="projects-list-item__button-icon" />
+                    </RoundButton>
+                </div>
+            </div>
+        </>
+    )
+}
+
+<div class="wrapper projects-list-wrapper">
+    <ul class="list-unstyled projects-list">
+        {
+            projects.map((project, i) => (
+                <li class:list={['projects-list-item js-projects-list-item', { 'is-hidden': i > 0 }]}>
+                    <video muted loop playsinline hidden class="js-projects-list-item__video">
+                        {project.video.map((video) => (
+                            <source media={video.media} src={video.src} type={video.type} />
+                        ))}
+                    </video>
+                    <div class="projects-list-item__name clip-container">
+                        <div class="clip-container__el">
+                            <IconLink
+                                href={project.websiteUrl}
+                                icon="link"
+                                target="_blank"
+                                rel="noreferrer nofollow"
+                                class="project-link h3 js-hover-container"
+                            >
+                                <Hover tag="span">
+                                    <h2 class="h3 project-link__name">{project.title}</h2>
+                                </Hover>
+                            </IconLink>
+                        </div>
+                    </div>
+
+                    <div class="projects-list-item__info-button-wrapper clip-container">
+                        <button
+                            type="button"
+                            class="text-l projects-list-item__info-button clip-container__el js-projects-list-item-info-button"
+                            data-index={i}
+                            aria-expanded="false"
+                            aria-controls={`project-info-${i}`}
+                        >
+                            See info
+                        </button>
+                    </div>
+
+                    <div
+                        class="projects-list-item__info js-projects-list-item-info"
+                        data-index={i}
+                        id={`project-info-${i}`}
+                    >
+                        <div class="projects-list-item__info-close-wrapper clip-container">
+                            <button
+                                type="button"
+                                class="projects-list-item__info-close js-projects-list-item-info-close clip-container__el"
+                                aria-label="Close project info"
+                            >
+                                <Icon name="cross" />
+                            </button>
+                        </div>
+
+                        <div class="project-item projects-list-item__role">
+                            <div class="project-item__label clip-container">
+                                <div class="clip-container__el">Role</div>
+                            </div>
+                            <div class="text-l clip-container">
+                                <div class="clip-container__el">{project.role}</div>
+                            </div>
+                        </div>
+
+                        {project.collaborators.length > 0 && (
+                            <div class="project-item projects-list-item__collaborators">
+                                <div class="project-item__label clip-container">
+                                    <div class="clip-container__el">In collaboration with</div>
+                                </div>
+                                <ul class="list-unstyled">
+                                    {project.collaborators.map((collaborator) => (
+                                        <li class="text-l clip-container">
+                                            <div class="clip-container__el">{collaborator}</div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {project.recognitions.length > 0 && (
+                            <div class="project-item projects-list-item__recognitions">
+                                <div class="project-item__label clip-container">
+                                    <div class="clip-container__el">Recognitions</div>
+                                </div>
+                                <ul class="list-unstyled project-item__list">
+                                    {project.recognitions.map((recognition) => (
+                                        <li class="text-l clip-container">
+                                            <div class="clip-container__el">
+                                                {recognition.url ? (
+                                                    <IconLink
+                                                        href={recognition.url}
+                                                        icon="link"
+                                                        target="_blank"
+                                                        rel="noreferrer nofollow"
+                                                        class="js-hover-container"
+                                                    >
+                                                        <Hover tag="span">{recognition.name}</Hover>
+                                                    </IconLink>
+                                                ) : (
+                                                    <span>{recognition.name}</span>
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {project.technologies.length > 0 && (
+                            <div class="project-item projects-list-item__technologies">
+                                <div class="project-item__label clip-container">
+                                    <div class="clip-container__el">Technologies</div>
+                                </div>
+                                <ul class="list-unstyled project-item__list">
+                                    {project.technologies.map((technology) => (
+                                        <li class="text-l clip-container">
+                                            <div class="clip-container__el">{technology}</div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div class="project-item projects-list-item__year">
+                            <div class="project-item__label clip-container">
+                                <div class="clip-container__el">Year</div>
+                            </div>
+                            <div class="text-l clip-container">
+                                <div class="clip-container__el">{project.releaseYear}</div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            ))
+        }
+    </ul>
+</div>
+
+<style lang="scss" is:global>
+    @use './ProjectsPageView';
+</style>
+
+<script>
+    import projectsPageView from './ProjectsPageView';
+
+    document.addEventListener('astro:page-load', () => {
+        projectsPageView.init();
+    });
+
+    document.addEventListener('astro:before-swap', () => {
+        projectsPageView.destroy();
+    });
+</script>

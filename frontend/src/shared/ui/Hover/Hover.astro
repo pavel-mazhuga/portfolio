@@ -1,0 +1,46 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+export type Props = (HTMLAttributes<'button'> & HTMLAttributes<'a'>) & {
+    tag?: any;
+};
+
+const { tag = 'div', ...props } = Astro.props;
+
+const Element = tag;
+---
+
+<Element class:list={['hover js-hover', props.class]} {...props}>
+    <span class="hover__text js-hover-text"><slot /></span>
+</Element>
+
+<style lang="scss" is:global>
+    @use './Hover';
+</style>
+
+<script>
+    import hover from './Hover';
+
+    const hoverMq = matchMedia('(any-hover: hover), (hover: hover) and (pointer: fine)');
+
+    const onHoverMqChange = (event: MediaQueryListEvent) => {
+        if (event.matches) {
+            hover.init();
+        } else {
+            hover.destroy();
+        }
+    };
+
+    document.addEventListener('astro:page-load', () => {
+        if (hoverMq.matches) {
+            hover.init();
+        }
+
+        hoverMq.addEventListener('change', onHoverMqChange);
+    });
+
+    document.addEventListener('astro:before-swap', () => {
+        hoverMq.removeEventListener('change', onHoverMqChange);
+        hover.destroy();
+    });
+</script>

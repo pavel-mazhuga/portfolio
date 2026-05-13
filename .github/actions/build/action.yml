@@ -1,0 +1,39 @@
+name: "Build Frontend"
+description: "Build frontend application"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout LFS files
+      shell: bash
+      run: git lfs pull
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+        cache: "pnpm"
+        cache-dependency-path: frontend/pnpm-lock.yaml
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        cd frontend
+        pnpm install
+
+    - name: Rebuild Sharp for platform
+      shell: bash
+      run: |
+        cd frontend
+        pnpm rebuild sharp
+
+    - name: Build
+      shell: bash
+      run: |
+        cd frontend
+        pnpm build

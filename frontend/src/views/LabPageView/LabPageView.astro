@@ -1,0 +1,70 @@
+---
+import { experiments } from '@/entities/experiment';
+import Image from '@/shared/ui/Image';
+---
+
+<div class="wrapper">
+    <div class="page__header clip-container">
+        <h1 class="text-l clip-container__el">Lab</h1>
+
+        <div class="page__header-right page-counter text-l clip-container__el">
+            <span>{experiments.length.toString().padStart(2, '0')}</span>
+        </div>
+    </div>
+
+    <div>
+        <ul class="list-unstyled experiments-list" style={`--clip-container-delay: 0.08s;`}>
+            {
+                experiments.map((experiment, i) => (
+                    <li class="experiments-list__item">
+                        <a href={`/lab/${experiment.slug}/`} class="experiment-card" data-astro-reload>
+                            <div class="clip-container">
+                                <div class="experiment-card__image-wrapper clip-container__el">
+                                    <Image
+                                        src={experiment.preview.src}
+                                        alt={experiment.name}
+                                        width={experiment.preview.width || 1000}
+                                        height={experiment.preview.height || 1000}
+                                        sizes="(max-width: 576px) 100vw, (max-width: 1199px) 50vw, 25vw"
+                                        priority={i < 8}
+                                        class="img-fluid experiment-card__image"
+                                    />
+                                </div>
+                            </div>
+                            <div class="experiment-card__content">
+                                <div class="text-ml experiment-card__name clip-container">
+                                    <div class="clip-container__el">{experiment.name}</div>
+                                </div>
+                                {experiment.tags.length > 0 && (
+                                    <ul class="list-unstyled tags-list experiment-card__tags-list">
+                                        {experiment.tags.map((tag) => (
+                                            <li class="clip-container">
+                                                <div class="tag text-s clip-container__el">#{tag}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</div>
+
+<style lang="scss" is:global>
+    @use './LabPageView';
+</style>
+
+<!-- <script>
+    import projectsPageView from './ProjectsPageView';
+
+    document.addEventListener('astro:page-load', () => {
+        projectsPageView.init();
+    });
+
+    document.addEventListener('astro:before-swap', () => {
+        projectsPageView.destroy();
+    });
+</script> -->

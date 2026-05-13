@@ -1,0 +1,28 @@
+---
+// eslint-disable-next-line fsd/layer-import-restrictions
+import RootLayout from '@/app/layouts/RootLayout';
+import { getCommonPageProps } from '@/shared/api/get-common-page-props';
+import type { AppBreadcrumbs } from '@/shared/model/types';
+import LabPageView from '@/views/LabPageView';
+
+const htmlClass = 'lab-page';
+const breadcrumbs: AppBreadcrumbs = [
+    {
+        text: 'Home',
+        href: '/',
+    },
+    {
+        text: 'Lab',
+        href: '/lab/',
+    },
+];
+const commonPageProps = await getCommonPageProps();
+const meta = {
+    ...commonPageProps.meta,
+    title: 'Lab',
+};
+---
+
+<RootLayout htmlClass={htmlClass} meta={meta} breadcrumbs={breadcrumbs}>
+    <LabPageView />
+</RootLayout>

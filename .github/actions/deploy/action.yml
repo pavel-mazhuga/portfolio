@@ -1,0 +1,45 @@
+name: "Deploy Files"
+description: "Deploy files to server via SSH"
+
+inputs:
+  ssh_private_key:
+    description: "SSH private key"
+    required: true
+  remote_host:
+    description: "Remote host"
+    required: true
+  remote_user:
+    description: "Remote user"
+    required: true
+  target:
+    description: "Target directory"
+    required: true
+  deploy_html:
+    description: "Deploy html directory"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ inputs.ssh_private_key }}
+        known_hosts: unnecessary
+
+    - name: Add known hosts
+      shell: bash
+      run: |
+        ssh-keyscan -H ${{ inputs.remote_host }} >> ~/.ssh/known_hosts
+
+    # - name: Deploy html files
+    #   if: ${{ inputs.deploy_html == 'true' }}
+    #   shell: bash
+    #   run: |
+    #     rsync -arvh --delete-after --exclude="html/partials" html ${{ inputs.remote_user }}@${{ inputs.remote_host }}:${{ inputs.target }}
+
+    - name: Deploy build files
+      shell: bash
+      run: |
+        rsync -arvh --delete-after frontend/build ${{ inputs.remote_user }}@${{ inputs.remote_host }}:${{ inputs.target }}

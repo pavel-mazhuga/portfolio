@@ -1,0 +1,47 @@
+<div id="layout-grid" class="layout-grid" style="display: none;"></div>
+
+<style>
+    .layout-grid {
+        pointer-events: none;
+        position: fixed;
+        z-index: 99999999;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, 0);
+        width: 100%;
+        height: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        --column-color: rgba(231, 64, 31, 0.04);
+        --gap-color: rgba(231, 64, 31, 0.13);
+
+        background-image: repeating-linear-gradient(
+            to right,
+            var(--column-color),
+            var(--column-color) var(--grid-column-width),
+            var(--gap-color) var(--grid-column-width),
+            var(--gap-color) calc(var(--grid-column-width) + var(--grid-gap))
+        );
+        background-size: min(var(--wrapper-max-width), calc(100vw - var(--scrollbar-width, 0px) - var(--offset-x) * 2))
+            100%;
+    }
+</style>
+
+<script>
+    const key = 'k';
+    let hidden = true;
+
+    function onKeydown(event: KeyboardEvent) {
+        if (event.key === key || event.key === key.toUpperCase()) {
+            hidden = !hidden;
+            const grid = document.getElementById('layout-grid');
+
+            if (grid) {
+                grid.style.display = hidden ? 'none' : 'block';
+            }
+        }
+    }
+
+    document.addEventListener('keydown', onKeydown);
+</script>

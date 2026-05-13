@@ -1,0 +1,55 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+@mixin link {
+    --bg-size: 0% 100%;
+    --bg-size-hover: 100% 100%;
+    --underline-height: 1px;
+
+    background-image: linear-gradient(
+        transparent calc(100% - var(--underline-height)),
+        currentColor var(--underline-height)
+    );
+    background-repeat: no-repeat;
+    background-size: var(--bg-size);
+    display: inline;
+    transition:
+        background-size 0.4s $app-default-easing,
+        color $app-default-duration $app-default-easing,
+        opacity $app-default-duration $app-default-easing;
+
+    @include hover {
+        background-size: var(--bg-size-hover);
+    }
+
+    &:active {
+        background-size: var(--bg-size-hover);
+    }
+
+    &:focus-visible {
+        background-size: var(--bg-size-hover);
+    }
+
+    &.link--underlined {
+        @extend %link-underlined;
+    }
+
+    &.link--disabled {
+        pointer-events: none;
+        user-select: none;
+        opacity: $btn-disabled-opacity;
+    }
+}
+
+%link {
+    @include link;
+}
+
+%link-underlined {
+    --bg-size: 100% 100%;
+    --bg-size-hover: 0% 100%;
+}
+
+.link {
+    @extend %link;
+}

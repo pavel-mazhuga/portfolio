@@ -1,0 +1,85 @@
+@use '@/app/css/utils/mixins' as *;
+@use '@/app/css/base/variables' as *;
+
+html {
+    font-family: $font-fallback;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-size-adjust: 100%;
+    font-size-adjust: 100%;
+}
+
+body {
+    @extend %text-default;
+}
+
+%text-default {
+    @include responsive-font-size(14px, 16px, 1280px, 1920px);
+}
+
+.text-default {
+    @extend %text-default;
+}
+
+.h1 {
+    font-family: $font-family-montserrat;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+
+.h2 {
+    @include responsive-font-size(24px, 36px, 1280px, 1920px);
+
+    font-family: $font-family-montserrat;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+
+.h3 {
+    @include responsive-font-size(22px, 28px, 1280px, 1920px);
+
+    font-family: $font-family-montserrat;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+
+.text-l {
+    @include responsive-font-size(16px, 20px, 1280px, 1920px);
+
+    font-family: $font-family-montserrat;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+
+.text-ml {
+    @include responsive-font-size(14px, 16px, 1280px, 1920px);
+
+    font-family: $font-family-montserrat;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+
+.text-m {
+    @include responsive-font-size(14px, 18px, 1280px, 1920px);
+
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.text-s {
+    @include responsive-font-size(12px, 14px, 1280px, 1920px);
+
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}

@@ -1,0 +1,251 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.app-message {
+    $line-height: 1.25;
+
+    min-height: $line-height * 1em;
+    line-height: $line-height;
+    margin-top: 10px;
+    padding-left: var(--padding-x);
+    padding-right: var(--padding-x);
+
+    .checkbox-input-group & {
+        padding-left: 36px;
+        padding-right: 0;
+
+        @include tablet {
+            padding-left: 32px;
+        }
+    }
+}
+
+.input-group {
+    --bg-color: #{$bg};
+    --color: #{$primary};
+    --border-color: #{rgba(#000, 0.1)};
+    --padding-x: 30px;
+    --height: 70px;
+    --border-radius: 36px;
+    --icon-size: 54px;
+    --label-height: 0px;
+    --active-label-transform: translate3d(0, calc(-215% + var(--label-height)), 0) scale(0.6);
+
+    position: relative;
+
+    @media screen and (max-width: 1366px) {
+        --height: 50px;
+    }
+
+    @include mobile {
+        --height: 50px;
+        --padding-x: 16px;
+        --border-radius: var(--height);
+        --icon-size: 30px;
+    }
+
+    &.input-group--textarea {
+        --active-label-transform: translate3d(0, calc(-185% + var(--label-height)), 0) scale(0.6);
+
+        &::before {
+            content: '';
+            position: absolute;
+            z-index: 1;
+            top: 1px;
+            left: var(--padding-x);
+            width: calc(100% - var(--padding-x) * 2);
+            height: 32px;
+            background-color: var(--bg-color);
+            pointer-events: none;
+
+            @include mobile {
+                height: 25px;
+            }
+        }
+    }
+
+    &.is-error {
+        .app-message {
+            color: $danger;
+        }
+
+        input[type='checkbox'] ~ .checkbox__element {
+            border-color: $danger;
+        }
+    }
+}
+
+.input-group__icon {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--height) / 2);
+    transform: translate3d(0, -50%, 0);
+    right: var(--padding-x);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    border-radius: 50%;
+
+    // stylelint-disable-next-line custom/no-nested-tag-selectors
+    svg {
+        width: 15px;
+        height: auto;
+        max-height: 100%;
+
+        @include mobile {
+            width: 12px;
+        }
+
+        [fill]:not([fill]) {
+            fill: currentColor;
+        }
+
+        [stroke]:not([stroke]) {
+            stroke: currentColor;
+        }
+    }
+
+    ~ .form-control:not(.visually-hidden) {
+        padding-right: calc(var(--padding-x) + var(--icon-size) + 15px);
+    }
+}
+
+.form-label {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    max-width: calc(100% - var(--padding-x) * 2);
+    transform-origin: 0% 50%;
+    display: block;
+    width: 100%;
+    color: var(--color);
+}
+
+.floated-labels {
+    position: relative;
+
+    ~ .form-label {
+        transition:
+            transform 0.3s $app-default-easing,
+            letter-spacing 0.3s ease,
+            opacity 0.3s ease;
+        pointer-events: none;
+        position: absolute;
+        z-index: 1;
+        display: inline-block;
+        top: calc(var(--height) / 2);
+        left: var(--padding-x);
+        will-change: transform;
+        transform: translate3d(0, -50%, 0);
+    }
+
+    &.floated-labels--active {
+        ~ .form-label {
+            transform: var(--active-label-transform);
+            letter-spacing: 0.1em;
+            opacity: 0.5;
+        }
+    }
+}
+
+.input-group.floated-labels--active {
+    .form-label {
+        transform: var(--active-label-transform);
+        letter-spacing: 0.1em;
+        opacity: 0.5;
+    }
+}
+
+.form-control {
+    width: 100%;
+    padding: 32px var(--padding-x) 13px;
+    background-color: var(--bg-color);
+    color: var(--color);
+    letter-spacing: inherit;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: border-color $app-default-duration $app-default-easing;
+    text-transform: uppercase;
+
+    @include hover {
+        border-color: currentColor;
+    }
+
+    @include mobile {
+        padding-top: 25px;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+        color: var(--color);
+        border-color: currentColor;
+    }
+
+    /* stylelint-disable declaration-no-important, custom/no-hover */
+    &:-webkit-autofill {
+        transition: none;
+        caret-color: var(--color);
+        border-color: var(--color);
+
+        &,
+        &:focus,
+        &:active,
+        &:hover {
+            transition: background-color 9999s ease;
+            color: var(--color) !important;
+            -webkit-text-fill-color: var(--color) !important;
+            box-shadow: inset 0 0 0 1000px var(--bg-color) !important;
+
+            ~ .form-label {
+                transform: var(--active-label-transform);
+            }
+        }
+    }
+    /* stylelint-enable declaration-no-important */
+
+    &::-webkit-credentials-auto-fill-button {
+        visibility: hidden;
+    }
+
+    &::placeholder {
+        opacity: 0.4;
+        color: currentColor;
+    }
+
+    &.is-error {
+        border-color: $danger;
+
+        ~ .form-label {
+            &::before {
+                background-color: $danger;
+            }
+        }
+
+        ~ .app-message {
+            color: $danger;
+        }
+    }
+
+    &:disabled {
+        opacity: $btn-disabled-opacity;
+        cursor: not-allowed;
+        border-color: currentColor;
+
+        ~ * {
+            opacity: $btn-disabled-opacity;
+        }
+    }
+}
+
+input.form-control,
+label.form-control {
+    height: var(--height);
+}
+
+textarea.form-control {
+    min-height: var(--height);
+
+    @include hidden-scrollbar;
+}

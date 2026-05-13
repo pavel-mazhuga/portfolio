@@ -1,0 +1,63 @@
+---
+import type { IExperiment } from '@/entities/experiment';
+import Hover from '@/shared/ui/Hover';
+import Icon from '@/shared/ui/Icon';
+import IconLink from '@/shared/ui/IconLink';
+import RoundButton from '@/shared/ui/RoundButton';
+
+type Props = {
+    experiment?: IExperiment;
+};
+
+const { experiment } = Astro.props;
+---
+
+<div class="wrapper lab-detail-page-content">
+    {
+        experiment ? (
+            <>
+                <h1 class="visually-hidden">{experiment.name}</h1>
+
+                <div class="page__header">
+                    <div class="clip-container">
+                        <IconLink
+                            href="/lab/"
+                            icon="arrow"
+                            iconPosition="left"
+                            class="page__header-back-link js-hover-container clip-container__el"
+                        >
+                            <Hover tag="span">Back</Hover>
+                        </IconLink>
+                    </div>
+                    <div class="page__header-right clip-container">
+                        <div class="clip-container__el">
+                            <RoundButton
+                                tag="a"
+                                href={experiment.sourceLink}
+                                aria-label="Source code"
+                                title="Source code"
+                                target="_blank"
+                                rel="noreferrer nofollow"
+                            >
+                                <Icon name="code" />
+                            </RoundButton>
+                        </div>
+                    </div>
+                </div>
+
+                <slot />
+            </>
+        ) : (
+            <div class="lab-detail-page__error">
+                <h1 class="h2">Experiment not found</h1>
+                <IconLink href="/lab/" icon="link">
+                    Visit lab
+                </IconLink>
+            </div>
+        )
+    }
+</div>
+
+<style lang="scss" is:global>
+    @use './LabDetailPageView';
+</style>

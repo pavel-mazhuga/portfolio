@@ -1,0 +1,38 @@
+---
+/**
+ * Это базовый компонент для выпадающего меню.
+ * Не стилизуйте его напрямую, вместо этого создавайте компоненты с его использованием.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+export type Props = HTMLAttributes<'div'> & {
+    position?:
+        | 'top-left'
+        | 'top-right'
+        | 'top-center'
+        | 'center-right'
+        | 'bottom-left'
+        | 'bottom-right'
+        | 'bottom-center';
+};
+
+const { position = 'bottom-center', ...props } = Astro.props;
+---
+
+<div class:list={['dropdown js-dropdown', props.class]} {...props}>
+    <slot />
+    <slot name="trigger" />
+    <div class:list={['dropdown-content js-dropdown-content', position]}>
+        <slot name="content" />
+    </div>
+</div>
+
+<style lang="scss" is:global>
+    @use './Dropdown';
+</style>
+
+<script>
+    import dropdowns from './Dropdown';
+
+    dropdowns.init();
+</script>

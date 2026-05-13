@@ -1,0 +1,31 @@
+---
+import IconLink from '@/shared/ui/IconLink';
+import Hover from '@/shared/ui/Hover';
+
+type Props = {
+    errorCode: number;
+    title: string;
+};
+
+const { errorCode, title } = Astro.props;
+---
+
+<div class="wrapper error-page-view">
+    <div class="error-page-view__content">
+        <div class="clip-container">
+            <div class="h3 error-page-view__error-code clip-container__el">{errorCode}</div>
+        </div>
+        <div class="clip-container">
+            <h1 class="h2 clip-container__el">{title}</h1>
+        </div>
+        <div class="clip-container error-page-view__home-page-link">
+            <IconLink href="/" icon="link" class="clip-container__el js-hover-container">
+                <Hover tag="span">Home page</Hover></IconLink
+            >
+        </div>
+    </div>
+</div>
+
+<style lang="scss" is:global>
+    @use './ErrorPageView';
+</style>

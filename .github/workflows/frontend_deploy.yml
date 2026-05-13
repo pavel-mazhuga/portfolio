@@ -1,0 +1,60 @@
+name: Deploy
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/actions/**"
+      - ".github/workflows/**"
+      - "frontend/**"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Env
+        env:
+          FRONTEND_PORT: 3000
+          HOST: https://needvision.pavelmazhuga.com
+        run: |
+          cd frontend
+          bash create-env.sh -p $FRONTEND_PORT -e development -h $HOST -a $HOST
+
+      - name: Build
+        id: build
+        uses: ./.github/actions/build
+
+      - name: Disallow Robots
+        shell: bash
+        run: |
+          cd frontend
+          bash robots-disallow.sh
+
+      - name: Deploy
+        id: deploy
+        if: success()
+        uses: ./.github/actions/deploy
+        with:
+          ssh_private_key: ${{ vars.SSH_PRIVATE_KEY }}
+          remote_host: ${{ vars.REMOTE_HOST }}
+          remote_user: ${{ vars.REMOTE_USER }}
+          target: ${{ vars.TARGET }}
+          deploy_html: "true"
+
+      - name: Pull
+        id: pull
+        if: success()
+        uses: ./.github/actions/pull
+        with:
+          ssh_private_key: ${{ vars.SSH_PRIVATE_KEY }}
+          remote_host: ${{ vars.REMOTE_HOST }}
+          remote_user: ${{ vars.REMOTE_USER }}
+          target: ${{ vars.TARGET }}
+          branch: main

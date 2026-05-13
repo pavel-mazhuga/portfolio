@@ -1,0 +1,166 @@
+---
+import '@/shared/ui/Input/Input.scss';
+
+export interface Props extends astroHTML.JSX.TextareaHTMLAttributes {
+    /**
+     * Лейбл (описание)
+     */
+    label?: string;
+    /**
+     * Нужно ли спрятать лейбл
+     */
+    hideLabel?: boolean;
+    /**
+     * Сообщение
+     */
+    message?: string;
+    /**
+     * Валиден ли инпут
+     */
+    valid?: boolean;
+    /**
+     * Вариант
+     */
+    variant?: 'light' | 'dark';
+}
+
+const {
+    id,
+    label,
+    hideLabel = false,
+    message = '',
+    valid = true,
+    variant = 'light',
+    placeholder,
+    rows = 6,
+    ...props
+} = Astro.props;
+---
+
+<div
+    class:list={[
+        'text-default',
+        'input-group',
+        'input-group--textarea',
+        'js-input-group--textarea',
+        `input-group-${variant}`,
+    ]}
+    data-textarea-group={id}
+    data-hide-label={hideLabel}
+    data-valid={valid}
+>
+    <div class="floated-labels input-group__input-row">
+        <div class="input-group__required-icon-wrapper">
+            {
+                props.required && (
+                    <svg
+                        class="input-group__required-icon input-group__required-icon--textarea"
+                        width="9"
+                        height="10"
+                        viewBox="0 0 9 10"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M8.3955 3.61664L8.334 3.47944L8.19694 3.54127L4.96401 4.99974L5.1844 1.00827L5.19314 0.85H5.03463H4.22863H4.07012L4.07885 1.00827L4.29924 4.99974L1.06631 3.54127L0.929254 3.47944L0.86775 3.61664L0.52975 4.37064L0.46017 4.52586L0.622871 4.57548L4.0685 5.62627L1.41112 8.70193L1.30927 8.81981L1.43092 8.91713L2.08092 9.43713L2.20678 9.53782L2.29818 9.40506L4.64397 5.99749L6.96465 9.40445L7.05584 9.53832L7.18233 9.43713L7.83233 8.91713L7.95398 8.81981L7.85213 8.70193L5.19476 5.62627L8.64038 4.57548L8.80308 4.52586L8.7335 4.37064L8.3955 3.61664Z"
+                            fill="#2B2724"
+                            stroke="#2B2724"
+                            stroke-width="0.3"
+                        />
+                    </svg>
+                )
+            }
+        </div>
+
+        <textarea
+            id={id}
+            placeholder={placeholder}
+            rows={rows}
+            class:list={['form-control', 'js-form-control', 'text-m', 'floated-labels', props.class]}
+            {...props}></textarea>
+    </div>
+
+    {
+        label !== undefined && (
+            <label for={id} class="form-label js-form-label text-xxs">
+                {label}
+            </label>
+        )
+    }
+
+    <div class="app-message js-app-message text-xxs" aria-live="polite" aria-describedby={id}>
+        {message}
+    </div>
+</div>
+
+<script>
+    import { initFloatedLabel } from '@/shared/ui/Input/floatedLabels';
+
+    document.querySelectorAll('.js-input-group--textarea').forEach(initFloatedLabel);
+</script>
+
+<style lang="scss">
+    @use '@/app/css/base/variables' as *;
+    @use '@/app/css/utils/mixins' as *;
+
+    .input-group--textarea {
+        --active-label-transform: translate3d(0, -120%, 0);
+
+        &.is-error .app-message {
+            color: $danger;
+        }
+    }
+
+    .input-group__required-icon-wrapper {
+        position: absolute;
+        width: var(--size);
+
+        --size: 10px;
+
+        @include laptop {
+            --size: 6px;
+        }
+
+        @include tablet {
+            --size: 8px;
+        }
+
+        @include mobile {
+            --size: 6px;
+        }
+    }
+
+    .input-group__required-icon {
+        --size: 10px;
+
+        width: var(--size);
+        height: var(--size);
+        z-index: 1;
+        display: inline-block;
+        vertical-align: middle;
+        position: absolute;
+        top: 2rem;
+        left: 0;
+        transform: translateX(0);
+
+        @include laptop {
+            --size: 6px;
+
+            transform: translateX(100%);
+        }
+
+        @include tablet {
+            --size: 8px;
+        }
+
+        @include mobile {
+            --size: 6px;
+        }
+    }
+
+    .form-label {
+        &.is-hidden {
+            opacity: 0;
+        }
+    }
+</style>

@@ -1,0 +1,99 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.experiments-list {
+    --columns: 4;
+
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    gap: 60px var(--grid-gap);
+
+    @media screen and (min-width: 2700px) {
+        --columns: 6;
+    }
+
+    @media screen and (max-width: 1366px) {
+        row-gap: 40px;
+    }
+
+    @include tablet {
+        --columns: 2;
+    }
+
+    @media screen and (max-width: 480px) {
+        --columns: 1;
+    }
+}
+
+.experiments-list__item {
+    display: flex;
+
+    > * {
+        width: 100%;
+    }
+}
+
+.experiment-card {
+    display: flex;
+    flex-direction: column;
+
+    @include hover {
+        .experiment-card__image {
+            transform: scale(1.04);
+        }
+    }
+}
+
+.experiment-card__image-wrapper {
+    @include cut-corners(16px);
+
+    overflow: hidden;
+    aspect-ratio: 1;
+    background-color: #000;
+}
+
+.experiment-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s $app-default-easing;
+}
+
+.experiment-card__content {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.experiment-card__name {
+    max-width: 36ch;
+
+    &:not(:last-child) {
+        margin-bottom: 16px;
+    }
+}
+
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    padding: 2px 6px;
+    background-color: $light;
+    color: #000;
+}
+
+.experiment-card__tags-list {
+    margin-top: auto;
+
+    @for $i from 1 through 6 {
+        &:nth-child(#{$i}) {
+            .clip-container__el.is-visible {
+                transition-delay: 0s;
+            }
+        }
+    }
+}

@@ -1,0 +1,44 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:string';
+
+@function str-replace($string, $search, $replace: '') {
+    $index: string.index($string, $search);
+
+    @if $index {
+        @return string.slice($string, 1, $index - 1) + $replace +
+            str-replace(string.slice($string, $index + string.length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
+@mixin font-face($name, $path, $weight: null, $style: null, $exts: woff2 woff) {
+    $src: null;
+    $extmods: (
+        eot: '?',
+        svg: '#' + str-replace($name, ' ', '_'),
+    );
+    $formats: (
+        otf: 'opentype',
+        ttf: 'truetype',
+    );
+
+    @each $ext in $exts {
+        $extmod: if(map.has-key($extmods, $ext), $ext + map.get($extmods, $ext), $ext);
+        $format: if(map.has-key($formats, $ext), map.get($formats, $ext), $ext);
+        $src: list.append($src, url(string.quote($path + '.' + $extmod)) format(string.quote($format)), comma);
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: string.quote($name);
+        font-style: $style;
+        font-weight: $weight;
+        src: $src;
+    }
+}
+
+@include font-face('Montserrat', '/static/fonts/Montserrat-Medium', 500, null, woff2);
+@include font-face('Montserrat', '/static/fonts/Montserrat-Bold', 700, null, woff2);
+@include font-face('OpenSans', '/static/fonts/OpenSans-Regular', 400, null, woff2);

@@ -1,0 +1,77 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.dropdown {
+    --dropdown-max-height: 500px;
+    --dropdown-transition-duration: #{$app-default-duration};
+
+    position: relative;
+    display: flex;
+    width: max-content;
+    max-width: 100%;
+
+    &.dropdown--opened {
+        .dropdown-content {
+            z-index: 3;
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.dropdown-toggler {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    position: absolute;
+    z-index: 2;
+    max-width: 100vw;
+    min-width: 100%;
+    width: max-content;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity var(--dropdown-transition-duration) ease,
+        visibility var(--dropdown-transition-duration) ease,
+        transform var(--dropdown-transition-duration) $app-default-easing;
+    max-height: min(var(--dropdown-max-height), calc(100vh - var(--header-height)));
+    overflow-y: auto;
+
+    &.bottom-left {
+        top: 100%;
+        left: 0;
+    }
+
+    &.bottom-center {
+        top: 100%;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+
+    &.bottom-right {
+        top: 100%;
+        right: 0;
+    }
+
+    &.top-left {
+        bottom: 100%;
+        left: 0;
+    }
+
+    &.top-right {
+        bottom: 100%;
+        right: 0;
+    }
+
+    &.top-center {
+        bottom: 100%;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+
+    &.center-right {
+        bottom: 50%;
+        right: 0;
+    }
+}

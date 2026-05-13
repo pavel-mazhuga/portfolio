@@ -1,0 +1,33 @@
+@use '@/app/css/utils/mixins' as *;
+
+:root {
+    // Боковые оффсеты страницы
+    --base-offset-x: 40px;
+    --offset-x: calc(var(--base-offset-x) + env(safe-area-inset-left));
+
+    // Максимальная ширина .wrapper
+    --wrapper-max-width: 3840px;
+
+    // Сетка
+    --grid-columns: 12;
+    --grid-gap: 16px;
+    --grid-column-width: calc(
+        min(var(--wrapper-max-width), (100vw - var(--scrollbar-width, 0px) - var(--offset-x) * 2)) /
+            var(--grid-columns) - var(--grid-gap) * ((var(--grid-columns) - 1) / var(--grid-columns))
+    );
+
+    // Высота хедера
+    --header-height: 64px;
+
+    // Разница между минимальной и максимальной высотой экрана
+    --mobile-difference-minvh-vh: 0px;
+
+    @media screen and (max-width: 1366px) {
+        --base-offset-x: 32px;
+        --header-height: 50px;
+    }
+
+    @include tablet {
+        --base-offset-x: 16px;
+    }
+}

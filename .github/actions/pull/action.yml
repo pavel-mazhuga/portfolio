@@ -1,0 +1,33 @@
+name: "Server Pull"
+description: "Update repository on server"
+
+inputs:
+  ssh_private_key:
+    description: "SSH private key"
+    required: true
+  remote_host:
+    description: "Remote host"
+    required: true
+  remote_user:
+    description: "Remote user"
+    required: true
+  target:
+    description: "Target directory"
+    required: true
+  branch:
+    description: "Git branch to checkout"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update server repository
+      uses: appleboy/ssh-action@v1.1.0
+      with:
+        host: ${{ inputs.remote_host }}
+        username: ${{ inputs.remote_user }}
+        key: ${{ inputs.ssh_private_key }}
+        script: |
+          cd ${{ inputs.target }}
+          git checkout ${{ inputs.branch }}
+          git pull --force

@@ -1,0 +1,92 @@
+---
+import './Input.scss';
+
+export interface Props extends astroHTML.JSX.InputHTMLAttributes {
+    /**
+     * Иконка
+     */
+    icon?: HTMLElement;
+    /**
+     * Лейбл (описание)
+     */
+    label: string;
+    /**
+     * Нужно ли спрятать лейбл
+     */
+    hideLabel?: boolean;
+    /**
+     * Сообщение
+     */
+    message?: string;
+    /**
+     * Валиден ли инпут
+     */
+    valid?: boolean;
+    /**
+     * Рендерить ли сообщение
+     */
+    showMessage?: boolean;
+    /**
+     * Класс инпута
+     */
+    inputClassName?: string;
+}
+
+const {
+    id,
+    label,
+    hideLabel = false,
+    valid = true,
+    message,
+    showMessage = true,
+    icon,
+    inputClassName,
+    ...props
+} = Astro.props;
+---
+
+<div
+    class:list={[
+        'text-caption',
+        'input-group',
+        'js-input-group',
+        props.class,
+        {
+            'is-error': !valid,
+        },
+    ]}
+    data-hide-label={hideLabel}
+    data-valid={valid}
+>
+    <input
+        id={id}
+        class:list={[
+            'form-control',
+            'js-form-control',
+            'floated-labels',
+            inputClassName,
+            {
+                'is-error': !valid,
+            },
+        ]}
+        data-testid="input"
+        {...props}
+    />
+    <label for={id} class:list={['form-label', 'js-form-label', { 'visually-hidden': hideLabel }]}>
+        {label}
+    </label>
+    {icon && <div class="input-group__icon">{icon}</div>}
+    {
+        showMessage && (
+            <div class="app-message text-caption-sm" aria-live="polite" aria-describedby={id}>
+                {message || ''}
+            </div>
+        )
+    }
+</div>
+
+<script>
+    import { initFloatedLabel } from './floatedLabels';
+
+    document.querySelectorAll('.js-input-group').forEach(initFloatedLabel);
+</script>

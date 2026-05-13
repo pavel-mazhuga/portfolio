@@ -1,0 +1,40 @@
+.hover {
+    display: inline-block;
+}
+
+.hover__text {
+    display: inline-block;
+}
+
+.hover__word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.hover__char {
+    display: inline-block;
+}
+
+.hover__clip {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    height: 1.4em;
+    height: 1lh;
+    line-height: inherit;
+}
+
+.hover__track {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    will-change: transform;
+}
+
+.hover__row {
+    display: block;
+    flex-shrink: 0;
+    height: 1.4em;
+    height: 1lh;
+    line-height: inherit;
+}

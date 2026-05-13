@@ -1,0 +1,3 @@
+{
+  "setup-worktree": ["cd frontend && pnpm install"]
+}

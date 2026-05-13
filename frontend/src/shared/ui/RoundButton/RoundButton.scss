@@ -1,0 +1,43 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.round-button {
+    --size: 42px;
+    @include clickable;
+
+    border-radius: 50%;
+    width: var(--size);
+    height: var(--size);
+    border: 1px solid currentColor;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition:
+        background-color $app-default-duration ease,
+        color $app-default-duration ease;
+
+    @include hover {
+        background-color: #fff;
+        color: #000;
+    }
+
+    @supports (corner-shape: bevel) {
+        /* stylelint-disable-next-line property-no-unknown */
+        corner-shape: bevel;
+        height: auto;
+        border-radius: 50% / 25%;
+        aspect-ratio: cos(30deg);
+    }
+
+    @include tablet {
+        --size: 30px;
+    }
+
+    .icon {
+        --size: 20px;
+
+        @include tablet {
+            --size: 16px;
+        }
+    }
+}

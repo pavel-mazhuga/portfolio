@@ -1,0 +1,10 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.select__option--active {
+    display: none;
+}
+
+.select__toggler {
+    text-align: left;
+}

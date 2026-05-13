@@ -1,0 +1,14 @@
+---
+import { type AppLocale } from '@/shared/config/i18n';
+import type { HTMLAttributes } from 'astro/types';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+export type Props = HTMLAttributes<'a'>;
+
+const { href, ...props } = Astro.props;
+const currentLocale = Astro.currentLocale as AppLocale;
+---
+
+<a href={getRelativeLocaleUrl(currentLocale, href as string)} {...props}>
+    <slot />
+</a>

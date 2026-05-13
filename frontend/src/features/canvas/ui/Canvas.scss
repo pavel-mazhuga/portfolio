@@ -1,0 +1,15 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.canvas-wrapper {
+    position: fixed;
+    inset: 0;
+    height: 100lvh;
+}
+
+.canvas {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100%;
+}

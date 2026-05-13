@@ -1,0 +1,213 @@
+@use 'sass:math';
+
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+* {
+    @include scrollbar;
+}
+
+:root {
+    interpolate-size: allow-keywords;
+}
+
+html {
+    background-color: $body-bg;
+    color: $body-color;
+
+    &.no-scroll {
+        overflow: hidden;
+        padding-right: var(--scrollbar-width, 0px);
+    }
+}
+
+body {
+    -webkit-tap-highlight-color: rgb(0, 0, 0, 0%);
+    min-height: vh(100);
+    min-height: vh(100, 1svh);
+    font-family: $font-family;
+    display: flex;
+    flex-direction: column;
+}
+
+.js-focus-visible :focus:not(.focus-visible) {
+    outline: none;
+}
+
+::selection {
+    background-color: rgba(#fff, 0);
+}
+
+:focus {
+    outline-color: currentColor;
+}
+
+:focus-visible {
+    @include outline;
+}
+
+%visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 0;
+    clip: rect(0 0 0 0);
+}
+
+.visually-hidden {
+    @extend %visually-hidden;
+}
+
+.wrapper {
+    display: block;
+    width: 100%;
+    max-width: var(--wrapper-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--offset-x);
+    padding-right: var(--offset-x);
+}
+
+%img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.img-fluid {
+    @extend %img-fluid;
+}
+
+.pointer-events-none {
+    // stylelint-disable-next-line declaration-no-important
+    pointer-events: none !important;
+}
+
+.pointer-events-auto {
+    // stylelint-disable-next-line declaration-no-important
+    pointer-events: auto !important;
+}
+
+/*! beasties:include start */
+
+.list-unstyled {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/*! beasties:include end */
+
+.tp-dfwv {
+    z-index: 100;
+    // stylelint-disable-next-line declaration-no-important
+    top: auto !important;
+    bottom: 10px;
+    // stylelint-disable-next-line declaration-no-important
+    width: 350px !important;
+
+    @include mobile {
+        // stylelint-disable-next-line declaration-no-important
+        width: 300px !important;
+    }
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    padding-top: calc(var(--header-height) + 16px);
+    padding-bottom: var(--offset-x);
+}
+
+.page__header {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+
+    &:not(:last-child) {
+        margin-bottom: 60px;
+
+        @include mobile {
+            margin-bottom: 40px;
+        }
+    }
+}
+
+.page__header-right {
+    margin-left: auto;
+}
+
+.page-counter {
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    gap: 0.3em;
+}
+
+.stats-gl {
+    // stylelint-disable-next-line declaration-no-important
+    top: auto !important;
+    bottom: 0;
+    height: 48px;
+}
+
+.clip-container {
+    overflow: hidden;
+    overflow: clip;
+
+    @for $i from 1 through 6 {
+        &:nth-child(#{$i}) {
+            .clip-container__el.is-visible {
+                transition-delay: calc(
+                    var(--clip-container-delay, 0s) + #{math.div(($i - 1) * $line-transition-duration, 6)}
+                );
+            }
+        }
+    }
+}
+
+.clip-container__el {
+    transform: translateY(105%);
+    transition: transform $line-transition-duration $line-transition-easing;
+
+    &.is-visible {
+        transform: translateY(0);
+    }
+}
+
+$vt-line-names: 'clip-line', 'index-desc-line', 'index-title-line';
+
+@each $vt-name in $vt-line-names {
+    @for $i from 0 through 10 {
+        ::view-transition-old(#{$vt-name}-#{$i}) {
+            animation: clip-line-vt-exit $line-transition-duration $line-transition-easing both;
+        }
+    }
+}
+
+@keyframes clip-line-vt-exit {
+    from {
+        clip-path: inset(0 0 0 0);
+        transform: translate3d(0, 0, 0);
+    }
+
+    to {
+        clip-path: inset(0 0 100% 0);
+        transform: translate3d(0, 105%, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @each $vt-name in $vt-line-names {
+        @for $i from 0 through 10 {
+            ::view-transition-old(#{$vt-name}-#{$i}) {
+                animation: none;
+            }
+        }
+    }
+}

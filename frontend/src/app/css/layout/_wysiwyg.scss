@@ -1,0 +1,35 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+@use '@/app/css/layout/common';
+@use '@/app/css/components/link';
+
+.wysiwyg {
+    /* stylelint-disable custom/no-nested-tag-selectors */
+
+    p:not([class]) {
+        &:not(:first-child) {
+            margin-top: 1.33em;
+        }
+
+        &:not(:last-child) {
+            margin-bottom: 1.33em;
+        }
+    }
+
+    p:empty {
+        display: none;
+    }
+
+    img:not([class]) {
+        @extend %img-fluid;
+    }
+
+    a:not([class]) {
+        @extend %link;
+        @extend %link-underlined;
+
+        color: $primary;
+    }
+
+    /* stylelint-enable custom/no-nested-tag-selectors */
+}

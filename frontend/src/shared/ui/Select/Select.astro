@@ -1,0 +1,60 @@
+---
+import Dropdown, { type Props as DropdownProps } from '../Dropdown';
+
+export type Props = DropdownProps & {
+    name?: string;
+    options: {
+        label: string;
+        value: string;
+    }[];
+    initialValue?: string;
+    placeholder?: string;
+};
+
+const { name, id, options, initialValue, placeholder = 'Select an option', ...props } = Astro.props;
+---
+
+<Dropdown class:list={['select', props.class]} {...props}>
+    <input type="hidden" id={id} name={name} class="js-dropdown-input" value={initialValue} />
+
+    <slot name="trigger">
+        <button class="select__toggler js-dropdown-toggler js-select-toggler-value" type="button"
+            >{initialValue ? options.find((option) => option.value === initialValue)?.label : placeholder}</button
+        >
+    </slot>
+
+    <div slot="content" class="select__content">
+        <slot name="content">
+            <ul class="list-unstyled select__list">
+                {
+                    options.map((option) => (
+                        <li class="select__list-item">
+                            <button
+                                class:list={[
+                                    'js-select-option',
+                                    'select__option',
+                                    { 'select__option--active': option.value === initialValue },
+                                ]}
+                                data-value={option.value}
+                                data-text={option.label}
+                                type="button"
+                            >
+                                {option.label}
+                            </button>
+                        </li>
+                    ))
+                }
+            </ul>
+        </slot>
+    </div>
+</Dropdown>
+
+<style lang="scss" is:global>
+    @use './Select';
+</style>
+
+<script>
+    import selects from './Select';
+
+    selects.init();
+</script>
