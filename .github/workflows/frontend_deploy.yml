@@ -31,12 +31,6 @@ jobs:
         id: build
         uses: ./.github/actions/build
 
-      - name: Disallow Robots
-        shell: bash
-        run: |
-          cd frontend
-          bash robots-disallow.sh
-
       - name: Deploy
         id: deploy
         if: success()
