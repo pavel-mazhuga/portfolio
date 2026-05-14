@@ -48,13 +48,13 @@ jobs:
           target: ${{ vars.TARGET }}
           deploy_html: "true"
 
-      - name: Pull
-        id: pull
-        if: success()
-        uses: ./.github/actions/pull
-        with:
-          ssh_private_key: ${{ vars.SSH_PRIVATE_KEY }}
-          remote_host: ${{ vars.REMOTE_HOST }}
-          remote_user: ${{ vars.REMOTE_USER }}
-          target: ${{ vars.TARGET }}
-          branch: main
+      # - name: Pull
+      #   id: pull
+      #   if: success()
+      #   uses: ./.github/actions/pull
+      #   with:
+      #     ssh_private_key: ${{ vars.SSH_PRIVATE_KEY }}
+      #     remote_host: ${{ vars.REMOTE_HOST }}
+      #     remote_user: ${{ vars.REMOTE_USER }}
+      #     target: ${{ vars.TARGET }}
+      #     branch: main
