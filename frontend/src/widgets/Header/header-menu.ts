@@ -1,7 +1,7 @@
 import { navigate } from 'astro:transitions/client';
 import { onOutsideClickAction } from '@/shared/lib/on-outside-click-action';
 
-const MOBILE_MQ = '(max-width: 767px)';
+const MOBILE_MQ = '(max-width: 767px), (max-width: 900px) and (orientation: landscape)';
 const MOBILE_MENU_CLOSE_FALLBACK_MS = 1600;
 
 function isInternalNavigationLink(link: HTMLAnchorElement): boolean {

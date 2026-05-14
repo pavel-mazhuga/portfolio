@@ -109,81 +109,82 @@ import RoundButton from '@/shared/ui/RoundButton';
                                 <Icon name="cross" />
                             </button>
                         </div>
-
-                        <div class="project-item projects-list-item__role">
-                            <div class="project-item__label clip-container">
-                                <div class="clip-container__el">Role</div>
-                            </div>
-                            <div class="text-l clip-container">
-                                <div class="clip-container__el">{project.role}</div>
-                            </div>
-                        </div>
-
-                        {project.collaborators.length > 0 && (
-                            <div class="project-item projects-list-item__collaborators">
+                        <div class="projects-list-item__info-inner js-projects-list-item__info-inner">
+                            <div class="project-item projects-list-item__role">
                                 <div class="project-item__label clip-container">
-                                    <div class="clip-container__el">In collaboration with</div>
+                                    <div class="clip-container__el">Role</div>
                                 </div>
-                                <ul class="list-unstyled">
-                                    {project.collaborators.map((collaborator) => (
-                                        <li class="text-l clip-container">
-                                            <div class="clip-container__el">{collaborator}</div>
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div class="text-l clip-container">
+                                    <div class="clip-container__el">{project.role}</div>
+                                </div>
                             </div>
-                        )}
 
-                        {project.recognitions.length > 0 && (
-                            <div class="project-item projects-list-item__recognitions">
+                            {project.collaborators.length > 0 && (
+                                <div class="project-item projects-list-item__collaborators">
+                                    <div class="project-item__label clip-container">
+                                        <div class="clip-container__el">In collaboration with</div>
+                                    </div>
+                                    <ul class="list-unstyled">
+                                        {project.collaborators.map((collaborator) => (
+                                            <li class="text-l clip-container">
+                                                <div class="clip-container__el">{collaborator}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {project.recognitions.length > 0 && (
+                                <div class="project-item projects-list-item__recognitions">
+                                    <div class="project-item__label clip-container">
+                                        <div class="clip-container__el">Recognitions</div>
+                                    </div>
+                                    <ul class="list-unstyled project-item__list">
+                                        {project.recognitions.map((recognition) => (
+                                            <li class="text-l clip-container">
+                                                <div class="clip-container__el">
+                                                    {recognition.url ? (
+                                                        <IconLink
+                                                            href={recognition.url}
+                                                            icon="link"
+                                                            target="_blank"
+                                                            rel="noreferrer nofollow"
+                                                            class="js-hover-container"
+                                                        >
+                                                            <Hover tag="span">{recognition.name}</Hover>
+                                                        </IconLink>
+                                                    ) : (
+                                                        <span>{recognition.name}</span>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {project.technologies.length > 0 && (
+                                <div class="project-item projects-list-item__technologies">
+                                    <div class="project-item__label clip-container">
+                                        <div class="clip-container__el">Technologies</div>
+                                    </div>
+                                    <ul class="list-unstyled project-item__list">
+                                        {project.technologies.map((technology) => (
+                                            <li class="text-l clip-container">
+                                                <div class="clip-container__el">{technology}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            <div class="project-item projects-list-item__year">
                                 <div class="project-item__label clip-container">
-                                    <div class="clip-container__el">Recognitions</div>
+                                    <div class="clip-container__el">Year</div>
                                 </div>
-                                <ul class="list-unstyled project-item__list">
-                                    {project.recognitions.map((recognition) => (
-                                        <li class="text-l clip-container">
-                                            <div class="clip-container__el">
-                                                {recognition.url ? (
-                                                    <IconLink
-                                                        href={recognition.url}
-                                                        icon="link"
-                                                        target="_blank"
-                                                        rel="noreferrer nofollow"
-                                                        class="js-hover-container"
-                                                    >
-                                                        <Hover tag="span">{recognition.name}</Hover>
-                                                    </IconLink>
-                                                ) : (
-                                                    <span>{recognition.name}</span>
-                                                )}
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        {project.technologies.length > 0 && (
-                            <div class="project-item projects-list-item__technologies">
-                                <div class="project-item__label clip-container">
-                                    <div class="clip-container__el">Technologies</div>
+                                <div class="text-l clip-container">
+                                    <div class="clip-container__el">{project.releaseYear}</div>
                                 </div>
-                                <ul class="list-unstyled project-item__list">
-                                    {project.technologies.map((technology) => (
-                                        <li class="text-l clip-container">
-                                            <div class="clip-container__el">{technology}</div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        <div class="project-item projects-list-item__year">
-                            <div class="project-item__label clip-container">
-                                <div class="clip-container__el">Year</div>
-                            </div>
-                            <div class="text-l clip-container">
-                                <div class="clip-container__el">{project.releaseYear}</div>
                             </div>
                         </div>
                     </div>

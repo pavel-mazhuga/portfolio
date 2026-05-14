@@ -39,7 +39,7 @@
 
     margin-right: var(--grid-gap);
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         width: auto;
         flex-shrink: 0;
     }
@@ -58,7 +58,7 @@
     align-items: center;
     margin-left: var(--gap);
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         margin-left: auto;
         gap: 24px;
     }
@@ -71,7 +71,7 @@
         transition: transform $line-transition-duration $app-default-easing;
         transform-origin: 50% 100%;
 
-        @media screen and (max-width: 767px) {
+        @include mobile {
             display: none;
         }
     }
@@ -95,7 +95,7 @@
 
     display: contents;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         --transition-duration: 1s;
         --transition-delay: 0.5s;
 
@@ -178,7 +178,7 @@
 .header__menu-close-wrapper {
     display: none;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         display: inline-flex;
         justify-content: center;
         align-items: center;
@@ -199,7 +199,7 @@
     gap: var(--gap);
     flex-wrap: wrap;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         flex-direction: column;
         gap: 24px;
         font-size: 16px;
@@ -214,7 +214,7 @@
 .header__nav-item--mobile {
     display: none;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         display: block;
     }
 }
@@ -225,7 +225,7 @@
     gap: var(--gap);
     flex-wrap: wrap;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         gap: 24px;
         justify-content: center;
     }
@@ -238,7 +238,7 @@
 .menu-btn.round-button {
     display: none;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         display: inline-flex;
         margin-left: auto;
         position: relative;
@@ -283,7 +283,7 @@
 .header__right-mobile-link {
     --clip-container-delay: 0.4s;
 
-    @media screen and (max-width: 767px) {
+    @include mobile {
         --clip-container-delay: 0s;
     }
 }

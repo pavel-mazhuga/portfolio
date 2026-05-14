@@ -61,6 +61,7 @@ function handleInfoButtonClick(event: Event) {
     if (willOpen) {
         info.classList.add('is-visible');
         button.setAttribute('aria-expanded', 'true');
+        info.querySelector<HTMLElement>('.js-projects-list-item__info-inner')?.scrollTo(0, 0);
         disposeProjectInfoOutsideClick = onOutsideClickAction([info, button], closeAllProjectInfo);
     }
 }
