@@ -31,6 +31,12 @@ jobs:
         id: build
         uses: ./.github/actions/build
 
+      - name: Robots
+        shell: bash
+        run: |
+          cd frontend
+          bash robots-allow.sh
+
       - name: Deploy
         id: deploy
         if: success()
