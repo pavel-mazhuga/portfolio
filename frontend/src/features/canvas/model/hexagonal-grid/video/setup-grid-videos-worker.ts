@@ -1,5 +1,6 @@
 import { uniform } from 'three/tsl';
 import { LinearFilter, SRGBColorSpace, UniformNode, VideoFrameTexture } from 'three/webgpu';
+import { webGpuVideoFrameNeedsCanvasShim } from './video-frame-pipeline';
 
 export type GridVideoWorkerSetup = {
     videoTextures: VideoFrameTexture[];
@@ -12,6 +13,13 @@ export type GridVideoWorkerSetup = {
 
 export function setupGridVideosForWorker(slotCount: number): GridVideoWorkerSetup {
     const previousFrames: (VideoFrame | undefined)[] = Array.from({ length: slotCount }, () => undefined);
+    const useCanvasShim = webGpuVideoFrameNeedsCanvasShim();
+    const shimCanvases: OffscreenCanvas[] | undefined = useCanvasShim
+        ? Array.from({ length: slotCount }, () => new OffscreenCanvas(1, 1))
+        : undefined;
+    const shimCtxs: (OffscreenCanvasRenderingContext2D | null)[] | undefined = useCanvasShim
+        ? Array.from({ length: slotCount }, () => null)
+        : undefined;
 
     const videoTextures: VideoFrameTexture[] = [];
 
@@ -32,6 +40,41 @@ export function setupGridVideosForWorker(slotCount: number): GridVideoWorkerSetu
 
         if (texture === undefined) {
             frame.close();
+
+            return;
+        }
+
+        if (useCanvasShim && shimCanvases !== undefined && shimCtxs !== undefined) {
+            const w = frame.displayWidth;
+            const h = frame.displayHeight;
+
+            if (w > 0 && h > 0) {
+                const canvas = shimCanvases[index]!;
+                let ctx = shimCtxs[index];
+
+                if (canvas.width !== w || canvas.height !== h) {
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx = canvas.getContext('2d', { alpha: false });
+                    shimCtxs[index] = ctx;
+                } else if (ctx === null) {
+                    ctx = canvas.getContext('2d', { alpha: false });
+                    shimCtxs[index] = ctx;
+                }
+
+                if (ctx !== null) {
+                    ctx.drawImage(frame, 0, 0, w, h);
+                    previousFrames[index]?.close();
+                    previousFrames[index] = undefined;
+                    frame.close();
+                    texture.image = canvas;
+                    texture.needsUpdate = true;
+                } else {
+                    frame.close();
+                }
+            } else {
+                frame.close();
+            }
 
             return;
         }

@@ -1,7 +1,7 @@
 import { uniform } from 'three/tsl';
 import { LinearFilter, SRGBColorSpace, UniformNode, VideoFrameTexture, VideoTexture } from 'three/webgpu';
 import type { HexGridVideoSlotTexture } from '../types';
-import { canUseVideoFrameTexturePipeline } from './video-frame-pipeline';
+import { canUseVideoFrameTexturePipeline, webGpuVideoFrameNeedsCanvasShim } from './video-frame-pipeline';
 
 export type SetupGridVideosOptions = {
     deferSrc?: boolean;
@@ -20,6 +20,9 @@ function pushVideoFramesToTexture(video: HTMLVideoElement, texture: VideoFrameTe
     let active = true;
     let pendingHandle = 0;
     let previousFrame: VideoFrame | undefined;
+    const useCanvasShim = webGpuVideoFrameNeedsCanvasShim();
+    const canvas = useCanvasShim ? document.createElement('canvas') : undefined;
+    let shimCtx: CanvasRenderingContext2D | null = null;
 
     const schedule = () => {
         pendingHandle = video.requestVideoFrameCallback(() => {
@@ -31,9 +34,37 @@ function pushVideoFramesToTexture(video: HTMLVideoElement, texture: VideoFrameTe
                 try {
                     const frame = new VideoFrame(video);
 
-                    previousFrame?.close();
-                    previousFrame = frame;
-                    texture.setFrame(frame);
+                    if (useCanvasShim && canvas !== undefined) {
+                        const w = frame.displayWidth;
+                        const h = frame.displayHeight;
+
+                        if (w > 0 && h > 0) {
+                            if (canvas.width !== w || canvas.height !== h) {
+                                canvas.width = w;
+                                canvas.height = h;
+                                shimCtx = canvas.getContext('2d', { alpha: false });
+                            } else if (shimCtx === null) {
+                                shimCtx = canvas.getContext('2d', { alpha: false });
+                            }
+
+                            if (shimCtx !== null) {
+                                shimCtx.drawImage(frame, 0, 0, w, h);
+                                previousFrame?.close();
+                                previousFrame = undefined;
+                                frame.close();
+                                texture.image = canvas;
+                                texture.needsUpdate = true;
+                            } else {
+                                frame.close();
+                            }
+                        } else {
+                            frame.close();
+                        }
+                    } else {
+                        previousFrame?.close();
+                        previousFrame = frame;
+                        texture.setFrame(frame);
+                    }
                 } catch {
                     // see https://github.com/mrdoob/three.js/issues/32391
                 }

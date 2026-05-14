@@ -56,7 +56,13 @@ import RoundButton from '@/shared/ui/RoundButton';
         {
             projects.map((project, i) => (
                 <li class:list={['projects-list-item js-projects-list-item', { 'is-hidden': i > 0 }]}>
-                    <video muted loop playsinline hidden class="js-projects-list-item__video">
+                    <video
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata"
+                        class="projects-list-item__video js-projects-list-item__video visually-hidden"
+                    >
                         {project.video.map((video) => (
                             <source media={video.media} src={video.src} type={video.type} />
                         ))}
