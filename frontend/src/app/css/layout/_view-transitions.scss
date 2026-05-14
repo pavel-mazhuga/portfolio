@@ -10,32 +10,12 @@
 html[data-vt-lab-fade] {
     ::view-transition-old(root),
     ::view-transition-old(main) {
-        animation: vt-lab-fade-out $line-transition-duration $line-transition-easing both;
+        animation: fade-out $line-transition-duration $line-transition-easing both;
     }
 
     ::view-transition-new(root),
     ::view-transition-new(main) {
-        animation: vt-lab-fade-in $line-transition-duration $line-transition-easing both;
-    }
-}
-
-@keyframes vt-lab-fade-out {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
-}
-
-@keyframes vt-lab-fade-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
+        animation: fade-in $line-transition-duration $line-transition-easing both;
     }
 }
 
