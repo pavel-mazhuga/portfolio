@@ -49,7 +49,9 @@ const socialLinks = [
 <header class:list={['header js-header', props.class]} {...props}>
     <div class="wrapper header__wrapper">
         <div class="header__left">
-            <Hover tag="a" href="/" class:list={['header__logo', { 'is-active': '/' === pathname }]}>P.M.</Hover>
+            <Hover tag="a" href="/" class:list={['header__logo', 'js-header-logo', { 'is-active': '/' === pathname }]}
+                >P.M.</Hover
+            >
         </div>
 
         <div class="header__menu js-header-menu">
@@ -142,6 +144,12 @@ const socialLinks = [
 
     const syncHeaderNavActive = () => {
         const pathname = window.location.pathname;
+
+        document.querySelectorAll<HTMLAnchorElement>('.js-header-logo[href]').forEach((link) => {
+            const href = link.getAttribute('href');
+
+            link.classList.toggle('is-active', href !== null && pathname === href);
+        });
 
         document.querySelectorAll<HTMLAnchorElement>('.js-header-nav-link[href]').forEach((link) => {
             const href = link.getAttribute('href');
