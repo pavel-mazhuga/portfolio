@@ -22,7 +22,7 @@ jobs:
       - name: Create Env
         env:
           FRONTEND_PORT: 3000
-          HOST: https://needvision.pavelmazhuga.com
+          HOST: https://pavelmazhuga.com
         run: |
           cd frontend
           bash create-env.sh -p $FRONTEND_PORT -e development -h $HOST -a $HOST
