@@ -1,4 +1,3 @@
-export * from './dom';
 export * from './mobile';
 export * from './css';
 export * from './calculate-scrollbar-width';
