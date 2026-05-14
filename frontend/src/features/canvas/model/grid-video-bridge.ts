@@ -1,3 +1,4 @@
+import { hydrateGridVideosNeighborFirst, prefetchAdjacentGridVideos } from './hexagonal-grid/video/adjacent-video-prefetch';
 import { canUseVideoFrameTexturePipeline } from './hexagonal-grid/video/video-frame-pipeline';
 
 type WorkerLike = {
@@ -8,6 +9,7 @@ export class GridVideoBridge {
     private readonly videos: HTMLVideoElement[] = [];
     private readonly releases: (() => void)[] = [];
     private disposed = false;
+    private lastWarmIndex = 0;
 
     constructor(
         private readonly worker: WorkerLike,
@@ -94,20 +96,14 @@ export class GridVideoBridge {
     syncVideoUrls(urls: string[]): void {
         if (this.disposed || urls.length === 0) return;
 
-        for (let i = 0; i < this.videos.length; i++) {
-            const url = urls[i];
-            const video = this.videos[i];
-
-            if (!url || !video || video.src) {
-                continue;
-            }
-
-            video.src = url;
-        }
+        hydrateGridVideosNeighborFirst(this.videos, urls, this.lastWarmIndex);
     }
 
     playOnly(index: number): void {
         if (this.disposed) return;
+
+        this.lastWarmIndex = index;
+        prefetchAdjacentGridVideos(this.videos, index);
 
         for (let i = 0; i < this.videos.length; i++) {
             const video = this.videos[i];
@@ -122,6 +118,9 @@ export class GridVideoBridge {
 
     ensurePlaying(index: number): void {
         if (this.disposed) return;
+
+        this.lastWarmIndex = index;
+        prefetchAdjacentGridVideos(this.videos, index);
 
         const video = this.videos[index];
 

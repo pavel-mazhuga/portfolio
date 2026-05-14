@@ -36,6 +36,7 @@ import { setupHexGridTweaks } from './tweaks/hex-grid-tweaks';
 import type { GridLayout, HexGridGpuDeps, HexGridMaterialDeps, HexGridVideoSlotTexture } from './types';
 import { type GridVideoSetup, setupGridVideos } from './video/setup-grid-videos';
 import { setupGridVideosForWorker } from './video/setup-grid-videos-worker';
+import { hydrateGridVideosNeighborFirst, prefetchAdjacentGridVideos } from './video/adjacent-video-prefetch';
 
 export type HexagonalGridVideoOptions = {
     useWorkerVideoPipeline: boolean;
@@ -205,16 +206,7 @@ export class HexagonalGrid {
 
         if (urls.length === 0) return;
 
-        for (let i = 0; i < this.videos.length; i++) {
-            const url = urls[i];
-            const video = this.videos[i];
-
-            if (!url || !video || video.src) {
-                continue;
-            }
-
-            video.src = url;
-        }
+        hydrateGridVideosNeighborFirst(this.videos, urls, this.currentVideoIndex);
     }
 
     resizeToViewport(viewportSize: Vector2): void {
@@ -618,6 +610,10 @@ export class HexagonalGrid {
         if (this.currentVideoIndex === index) return;
 
         this.currentVideoIndex = index;
+
+        if (!this.useWorkerVideoPipeline) {
+            prefetchAdjacentGridVideos(this.videos, this.currentVideoIndex);
+        }
 
         if (this.projectModeActive) {
             this.#clearSlidePlaybackSettleTimer();
