@@ -27,3 +27,4 @@ pnpm-debug.log*
 .idea/
 playwright-report/
 test-results/
+public/static/videos/_*
