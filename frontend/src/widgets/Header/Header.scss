@@ -23,6 +23,10 @@
 
 .header__logo {
     @include clickable;
+
+    &.is-active {
+        pointer-events: none;
+    }
 }
 
 .header__wrapper {

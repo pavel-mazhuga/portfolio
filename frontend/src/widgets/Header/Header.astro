@@ -49,7 +49,7 @@ const socialLinks = [
 <header class:list={['header js-header', props.class]} {...props}>
     <div class="wrapper header__wrapper">
         <div class="header__left">
-            <Hover tag="a" href="/" class="header__logo">P.M.</Hover>
+            <Hover tag="a" href="/" class:list={['header__logo', { 'is-active': '/' === pathname }]}>P.M.</Hover>
         </div>
 
         <div class="header__menu js-header-menu">
