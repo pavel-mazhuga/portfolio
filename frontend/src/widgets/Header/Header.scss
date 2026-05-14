@@ -137,6 +137,11 @@
             --clip-container-delay: 0.3s;
         }
 
+        .header__nav {
+            position: relative;
+            z-index: 1;
+        }
+
         .header__nav-list {
             --clip-container-delay: 0.1s;
         }

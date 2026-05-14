@@ -67,20 +67,6 @@ const socialLinks = [
                 nav.length > 0 && (
                     <nav class="header__nav">
                         <ul class="list-unstyled header__nav-list">
-                            <li class="header__nav-item header__nav-item--mobile clip-container clip-container--view-transition-once">
-                                <div class="clip-container__el">
-                                    <Hover
-                                        tag="a"
-                                        href="/"
-                                        class:list={[
-                                            'header__nav-link link js-header-nav-link',
-                                            { 'is-active': '/' === pathname },
-                                        ]}
-                                    >
-                                        Home
-                                    </Hover>
-                                </div>
-                            </li>
                             {nav.map((item) => (
                                 <li class="header__nav-item clip-container clip-container--view-transition-once">
                                     <div class="clip-container__el">
