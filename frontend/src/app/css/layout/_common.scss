@@ -24,8 +24,8 @@ html {
 
 body {
     -webkit-tap-highlight-color: rgb(0, 0, 0, 0%);
-    min-height: vh(100);
-    min-height: vh(100, 1svh);
+    min-height: 100vh;
+    min-height: 100svh;
     font-family: $font-family;
     display: flex;
     flex-direction: column;
