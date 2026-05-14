@@ -17,12 +17,7 @@ import Image from '@/shared/ui/Image';
             {
                 experiments.map((experiment, i) => (
                     <li class="experiments-list__item">
-                        <a
-                            href={`/lab/${experiment.slug}/`}
-                            class="experiment-card"
-                            data-astro-reload
-                            data-astro-prefetch
-                        >
+                        <a href={`/lab/${experiment.slug}/`} class="experiment-card" data-astro-reload>
                             <div class="clip-container">
                                 <div class="experiment-card__image-wrapper clip-container__el">
                                     <Image

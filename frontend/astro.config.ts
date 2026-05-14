@@ -21,8 +21,6 @@ export default defineConfig({
 
     compressHTML: !IS_EXTERNAL_TEMPLATING,
 
-    prefetch: true,
-
     server: {
         port: Number(PORT),
     },
