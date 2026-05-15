@@ -1,5 +1,4 @@
 import node from '@astrojs/node';
-import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, envField } from 'astro/config';
 import { resolve } from 'path';
@@ -79,8 +78,6 @@ export default defineConfig({
     },
 
     integrations: [
-        react(),
-
         sitemap({
             changefreq: 'monthly',
             priority: 0.7,

@@ -6,9 +6,7 @@
             "@public/*": ["./public/*"],
             "@static/*": ["./public/static/*"],
             "@icons/*": ["./public/static/icons/*"]
-        },
-        "jsx": "react-jsx",
-        "jsxImportSource": "react"
+        }
     },
     "include": [".astro/types.d.ts", "env.d.ts", "**/*"],
     "exclude": ["build"]
