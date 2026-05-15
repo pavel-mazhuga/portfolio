@@ -24,12 +24,14 @@ function prepareClipVtExit() {
         return;
     }
 
-    document.querySelectorAll<HTMLElement>(CLIP_EL_SELECTOR).forEach((el, index) => {
+    let clipVtIndex = 0;
+
+    document.querySelectorAll<HTMLElement>(CLIP_EL_SELECTOR).forEach((el) => {
         if (isClipVtOnceEl(el)) {
             return;
         }
 
-        el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${index}`;
+        el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${clipVtIndex++}`;
     });
 }
 

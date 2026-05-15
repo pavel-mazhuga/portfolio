@@ -182,9 +182,10 @@ body {
 }
 
 $vt-line-names: 'clip-line', 'index-desc-line', 'index-title-line';
+$vt-line-index-max: 90;
 
 @each $vt-name in $vt-line-names {
-    @for $i from 0 through 10 {
+    @for $i from 0 through $vt-line-index-max {
         ::view-transition-old(#{$vt-name}-#{$i}) {
             animation: clip-line-vt-exit $line-transition-duration $line-transition-easing both;
         }
@@ -205,7 +206,7 @@ $vt-line-names: 'clip-line', 'index-desc-line', 'index-title-line';
 
 @media (prefers-reduced-motion: reduce) {
     @each $vt-name in $vt-line-names {
-        @for $i from 0 through 10 {
+        @for $i from 0 through $vt-line-index-max {
             ::view-transition-old(#{$vt-name}-#{$i}) {
                 animation: none;
             }
