@@ -8,7 +8,10 @@ export type IProject = {
     websiteUrl: string;
     releaseYear: number;
     role: Role;
-    collaborators: string[];
+    collaborators: {
+        name: string;
+        url?: string;
+    }[];
     technologies: string[];
     recognitions: { name: string; url?: string }[];
 };

@@ -127,7 +127,21 @@ import RoundButton from '@/shared/ui/RoundButton';
                                     <ul class="list-unstyled">
                                         {project.collaborators.map((collaborator) => (
                                             <li class="text-l clip-container">
-                                                <div class="clip-container__el">{collaborator}</div>
+                                                <div class="clip-container__el">
+                                                    {collaborator.url ? (
+                                                        <IconLink
+                                                            href={collaborator.url}
+                                                            icon="link"
+                                                            target="_blank"
+                                                            rel="noreferrer nofollow"
+                                                            class="js-hover-container"
+                                                        >
+                                                            <Hover tag="span">{collaborator.name}</Hover>
+                                                        </IconLink>
+                                                    ) : (
+                                                        <span>{collaborator.name}</span>
+                                                    )}
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>

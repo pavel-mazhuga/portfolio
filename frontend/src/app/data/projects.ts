@@ -7,6 +7,11 @@ enum Recognition {
     CSSDA_WEBSITE_OF_THE_DAY = 'CSSDA Website Of The Day',
 }
 
+const CHIPSA = {
+    name: 'Chipsa',
+    url: 'https://chipsa.design',
+} as const;
+
 export const projects: IProject[] = [
     {
         slug: 'chillbase',
@@ -55,7 +60,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://chillbase.net/',
         releaseYear: 2025,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['React (Next.js)', 'WebGL (Three.js)', 'Framer Motion'],
         recognitions: [
             {
@@ -111,7 +116,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://timeless.club/en',
         releaseYear: 2025,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['React (Next.js)', 'WebGL (Three.js)', 'Framer Motion'],
         recognitions: [],
     },
@@ -162,7 +167,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://museum.samokat.ru',
         releaseYear: 2023,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['React (Next.js)', 'WebGL (Three.js)', 'Framer Motion'],
         recognitions: [],
     },
@@ -213,7 +218,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://chipsa.design/',
         releaseYear: 2025,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['React (Next.js)', 'WebGL (Three.js)', 'Framer Motion'],
         recognitions: [
             { name: Recognition.AWWARDS_WEBSITE_OF_THE_DAY, url: 'https://www.awwwards.com/sites/chipsa' },
@@ -267,7 +272,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://zagranitsa.pro/',
         releaseYear: 2023,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['React (Next.js)', 'WebGL (Three.js)', 'Framer Motion'],
         recognitions: [],
     },
@@ -318,7 +323,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://control.chipsa.ru/',
         releaseYear: 2021,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['WebGL (OGL)', 'GSAP'],
         recognitions: [
             { name: Recognition.FWA_OF_THE_DAY, url: 'https://thefwa.com/cases/control-p2' },
@@ -376,7 +381,7 @@ export const projects: IProject[] = [
         websiteUrl: 'https://webgl3d.chipsa.design/',
         releaseYear: 2026,
         role: Role.FRONTEND,
-        collaborators: ['Chipsa'],
+        collaborators: [CHIPSA],
         technologies: ['Astro', 'WebGL (Three.js)', 'Rapier'],
         recognitions: [],
     },
