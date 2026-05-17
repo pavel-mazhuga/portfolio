@@ -30,7 +30,9 @@ const locale = Astro.currentLocale as AppLocale;
                     >
                         {item.href && i < data.length - 1 ? (
                             <a class="breadcrumbs__link" href={item.href} itemprop="item">
-                                {tp(item.text, locale)}
+                                <span itemprop="name" class="breadcrumbs__link-item">
+                                    {tp(item.text, locale)}
+                                </span>
                             </a>
                         ) : (
                             <span class="breadcrumbs__link" itemprop="item">
