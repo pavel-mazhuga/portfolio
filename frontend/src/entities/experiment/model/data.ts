@@ -186,5 +186,5 @@ export const experiments: IExperiment[] = experimentData.map((item) => ({
         height: 2160,
         alt: item.name,
     },
-    sourceLink: `https://github.com/pavel-mazhuga/portfolio/tree/main/src/app/lab/${item.slug}`,
+    sourceLink: `https://github.com/pavel-mazhuga/portfolio/tree/main/frontend/src/features/experiments/${item.slug}`,
 }));
