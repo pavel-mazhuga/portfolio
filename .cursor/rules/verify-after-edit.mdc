@@ -1,0 +1,31 @@
+---
+description: Run linters and tsc after creating or editing files
+globs: frontend/**/*
+alwaysApply: true
+---
+
+# Verify after edits
+
+After creating or changing files under `frontend/`, run checks **on the affected paths** (avoid scanning the whole project when unnecessary).
+
+## Commands (from `frontend/`)
+
+```bash
+# JS/TS/Astro
+pnpm exec eslint "path/to/changed/**/*.{ts,tsx,js,jsx,astro}"
+
+# SCSS/CSS/Astro
+pnpm exec stylelint "path/to/changed/**/*.{scss,css,astro}"
+
+# TypeScript
+pnpm tsc
+```
+
+For a single file, pass the exact path, e.g. `src/shared/ui/RoundButton/RoundButton.astro`.
+
+## Order
+
+1. Make the changes.
+2. Run `eslint` and `stylelint` on the changed files or folder.
+3. Run `pnpm tsc` (whole project — types are cross-module).
+4. Fix errors before replying to the user.
