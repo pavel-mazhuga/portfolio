@@ -109,10 +109,10 @@ export class ShadowedParticles extends Group {
         gltf.scene.updateMatrixWorld(true);
 
         const bbox3 = new Box3().setFromObject(gltf.scene);
-        const center3 = new Vector3();
+        const center = new Vector3();
 
-        bbox3.getCenter(center3);
-        gltf.scene.position.sub(center3);
+        bbox3.getCenter(center);
+        gltf.scene.position.sub(center);
         gltf.scene.updateMatrixWorld(true);
 
         const meshes: Mesh[] = [];
@@ -155,6 +155,26 @@ export class ShadowedParticles extends Group {
             }
 
             filled += count;
+        }
+
+        const centroid = new Vector3();
+
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+
+            centroid.x += positions[i3];
+            centroid.y += positions[i3 + 1];
+            centroid.z += positions[i3 + 2];
+        }
+
+        centroid.multiplyScalar(1 / particleCount);
+
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+
+            positions[i3] -= centroid.x;
+            positions[i3 + 1] -= centroid.y;
+            positions[i3 + 2] -= centroid.z;
         }
 
         return { positions, normals };
