@@ -4,6 +4,13 @@ type ExperimentInput = Omit<IExperiment, 'preview' | 'sourceLink'>;
 
 const experimentData: ExperimentInput[] = [
     {
+        name: 'Shadowed particles',
+        slug: 'shadowed-particles',
+        tags: ['webgpu', 'tsl', 'shaders', 'particles'],
+        seoTitle: 'Shadowed particles (hologram)',
+        tip: 'Move cursor',
+    },
+    {
         name: 'Metaballs',
         slug: 'metaballs',
         tags: ['webgpu', 'tsl', 'shaders', 'raymarching', 'sdf'],
