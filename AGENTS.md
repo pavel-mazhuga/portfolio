@@ -13,7 +13,8 @@ Non-obvious caveats:
   see `.gitattributes`) are stored in Git LFS. On a fresh checkout the working-tree files
   are LFS pointer text, not binaries. You MUST `git lfs pull` or `pnpm build` fails with
   `Input buffer contains unsupported image format` (sharp receives the pointer text). The
-  startup update script runs `git lfs install --local --force` + `git lfs pull`.
+  startup update script runs `git lfs pull` (do NOT run `git lfs install --force` here — it
+  overwrites the Cursor agent git-hook dispatcher and breaks commits).
 - `.env` is gitignored. Create it with
   `bash frontend/create-env.sh -e local -h http://localhost:3000 -a http://localhost:3000 -p 3000`.
   Astro reads `HOST`/`PORT` from it (PORT defaults to 3000).
