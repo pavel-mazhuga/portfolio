@@ -1,8 +1,8 @@
 # Shadowed particles (TSL)
 
-Hologram-style instanced particles with volume lighting, noise displacement, and mouse interaction.
+1:1 port of particle system from [hologram-particles](https://github.com/cortiz2894/hologram-particles) `ParticlesHologram.tsx` — particles on black background only.
 
-Based on [hologram-particles](https://github.com/cortiz2894/hologram-particles) by cortiz2894 — stripped to particles on a black background only.
+Default model: `bd1.glb` (BD-1). Parameter defaults match the reference component props.
 
 ## Demo
 

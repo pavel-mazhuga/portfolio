@@ -1,7 +1,6 @@
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
-    Fn,
     attribute,
     clamp,
     cos,
@@ -10,6 +9,7 @@ import {
     mix,
     mx_fractal_noise_vec3,
     mx_noise_float,
+    normalLocal,
     normalize,
     positionLocal,
     pow,
@@ -33,82 +33,26 @@ import {
     UniformNode,
     Vector3,
 } from 'three/webgpu';
+import { HOLOGRAM_DEFAULTS } from './hologramDefaults';
 
-export type ShadowedParticlesGeometry = {
+export type HologramGeometry = {
     positions: Float32Array;
     normals: Float32Array;
 };
 
-export type ShadowedParticlesParams = {
-    color: string;
-    floatAmp: number;
-    sphereSize: number;
-    ambient: number;
-    wrap: number;
-    light1X: number;
-    light1Y: number;
-    light1Z: number;
-    light1Color: string;
-    light1Intensity: number;
-    light2X: number;
-    light2Y: number;
-    light2Z: number;
-    light2Color: string;
-    light2Intensity: number;
-    volumeStrength: number;
-    noiseAmp: number;
-    noiseScale: number;
-    noiseSpeed: number;
-    noiseGain: number;
-    maskScale: number;
-    maskSpeed: number;
-    maskContrast: number;
-    mouseRadius: number;
-    mouseStrength: number;
-    mouseScatter: number;
-    mouseGlowColor: string;
-    mouseGlowPassive: number;
-    mouseGlowActive: number;
-    mouseGlowPow: number;
-};
-
-const DEFAULT_PARAMS: ShadowedParticlesParams = {
-    color: '#8aa0b8',
-    floatAmp: 0.01,
-    sphereSize: 0.01,
-    ambient: 0.31,
-    wrap: 0.87,
-    light1X: 0,
-    light1Y: 4,
-    light1Z: 0,
-    light1Color: '#ffffff',
-    light1Intensity: 1.0,
-    light2X: 0,
-    light2Y: -4,
-    light2Z: 0,
-    light2Color: '#4488ff',
-    light2Intensity: 0.5,
-    volumeStrength: 0.79,
-    noiseAmp: 0.08,
-    noiseScale: 0.6,
-    noiseSpeed: 0.15,
-    noiseGain: 0.5,
-    maskScale: 0.4,
-    maskSpeed: 0.04,
-    maskContrast: 1.5,
-    mouseRadius: 1.5,
-    mouseStrength: 0.6,
-    mouseScatter: 0.6,
-    mouseGlowColor: '#ffffff',
-    mouseGlowPassive: 0,
-    mouseGlowActive: 1.5,
-    mouseGlowPow: 2.0,
+export type HologramParticleParams = {
+    -readonly [Key in keyof typeof HOLOGRAM_DEFAULTS]: (typeof HOLOGRAM_DEFAULTS)[Key];
 };
 
 export class ShadowedParticles extends Group {
-    params: ShadowedParticlesParams;
+    readonly params: HologramParticleParams;
     readonly rotGroup: Group;
     readonly instancedMesh: InstancedMesh<IcosahedronGeometry, MeshBasicNodeMaterial>;
+
+    readonly posAttr: InstancedBufferAttribute;
+    readonly normAttr: InstancedBufferAttribute;
+    readonly posAttrTarget: InstancedBufferAttribute;
+    readonly normAttrTarget: InstancedBufferAttribute;
 
     uniforms: {
         color: UniformNode<'color', Color>;
@@ -140,9 +84,12 @@ export class ShadowedParticles extends Group {
         mouseGlowActive: UniformNode<'float', number>;
         mouseGlowPow: UniformNode<'float', number>;
         mouseGlowEnergy: UniformNode<'float', number>;
+        transitionProgress: UniformNode<'float', number>;
+        transitionGlowScale: UniformNode<'float', number>;
+        entranceGlow: UniformNode<'float', number>;
     };
 
-    static async sampleGLBGeometry(url: string, particleCount: number): Promise<ShadowedParticlesGeometry> {
+    static async sampleGLBGeometry(url: string, particleCount: number): Promise<HologramGeometry> {
         const gltf = await new GLTFLoader().loadAsync(url);
 
         const bbox = new Box3().setFromObject(gltf.scene);
@@ -183,7 +130,7 @@ export class ShadowedParticles extends Group {
         const normMatrix = new Matrix3();
 
         let filled = 0;
-        const perMesh = Math.max(1, Math.floor(particleCount / meshes.length));
+        const perMesh = Math.floor(particleCount / meshes.length);
 
         for (let m = 0; m < meshes.length; m++) {
             const mesh = meshes[m];
@@ -213,11 +160,13 @@ export class ShadowedParticles extends Group {
         return { positions, normals };
     }
 
-    constructor(geometry: ShadowedParticlesGeometry, particleCount: number, params: Partial<ShadowedParticlesParams> = {}) {
+    constructor(geometry: HologramGeometry, params: HologramParticleParams = HOLOGRAM_DEFAULTS) {
         super();
 
-        this.params = { ...DEFAULT_PARAMS, ...params };
+        this.params = params;
+        this.position.set(params.modelX, params.modelY, params.modelZ);
 
+        const particleCount = params.particleCount;
         const seeds = new Float32Array(particleCount);
 
         for (let i = 0; i < particleCount; i++) {
@@ -226,148 +175,160 @@ export class ShadowedParticles extends Group {
 
         const sphereGeo = new IcosahedronGeometry(1, 0);
 
+        this.posAttr = new InstancedBufferAttribute(new Float32Array(geometry.positions.length), 3);
+        this.normAttr = new InstancedBufferAttribute(new Float32Array(geometry.normals.length), 3);
+        this.posAttrTarget = new InstancedBufferAttribute(geometry.positions.slice(), 3);
+        this.normAttrTarget = new InstancedBufferAttribute(geometry.normals.slice(), 3);
+
         sphereGeo.setAttribute('instanceSeed', new InstancedBufferAttribute(seeds, 1));
-        sphereGeo.setAttribute('instanceNormal', new InstancedBufferAttribute(geometry.normals.slice(), 3));
-        sphereGeo.setAttribute('instancePos', new InstancedBufferAttribute(geometry.positions.slice(), 3));
+        sphereGeo.setAttribute('instanceNormal', this.normAttr);
+        sphereGeo.setAttribute('instancePos', this.posAttr);
+        sphereGeo.setAttribute('instanceNormalTarget', this.normAttrTarget);
+        sphereGeo.setAttribute('instancePosTarget', this.posAttrTarget);
 
         this.uniforms = {
-            color: uniform(new Color(this.params.color)),
-            floatAmp: uniform(this.params.floatAmp),
-            sphereSize: uniform(this.params.sphereSize),
-            ambient: uniform(this.params.ambient),
-            wrap: uniform(this.params.wrap),
-            light1Pos: uniform(new Vector3(this.params.light1X, this.params.light1Y, this.params.light1Z)),
-            light1Color: uniform(new Color(this.params.light1Color)),
-            light1Intensity: uniform(this.params.light1Intensity),
-            light2Pos: uniform(new Vector3(this.params.light2X, this.params.light2Y, this.params.light2Z)),
-            light2Color: uniform(new Color(this.params.light2Color)),
-            light2Intensity: uniform(this.params.light2Intensity),
-            volumeStrength: uniform(this.params.volumeStrength),
-            noiseAmp: uniform(this.params.noiseAmp),
-            noiseScale: uniform(this.params.noiseScale),
-            noiseSpeed: uniform(this.params.noiseSpeed),
-            noiseGain: uniform(this.params.noiseGain),
-            maskScale: uniform(this.params.maskScale),
-            maskSpeed: uniform(this.params.maskSpeed),
-            maskContrast: uniform(this.params.maskContrast),
+            color: uniform(new Color(params.color)),
+            floatAmp: uniform(params.floatAmp),
+            sphereSize: uniform(params.sphereSize),
+            ambient: uniform(params.ambient),
+            wrap: uniform(params.wrap),
+            light1Pos: uniform(new Vector3(params.light1X, params.light1Y, params.light1Z)),
+            light1Color: uniform(new Color(params.light1Color)),
+            light1Intensity: uniform(params.light1Intensity),
+            light2Pos: uniform(new Vector3(params.light2X, params.light2Y, params.light2Z)),
+            light2Color: uniform(new Color(params.light2Color)),
+            light2Intensity: uniform(params.light2Intensity),
+            volumeStrength: uniform(params.volumeStrength),
+            noiseAmp: uniform(params.noiseAmp),
+            noiseScale: uniform(params.noiseScale),
+            noiseSpeed: uniform(params.noiseSpeed),
+            noiseGain: uniform(params.noiseGain),
+            maskScale: uniform(params.maskScale),
+            maskSpeed: uniform(params.maskSpeed),
+            maskContrast: uniform(params.maskContrast),
             mousePos: uniform(new Vector3()),
             mouseVel: uniform(new Vector3()),
-            mouseRadius: uniform(this.params.mouseRadius),
-            mouseStrength: uniform(this.params.mouseStrength),
-            mouseScatter: uniform(this.params.mouseScatter),
-            mouseGlowColor: uniform(new Color(this.params.mouseGlowColor)),
-            mouseGlowPassive: uniform(this.params.mouseGlowPassive),
-            mouseGlowActive: uniform(this.params.mouseGlowActive),
-            mouseGlowPow: uniform(this.params.mouseGlowPow),
+            mouseRadius: uniform(params.mouseRadius),
+            mouseStrength: uniform(params.mouseStrength),
+            mouseScatter: uniform(params.mouseScatter),
+            mouseGlowColor: uniform(new Color(params.mouseGlowColor)),
+            mouseGlowPassive: uniform(params.mouseGlowPassive),
+            mouseGlowActive: uniform(params.mouseGlowActive),
+            mouseGlowPow: uniform(params.mouseGlowPow),
             mouseGlowEnergy: uniform(0),
+            transitionProgress: uniform(0),
+            transitionGlowScale: uniform(params.transitionGlowScale),
+            entranceGlow: uniform(1),
         };
 
         const u = this.uniforms;
         const material = new MeshBasicNodeMaterial();
 
-        material.positionNode = Fn(() => {
-            const seedAttr = attribute('instanceSeed', 'float') as Node<'float'>;
-            const instPos = attribute('instancePos', 'vec3') as Node<'vec3'>;
+        const seedAttr = attribute('instanceSeed', 'float') as Node<'float'>;
+        const instNorm = attribute('instanceNormal', 'vec3') as Node<'vec3'>;
+        const instPos = attribute('instancePos', 'vec3') as Node<'vec3'>;
+        const instNormTgt = attribute('instanceNormalTarget', 'vec3') as Node<'vec3'>;
+        const instPosTgt = attribute('instancePosTarget', 'vec3') as Node<'vec3'>;
 
-            const phase = seedAttr.mul(Math.PI * 2);
+        const blendPos = mix(instPos, instPosTgt, u.transitionProgress);
+        const blendNorm = normalize(mix(instNorm, instNormTgt, u.transitionProgress));
 
-            const floatDisp = vec3(
-                cos(time.mul(1.3).add(phase)).mul(u.floatAmp).mul(0.6),
-                sin(time.mul(1.6).add(phase)).mul(u.floatAmp),
-                sin(time.mul(1.1).add(phase.add(1.0)))
-                    .mul(u.floatAmp)
-                    .mul(0.6),
+        const phase = seedAttr.mul(Math.PI * 2);
+
+        const floatDisp = vec3(
+            cos(time.mul(1.3).add(phase)).mul(u.floatAmp).mul(0.6),
+            sin(time.mul(1.6).add(phase)).mul(u.floatAmp),
+            sin(time.mul(1.1).add(phase.add(1.0)))
+                .mul(u.floatAmp)
+                .mul(0.6),
+        );
+
+        const maskCoord = blendPos
+            .mul(u.maskScale)
+            .add(
+                vec3(
+                    time.mul(u.maskSpeed),
+                    time.mul(u.maskSpeed).mul(0.7),
+                    time.mul(u.maskSpeed).mul(1.3),
+                ),
             );
 
-            const maskCoord = instPos
-                .mul(u.maskScale)
-                .add(
-                    vec3(
-                        time.mul(u.maskSpeed),
-                        time.mul(u.maskSpeed).mul(0.7),
-                        time.mul(u.maskSpeed).mul(1.3),
-                    ),
-                );
+        const rawMask = mx_noise_float(maskCoord);
+        const mask = pow(clamp(rawMask.mul(0.5).add(0.5), float(0), float(1)), u.maskContrast);
 
-            const rawMask = mx_noise_float(maskCoord);
-            const mask = pow(clamp(rawMask.mul(0.5).add(0.5), float(0), float(1)), u.maskContrast);
+        const noiseCoord = blendPos
+            .mul(u.noiseScale)
+            .add(vec3(time.mul(u.noiseSpeed), float(0), time.mul(u.noiseSpeed).mul(0.7)));
 
-            const noiseCoord = instPos
-                .mul(u.noiseScale)
-                .add(vec3(time.mul(u.noiseSpeed), float(0), time.mul(u.noiseSpeed).mul(0.7)));
+        const noiseDisp = mx_fractal_noise_vec3(noiseCoord, float(2), float(2.0), u.noiseGain)
+            .mul(u.noiseAmp)
+            .mul(mask);
 
-            const noiseDisp = mx_fractal_noise_vec3(noiseCoord, float(2), float(2.0), u.noiseGain)
-                .mul(u.noiseAmp)
-                .mul(mask);
+        const toMouse = u.mousePos.sub(blendPos);
+        const dist = toMouse.length();
+        const falloff = clamp(float(1.0).sub(dist.div(u.mouseRadius)), float(0), float(1));
+        const impulseLen = u.mouseVel.length();
+        const velDir = normalize(u.mouseVel.add(vec3(0.0001, 0.0001, 0.0001)));
+        const rawRand = vec3(
+            sin(seedAttr.mul(127.1)),
+            cos(seedAttr.mul(311.7)),
+            sin(seedAttr.mul(74.3).add(1.0)),
+        );
+        const randUnit = normalize(rawRand);
+        const onAxis = velDir.mul(dot(randUnit, velDir));
+        const perpToVel = normalize(randUnit.sub(onAxis).add(vec3(0, 0.0001, 0)));
+        const mouseDisp = velDir
+            .add(perpToVel.mul(u.mouseScatter))
+            .mul(impulseLen)
+            .mul(u.mouseStrength)
+            .mul(falloff.mul(falloff));
 
-            const toMouse = u.mousePos.sub(instPos);
-            const dist = toMouse.length();
-            const falloff = clamp(float(1.0).sub(dist.div(u.mouseRadius)), float(0), float(1));
-            const impulseLen = u.mouseVel.length();
-            const velDir = normalize(u.mouseVel.add(vec3(0.0001, 0.0001, 0.0001)));
-            const rawRand = vec3(
-                sin(seedAttr.mul(127.1)),
-                cos(seedAttr.mul(311.7)),
-                sin(seedAttr.mul(74.3).add(1.0)),
+        material.positionNode = positionLocal
+            .mul(u.sphereSize)
+            .add(blendPos)
+            .add(floatDisp)
+            .add(noiseDisp)
+            .add(mouseDisp);
+
+        const lightContrib = (
+            lightPos: typeof u.light1Pos,
+            lightCol: typeof u.light1Color,
+            lightInt: typeof u.light1Intensity,
+        ) => {
+            const dir = normalize(lightPos.sub(blendPos));
+            const figW = clamp(dot(blendNorm, dir).add(u.wrap).div(float(1.0).add(u.wrap)), float(0), float(1));
+            const sphW = clamp(
+                dot(normalize(normalLocal), dir)
+                    .add(u.wrap)
+                    .div(float(1.0).add(u.wrap)),
+                float(0),
+                float(1),
             );
-            const randUnit = normalize(rawRand);
-            const onAxis = velDir.mul(dot(randUnit, velDir));
-            const perpToVel = normalize(randUnit.sub(onAxis).add(vec3(0, 0.0001, 0)));
-            const mouseDisp = velDir
-                .add(perpToVel.mul(u.mouseScatter))
-                .mul(impulseLen)
-                .mul(u.mouseStrength)
-                .mul(falloff.mul(falloff));
+            const diffuse = mix(figW, figW.mul(sphW), u.volumeStrength);
 
-            return positionLocal
-                .mul(u.sphereSize)
-                .add(instPos)
-                .add(floatDisp)
-                .add(noiseDisp)
-                .add(mouseDisp);
-        })();
+            return lightCol.mul(diffuse).mul(lightInt);
+        };
 
-        material.colorNode = Fn(() => {
-            const instNorm = attribute('instanceNormal', 'vec3') as Node<'vec3'>;
-            const instPos = attribute('instancePos', 'vec3') as Node<'vec3'>;
+        const litColor = lightContrib(u.light1Pos, u.light1Color, u.light1Intensity).add(
+            lightContrib(u.light2Pos, u.light2Color, u.light2Intensity),
+        );
 
-            const toMouse = u.mousePos.sub(instPos);
-            const dist = toMouse.length();
-            const falloff = clamp(float(1.0).sub(dist.div(u.mouseRadius)), float(0), float(1));
+        const lit = clamp(litColor.add(u.ambient), float(0), float(1));
+        const shadedColor = lit.mul(u.color);
 
-            const lightContrib = (
-                lightPos: typeof u.light1Pos,
-                lightCol: typeof u.light1Color,
-                lightInt: typeof u.light1Intensity,
-            ) => {
-                const dir = normalize(lightPos.sub(instPos));
-                const figW = clamp(dot(instNorm, dir).add(u.wrap).div(float(1.0).add(u.wrap)), float(0), float(1));
-                const sphW = clamp(
-                    dot(normalize(positionLocal), dir)
-                        .add(u.wrap)
-                        .div(float(1.0).add(u.wrap)),
-                    float(0),
-                    float(1),
-                );
-                const diffuse = mix(figW, figW.mul(sphW), u.volumeStrength);
+        const glowFalloff = pow(clamp(falloff, float(0), float(1)), u.mouseGlowPow);
+        const passiveGlow = glowFalloff.mul(u.mouseGlowPassive);
+        const activeGlow = glowFalloff.mul(u.mouseGlowEnergy).mul(u.mouseGlowActive);
+        const mouseGlowFactor = clamp(passiveGlow.add(activeGlow), float(0), float(1));
 
-                return lightCol.mul(diffuse).mul(lightInt);
-            };
+        const morphActivity = u.transitionProgress.mul(float(1).sub(u.transitionProgress)).mul(float(4));
+        const transDispMag = instPosTgt.sub(instPos).length();
+        const transNorm = clamp(transDispMag.mul(float(0.35)), float(0), float(1));
+        const transGlow = transNorm.mul(morphActivity).mul(u.transitionGlowScale);
 
-            const litColor = lightContrib(u.light1Pos, u.light1Color, u.light1Intensity).add(
-                lightContrib(u.light2Pos, u.light2Color, u.light2Intensity),
-            );
+        const glowFactor = clamp(mouseGlowFactor.add(transGlow), float(0), float(1)).mul(u.entranceGlow);
 
-            const lit = clamp(litColor.add(u.ambient), float(0), float(1));
-            const shadedColor = lit.mul(u.color);
-
-            const glowFalloff = pow(clamp(falloff, float(0), float(1)), u.mouseGlowPow);
-            const passiveGlow = glowFalloff.mul(u.mouseGlowPassive);
-            const activeGlow = glowFalloff.mul(u.mouseGlowEnergy).mul(u.mouseGlowActive);
-            const mouseGlowFactor = clamp(passiveGlow.add(activeGlow), float(0), float(1));
-
-            return mix(shadedColor, u.mouseGlowColor, mouseGlowFactor);
-        })();
+        material.colorNode = mix(shadedColor, u.mouseGlowColor, glowFactor);
 
         this.instancedMesh = new InstancedMesh(sphereGeo, material, particleCount);
         this.instancedMesh.instanceMatrix.needsUpdate = true;
@@ -375,6 +336,40 @@ export class ShadowedParticles extends Group {
         this.rotGroup = new Group();
         this.rotGroup.add(this.instancedMesh);
         this.add(this.rotGroup);
+    }
+
+    syncUniformsFromParams() {
+        const p = this.params;
+        const u = this.uniforms;
+
+        u.color.value.set(p.color);
+        u.floatAmp.value = p.floatAmp;
+        u.sphereSize.value = p.sphereSize;
+        u.ambient.value = p.ambient;
+        u.wrap.value = p.wrap;
+        u.light1Pos.value.set(p.light1X, p.light1Y, p.light1Z);
+        u.light1Color.value.set(p.light1Color);
+        u.light1Intensity.value = p.light1Intensity;
+        u.light2Pos.value.set(p.light2X, p.light2Y, p.light2Z);
+        u.light2Color.value.set(p.light2Color);
+        u.light2Intensity.value = p.light2Intensity;
+        u.volumeStrength.value = p.volumeStrength;
+        u.noiseAmp.value = p.noiseAmp;
+        u.noiseScale.value = p.noiseScale;
+        u.noiseSpeed.value = p.noiseSpeed;
+        u.noiseGain.value = p.noiseGain;
+        u.maskScale.value = p.maskScale;
+        u.maskSpeed.value = p.maskSpeed;
+        u.maskContrast.value = p.maskContrast;
+        u.mouseRadius.value = p.mouseRadius;
+        u.mouseStrength.value = p.mouseStrength;
+        u.mouseScatter.value = p.mouseScatter;
+        u.mouseGlowColor.value.set(p.mouseGlowColor);
+        u.mouseGlowPassive.value = p.mouseGlowPassive;
+        u.mouseGlowActive.value = p.mouseGlowActive;
+        u.mouseGlowPow.value = p.mouseGlowPow;
+        u.transitionGlowScale.value = p.transitionGlowScale;
+        this.position.set(p.modelX, p.modelY, p.modelZ);
     }
 
     dispose() {
