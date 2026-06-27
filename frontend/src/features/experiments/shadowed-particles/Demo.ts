@@ -366,6 +366,14 @@ class Demo extends BaseExperience {
             this.particles?.syncUniformsFromParams();
         };
 
+        const geometryFolder = this.tweakPane.addFolder({ title: 'Geometry' });
+
+        geometryFolder.addBinding(this.params, 'particleCount', {
+            min: 1000,
+            max: 150_000,
+            step: 1000,
+        });
+
         const materialFolder = this.tweakPane.addFolder({ title: 'Material' });
 
         materialFolder.addBinding(this.params, 'color').on('change', onParticleChange);
