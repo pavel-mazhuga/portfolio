@@ -9,7 +9,9 @@ const experimentData: ExperimentInput[] = [
         tags: ['webgpu', 'tsl', 'shaders', 'particles'],
         seoTitle: 'Shadowed particles (hologram)',
         tip: 'Move cursor',
+        active: false,
     },
+
     {
         name: 'Metaballs',
         slug: 'metaballs',
@@ -185,7 +187,7 @@ const experimentData: ExperimentInput[] = [
     },
 ];
 
-export const experiments: IExperiment[] = experimentData.map((item) => ({
+const allExperiments: IExperiment[] = experimentData.map((item) => ({
     ...item,
     preview: {
         src: `/static/img/lab/${item.slug}/preview.jpeg`,
@@ -195,3 +197,7 @@ export const experiments: IExperiment[] = experimentData.map((item) => ({
     },
     sourceLink: `https://github.com/pavel-mazhuga/portfolio/tree/main/frontend/src/features/experiments/${item.slug}`,
 }));
+
+export const experiments = allExperiments;
+
+export const listedExperiments = allExperiments.filter((item) => item.active !== false);

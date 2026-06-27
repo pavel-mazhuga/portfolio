@@ -4,7 +4,7 @@ import { Color, Plane, Raycaster, RenderPipeline, TimestampQuery, Vector2, Vecto
 import BaseExperience from '../model/BaseExperience';
 import { ShadowedParticles } from './ShadowedParticles';
 
-const MODEL_URL = '/static/gltf/face2.glb';
+const MODEL_URL = '/static/gltf/suzanne.glb';
 const PARTICLE_COUNT = 40_000;
 
 class Demo extends BaseExperience {
@@ -99,7 +99,6 @@ class Demo extends BaseExperience {
             }
 
             this.particles = new ShadowedParticles(geometry, PARTICLE_COUNT);
-            this.particles.position.y = 1;
             this.scene.add(this.particles);
         });
     }
@@ -141,10 +140,7 @@ class Demo extends BaseExperience {
     private updatePointerFromCoords(clientX: number, clientY: number) {
         const rect = this.canvas.getBoundingClientRect();
 
-        this.mouseNDC.set(
-            ((clientX - rect.left) / rect.width) * 2 - 1,
-            -((clientY - rect.top) / rect.height) * 2 + 1,
-        );
+        this.mouseNDC.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
 
         this.particles?.getWorldPosition(this.modelCenter);
         this.camera.getWorldDirection(this.cameraDir);

@@ -162,8 +162,10 @@ export class ShadowedParticles extends Group {
         gltf.scene.updateMatrixWorld(true);
 
         const bbox3 = new Box3().setFromObject(gltf.scene);
+        const center3 = new Vector3();
 
-        gltf.scene.position.y -= bbox3.min.y;
+        bbox3.getCenter(center3);
+        gltf.scene.position.sub(center3);
         gltf.scene.updateMatrixWorld(true);
 
         const meshes: Mesh[] = [];

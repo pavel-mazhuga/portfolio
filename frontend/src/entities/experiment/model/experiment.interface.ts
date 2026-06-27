@@ -8,4 +8,5 @@ export type IExperiment = {
     sourceLink: string;
     tip?: string;
     seoTitle?: string;
+    active?: boolean;
 };
