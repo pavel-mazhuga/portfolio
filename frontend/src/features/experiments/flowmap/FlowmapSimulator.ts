@@ -2,6 +2,7 @@ import {
     Fn,
     If,
     clamp,
+    distance,
     float,
     smoothstep,
     texture,
@@ -87,7 +88,7 @@ export class FlowmapSimulator {
             const tmp = this.motionTextureNode.sample(st).toVar();
             const defTmp = this.defaultTextureNode.sample(st);
 
-            const dist = float(1).sub(smoothstep(float(0), this.uRange, this.uMousePos.distance(st)));
+            const dist = float(1).sub(smoothstep(float(0), this.uRange, distance(this.uMousePos, st)));
 
             If(dist.greaterThan(0), () => {
                 const speed = this.uMousePos.sub(tmp.zw);
