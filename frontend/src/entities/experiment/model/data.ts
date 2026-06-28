@@ -71,6 +71,7 @@ const experimentData: ExperimentInput[] = [
         slug: 'flowmap',
         tags: ['webgpu', 'tsl', 'shaders', 'postprocessing'],
         tip: 'Move cursor',
+        active: false,
     },
     {
         name: 'Nightingale hover effect (recreated)',
