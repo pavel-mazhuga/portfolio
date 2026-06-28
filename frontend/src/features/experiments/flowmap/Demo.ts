@@ -2,7 +2,7 @@ import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { add, pass, vec4 } from 'three/tsl';
+import { add, pass, renderOutput, vec4 } from 'three/tsl';
 import {
     AmbientLight,
     DoubleSide,
@@ -130,7 +130,7 @@ class FlowmapDemo extends BaseExperience {
         const scenePass = pass(this.scene, this.camera);
 
         this.sceneColor = scenePass.getTextureNode('output');
-        this.fxaaColor = fxaa(this.sceneColor);
+        this.fxaaColor = fxaa(renderOutput(scenePass));
         this.bloomPass = bloom(scenePass, BLOOM_DEFAULTS.strength, BLOOM_DEFAULTS.radius, BLOOM_DEFAULTS.threshold);
         this.combinedColor = add(
             this.fxaaColor as unknown as Node<'vec4'>,
@@ -146,6 +146,7 @@ class FlowmapDemo extends BaseExperience {
         });
 
         this.postProcessing = new RenderPipeline(this.renderer);
+        this.postProcessing.outputColorTransform = false;
         this.postProcessing.outputNode = this.flowmapPass;
         this.renderer.toneMappingExposure = Math.pow(BLOOM_DEFAULTS.exposure, 4);
 
@@ -164,11 +165,18 @@ class FlowmapDemo extends BaseExperience {
     override onWindowResize() {
         super.onWindowResize();
 
+        if (!this.simulator) {
+            return;
+        }
+
         const width = this.canvas.parentElement?.offsetWidth || 1;
         const height = this.canvas.parentElement?.offsetHeight || 1;
 
         this.simulator.setSize(width, height);
-        this.flowmapPass.aspect.value = width / height;
+
+        if (this.flowmapPass) {
+            this.flowmapPass.aspect.value = width / height;
+        }
     }
 
     async render() {
