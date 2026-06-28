@@ -12,10 +12,11 @@ import RoundButton from '@/shared/ui/RoundButton';
             <h1 class="text-l">Projects</h1>
         </div>
         <div class="page__header-right page-counter text-l clip-container__el">
-            <span
+            <div
                 class="js-projects-counter-current projects-counter-odometer"
                 data-total={projects.length}
-                aria-live="polite">01</span
+                role="status"
+                aria-atomic="true">01</div
             >
             /
             <span>{projects.length.toString().padStart(2, '0')}</span>
