@@ -1,6 +1,6 @@
 # Flowmap
 
-Mouse-driven flowmap distortion with reflective floor. Port of [r3f-flowmap](https://github.com/nemutas/r3f-flowmap) (TSL / WebGPU, no R3F).
+Mouse-driven flowmap distortion with reflective floor.
 
 Inspired by [Alien.js flowmap](https://alien.js.org/examples/shader_flowmap_rgbshift.html).
 
