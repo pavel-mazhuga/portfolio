@@ -90,6 +90,31 @@ self.onmessage = async (event: MessageEvent<{ message: string; payload?: unknown
             break;
         }
 
+        case 'prewarmAllRoutes': {
+            world?.prewarmAllRoutes();
+            break;
+        }
+
+        case 'prefetchHomeRoute': {
+            world?.prefetchHomeRoute();
+            break;
+        }
+
+        case 'suspend': {
+            world?.suspend();
+            break;
+        }
+
+        case 'resume': {
+            world?.resume();
+            break;
+        }
+
+        case 'prefetchProjectsRoute': {
+            world?.prefetchProjectsRoute();
+            break;
+        }
+
         case 'applyRouteState': {
             const pl = payload as Pick<GridRouteState, 'isProjectsPage'>;
 

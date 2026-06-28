@@ -1,3 +1,8 @@
+interface SchedulerIdleOptions {
+    timeout?: number;
+    signal?: AbortSignal;
+}
+
 interface SchedulerOptions {
     delay?: number;
     priority?: 'user-blocking' | 'user-visible' | 'background';
@@ -6,7 +11,9 @@ interface SchedulerOptions {
 
 interface TaskScheduler {
     schedule<T = void>(task: () => T, options?: SchedulerOptions): Promise<T>;
+    scheduleIdle(task: () => void, options?: SchedulerIdleOptions): void;
     yield(): Promise<void>;
+    yieldFrame(): Promise<void>;
 }
 
 interface WindowScheduler {
@@ -15,6 +22,37 @@ interface WindowScheduler {
 }
 
 function createScheduler(): TaskScheduler {
+    const scheduleIdle = (task: () => void, { timeout = 2000, signal }: SchedulerIdleOptions = {}): void => {
+        if (signal?.aborted) {
+            return;
+        }
+
+        const run = () => {
+            if (signal?.aborted) {
+                return;
+            }
+
+            task();
+        };
+
+        if (typeof requestIdleCallback === 'function') {
+            const idleId = requestIdleCallback(run, { timeout });
+
+            signal?.addEventListener('abort', () => cancelIdleCallback(idleId), { once: true });
+
+            return;
+        }
+
+        const timeoutId = setTimeout(run, 0);
+
+        signal?.addEventListener('abort', () => clearTimeout(timeoutId), { once: true });
+    };
+
+    const yieldFrame = (): Promise<void> =>
+        new Promise((resolve) => {
+            requestAnimationFrame(() => resolve());
+        });
+
     if (typeof window !== 'undefined' && 'scheduler' in window) {
         return {
             async schedule<T = void>(task: () => T, options: SchedulerOptions = {}): Promise<T> {
@@ -29,9 +67,11 @@ function createScheduler(): TaskScheduler {
                     signal,
                 });
             },
+            scheduleIdle,
             async yield(): Promise<void> {
                 return (window.scheduler as WindowScheduler).yield();
             },
+            yieldFrame,
         };
     }
 
@@ -58,16 +98,17 @@ function createScheduler(): TaskScheduler {
                     }
                 }, delay);
 
-                // Отмена через AbortSignal
                 signal?.addEventListener('abort', () => {
                     clearTimeout(timeoutId);
                     reject(new Error('Task was aborted'));
                 });
             });
         },
+        scheduleIdle,
         async yield(): Promise<void> {
             return new Promise<void>((resolve) => setTimeout(resolve, 0));
         },
+        yieldFrame,
     };
 }
 

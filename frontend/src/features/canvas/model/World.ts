@@ -19,7 +19,9 @@ import { Pane } from 'tweakpane';
 // eslint-disable-next-line fsd/layer-import-restrictions
 import { projects } from '@/app/data/projects';
 import { Pointer } from '../utils/Pointer';
+import { resolveProjectVideoUrlFromSources } from '../utils/resolve-project-video-url';
 import { Noises } from '../utils/tsl/Noises';
+import { warmupWorld } from '../utils/warmup-world';
 import { HexagonalGrid } from './hexagonal-grid';
 import type { CanvasData, GridRouteState, IWorld } from './types';
 
@@ -43,6 +45,7 @@ export class World implements IWorld {
     tweakPane?: Pane;
     postProcessing?: RenderPipeline;
     glowBlurPass?: GaussianBlurNode;
+    private scenePass?: ReturnType<typeof pass>;
     private disposed = false;
 
     constructor(readonly options: CanvasData) {
@@ -109,6 +112,9 @@ export class World implements IWorld {
                     useWorkerVideoPipeline: options.isWorker,
                     videoPlayback: options.videoPlayback,
                     useCoarsePointer: options.useCoarsePointer,
+                    onMeshRebuilt: (mesh) => {
+                        void this.renderer.compileAsync(mesh, this.camera, this.scene);
+                    },
                 },
             );
             this.scene.add(this.hexGrid.group);
@@ -120,18 +126,18 @@ export class World implements IWorld {
             this.postProcessing = new RenderPipeline(this.renderer);
 
             // Color
-            const scenePass = pass(this.scene, this.camera);
+            this.scenePass = pass(this.scene, this.camera);
 
-            scenePass.setMRT(
+            this.scenePass.setMRT(
                 mrt({
                     output,
                     bloomIntensity: float(0),
                 }),
             );
 
-            const outputPass = scenePass;
+            const outputPass = this.scenePass;
             const fxaaPass = fxaa(outputPass);
-            const bloomIntensityPass = scenePass.getTextureNode('bloomIntensity');
+            const bloomIntensityPass = this.scenePass.getTextureNode('bloomIntensity');
 
             // Blur is faster than bloom with the same visual effect
             this.glowBlurPass = gaussianBlur(outputPass.mul(max(bloomIntensityPass.r, float(0))), null, 8, {
@@ -152,7 +158,26 @@ export class World implements IWorld {
                 }
             }
 
+            if (!options.skipWarmup) {
+                void warmupWorld(
+                    {
+                        renderer: this.renderer,
+                        scene: this.scene,
+                        camera: this.camera,
+                        scenePass: this.scenePass,
+                        runCompute: () => {
+                            if (this.hexGrid?.group.visible) {
+                                this.renderer.compute(this.hexGrid.computeUpdate);
+                            }
+                        },
+                        renderFrame: () => this.render(),
+                    },
+                    { debug: options.isDebug, frameCount: 0 },
+                );
+            }
+
             this.renderer.setAnimationLoop(this.render);
+            this.prewarmAllRoutes();
 
             if (process.env.NODE_ENV === 'development' && !options.isWorker) {
                 this.initTweakpane();
@@ -172,12 +197,78 @@ export class World implements IWorld {
         }
     }
 
-    applyRouteState(state: GridRouteState) {
-        if (!this.options.isWorker) {
-            this.hexGrid?.ensureProjectVideosLoaded(state.videoUrls);
+    prefetchProjectsRoute() {
+        const viewport = this.getVisibleWorldSize();
+        const urls = projects.map((project) => resolveProjectVideoUrlFromSources(project.video));
+
+        this.hexGrid?.prefetchProjectVideosIdle(urls);
+        this.hexGrid?.ensureLayoutCached(viewport, true);
+    }
+
+    prefetchHomeRoute() {
+        this.hexGrid?.ensureLayoutCached(this.getVisibleWorldSize(), false);
+    }
+
+    prewarmAllRoutes() {
+        if (this.disposed) {
+            return;
         }
 
-        this.hexGrid?.setProjectMode(state.isProjectsPage, this.getVisibleWorldSize());
+        const urls = projects.map((project) => resolveProjectVideoUrlFromSources(project.video));
+
+        this.hexGrid?.prefetchProjectVideosIdle(urls);
+
+        void this.hexGrid?.prewarmAllRouteLayouts(this.getVisibleWorldSize());
+    }
+
+    applyRouteState(state: GridRouteState) {
+        if (this.disposed) {
+            return;
+        }
+
+        const videoUrls = this.#resolveProjectVideoUrls(state);
+
+        if (this.hexGrid?.matchesRouteState(state.isProjectsPage)) {
+            if (state.isProjectsPage && !this.options.isWorker && videoUrls.length > 0) {
+                this.hexGrid?.ensureProjectVideosLoaded(videoUrls);
+            }
+
+            return;
+        }
+
+        const enterProjects = state.isProjectsPage;
+
+        const apply = () => {
+            if (this.disposed) {
+                return;
+            }
+
+            if (!this.options.isWorker && enterProjects && videoUrls.length > 0) {
+                this.hexGrid?.ensureProjectVideosLoaded(videoUrls);
+            }
+
+            this.hexGrid?.setProjectMode(enterProjects, this.getVisibleWorldSize());
+        };
+
+        if (enterProjects) {
+            apply();
+
+            return;
+        }
+
+        apply();
+    }
+
+    #resolveProjectVideoUrls(state: GridRouteState): string[] {
+        if (!state.isProjectsPage) {
+            return [];
+        }
+
+        if (state.videoUrls.length > 0) {
+            return state.videoUrls;
+        }
+
+        return projects.map((project) => resolveProjectVideoUrlFromSources(project.video));
     }
 
     prevSlide() {
@@ -305,6 +396,20 @@ export class World implements IWorld {
 
             this.hexGrid.setupTweaks(folder);
         }
+    }
+
+    suspend() {
+        this.renderer.setAnimationLoop(null);
+        this.hexGrid?.pauseVideos();
+    }
+
+    resume() {
+        if (this.disposed) {
+            return;
+        }
+
+        this.renderer.setAnimationLoop(this.render);
+        this.onResize([this.options.width, this.options.height, this.options.dpr]);
     }
 
     dispose() {

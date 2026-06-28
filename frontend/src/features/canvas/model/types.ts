@@ -13,6 +13,7 @@ export type CanvasData = {
     width: number;
     height: number;
     isDebug: boolean;
+    skipWarmup?: boolean;
     useCoarsePointer: boolean;
     videoPlayback?: GridVideoPlayback;
     onInitialized?: () => void;
@@ -26,8 +27,13 @@ export interface IWorld {
     setPointerPosition: (x: number, y: number) => void;
     setPressed: (isPressed: boolean) => void;
     setPointerRadiusMul: (value: number) => void;
+    prefetchProjectsRoute?: () => void;
+    prefetchHomeRoute?: () => void;
+    prewarmAllRoutes?: () => void;
     applyRouteState: (state: GridRouteState) => void;
     prevSlide: () => void;
     nextSlide: () => void;
+    suspend: () => void;
+    resume: () => void;
     dispose: () => void;
 }

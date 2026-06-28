@@ -15,6 +15,7 @@ const { ...props } = Astro.props;
 </style>
 
 <script>
+    import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
     import canvas from './Canvas';
     import { isLabDetailPage } from '@/shared/lib/router';
 
@@ -22,9 +23,13 @@ const { ...props } = Astro.props;
         canvas.syncWithRoute();
     });
 
-    document.addEventListener('astro:before-swap', ({ to }) => {
-        if (isLabDetailPage(to.pathname)) {
-            canvas.destroy();
+    document.addEventListener('astro:before-preparation', (event) => {
+        if (!isTransitionBeforePreparationEvent(event)) {
+            return;
+        }
+
+        if (isLabDetailPage(event.to.pathname)) {
+            canvas.suspendForLab();
         }
     });
 </script>

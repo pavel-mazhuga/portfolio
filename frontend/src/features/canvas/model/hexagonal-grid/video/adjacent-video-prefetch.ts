@@ -1,3 +1,5 @@
+import { taskScheduler } from '@/shared/lib/scheduler';
+
 export function warmNeighborIndices(slotCount: number, activeIndex: number): Set<number> {
     const n = slotCount;
 
@@ -43,7 +45,7 @@ export function hydrateGridVideosNeighborFirst(
         return;
     }
 
-    const fillRemaining = () => {
+    taskScheduler.scheduleIdle(() => {
         for (let i = 0; i < slotCount; i++) {
             if (warm.has(i)) {
                 continue;
@@ -53,9 +55,7 @@ export function hydrateGridVideosNeighborFirst(
         }
 
         prefetchAdjacentGridVideos(videos, activeIndex);
-    };
-
-    setTimeout(fillRemaining, 0);
+    });
 }
 
 export function prefetchAdjacentGridVideos(videos: readonly HTMLVideoElement[], activeIndex: number): void {

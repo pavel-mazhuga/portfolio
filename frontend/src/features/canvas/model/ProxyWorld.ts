@@ -1,6 +1,7 @@
 import Stats, { type StatsData } from 'stats-gl';
 // eslint-disable-next-line fsd/layer-import-restrictions
 import { projects } from '@/app/data/projects';
+import { resolveProjectVideoUrlFromSources } from '../utils/resolve-project-video-url';
 import type { World } from './World';
 import { GridVideoBridge } from './grid-video-bridge';
 import { canUseVideoFrameTexturePipeline } from './hexagonal-grid/video/video-frame-pipeline';
@@ -12,6 +13,7 @@ export type ProxyWorldInitParams = {
     width: number;
     height: number;
     isDebug: boolean;
+    skipWarmup?: boolean;
     useCoarsePointer: boolean;
 };
 
@@ -216,8 +218,56 @@ export class ProxyWorld implements IWorld {
         }
     }
 
+    prewarmAllRoutes() {
+        if (this.worker) {
+            this.worker.postMessage({ message: 'prewarmAllRoutes' });
+        } else {
+            this.world?.prewarmAllRoutes();
+        }
+    }
+
+    prefetchProjectsRoute() {
+        const urls = this.#resolveProjectVideoUrls({ isProjectsPage: true, videoUrls: [] });
+
+        this.bridge?.syncVideoUrls(urls);
+
+        if (this.worker) {
+            this.worker.postMessage({ message: 'prefetchProjectsRoute' });
+        } else {
+            this.world?.prefetchProjectsRoute();
+        }
+    }
+
+    prefetchHomeRoute() {
+        if (this.worker) {
+            this.worker.postMessage({ message: 'prefetchHomeRoute' });
+        } else {
+            this.world?.prefetchHomeRoute();
+        }
+    }
+
+    suspend() {
+        if (this.worker) {
+            this.worker.postMessage({ message: 'suspend' });
+        } else {
+            this.world?.suspend();
+        }
+    }
+
+    resume() {
+        if (this.worker) {
+            this.worker.postMessage({ message: 'resume' });
+        } else {
+            this.world?.resume();
+        }
+    }
+
     applyRouteState(state: GridRouteState) {
-        this.bridge?.syncVideoUrls(state.videoUrls);
+        const videoUrls = this.#resolveProjectVideoUrls(state);
+
+        if (state.isProjectsPage && videoUrls.length > 0) {
+            this.bridge?.syncVideoUrls(videoUrls);
+        }
 
         if (this.worker) {
             this.worker.postMessage({
@@ -227,6 +277,18 @@ export class ProxyWorld implements IWorld {
         } else {
             this.world?.applyRouteState(state);
         }
+    }
+
+    #resolveProjectVideoUrls(state: GridRouteState): string[] {
+        if (!state.isProjectsPage) {
+            return [];
+        }
+
+        if (state.videoUrls.length > 0) {
+            return state.videoUrls;
+        }
+
+        return projects.map((project) => resolveProjectVideoUrlFromSources(project.video));
     }
 
     prevSlide() {

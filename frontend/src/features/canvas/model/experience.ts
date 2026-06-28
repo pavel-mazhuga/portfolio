@@ -1,37 +1,8 @@
+import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
 import debounce from 'lodash.debounce';
+import { isProjectsPage } from '@/shared/lib/router';
 import { ProxyWorld } from './ProxyWorld';
 import type { IWorld } from './types';
-
-/** iOS/WebKit often leaves currentSrc empty until load; list markup uses <source> only. */
-function resolveProjectListVideoUrl(video: HTMLVideoElement): string {
-    const current = video.currentSrc?.trim();
-
-    if (current) {
-        return current;
-    }
-
-    const direct = video.getAttribute('src')?.trim();
-
-    if (direct) {
-        try {
-            return new URL(direct, document.baseURI).href;
-        } catch {
-            return direct;
-        }
-    }
-
-    const fromSource = video.querySelector('source[src]')?.getAttribute('src')?.trim();
-
-    if (fromSource) {
-        try {
-            return new URL(fromSource, document.baseURI).href;
-        } catch {
-            return fromSource;
-        }
-    }
-
-    return '';
-}
 
 const SPACE_POINTER_RADIUS_MUL = 2;
 
@@ -53,6 +24,7 @@ class Experience {
     canvasParent: HTMLElement | null;
     world?: IWorld;
     #routeWired = false;
+    #lastIsProjectsPage?: boolean;
     #spacePressActive = false;
     prevTime = 0;
     isHoverMq = matchMedia('(any-hover: hover), (hover: hover) and (pointer: fine)');
@@ -67,7 +39,9 @@ class Experience {
         this.onKeyup = this.onKeyup.bind(this);
 
         this.canvasParent = canvas.parentElement;
-        const isDebug = new URLSearchParams(window.location.search).has('debug');
+        const searchParams = new URLSearchParams(window.location.search);
+        const isDebug = searchParams.has('debug');
+        const skipWarmup = searchParams.has('noWarmup');
 
         this.world = new ProxyWorld(
             {
@@ -76,6 +50,7 @@ class Experience {
                 width: canvas.offsetWidth,
                 height: canvas.offsetHeight,
                 isDebug,
+                skipWarmup,
                 useCoarsePointer: matchMedia('(pointer: coarse)').matches,
             },
             isDebug,
@@ -92,9 +67,50 @@ class Experience {
 
         this.#routeWired = true;
         document.addEventListener('astro:page-load', this.#onPageLoad);
+        document.addEventListener('astro:before-preparation', this.#onBeforePreparation);
         document.addEventListener('projects-prev', this.#onPrev);
         document.addEventListener('projects-next', this.#onNext);
+        this.#wireRoutePrefetch();
         this.#syncRouteFromDom();
+    }
+
+    #onBeforePreparation = (event: Event) => {
+        if (!isTransitionBeforePreparationEvent(event)) {
+            return;
+        }
+
+        const { to } = event;
+
+        if (isProjectsPage(to.pathname)) {
+            this.world?.prefetchProjectsRoute?.();
+
+            return;
+        }
+
+        if (to.pathname === '/' || to.pathname === '') {
+            this.world?.prefetchHomeRoute?.();
+        }
+    };
+
+    #wireRoutePrefetch() {
+        const prefetchProjects = () => this.world?.prefetchProjectsRoute?.();
+        const prefetchHome = () => this.world?.prefetchHomeRoute?.();
+        const prewarmAll = () => this.world?.prewarmAllRoutes?.();
+
+        document.querySelectorAll<HTMLAnchorElement>('a[href="/projects/"], a[href="/projects"]').forEach((link) => {
+            link.addEventListener('pointerenter', prefetchProjects, { passive: true });
+            link.addEventListener('focus', prefetchProjects);
+        });
+
+        document.querySelectorAll<HTMLAnchorElement>('a[href="/"]').forEach((link) => {
+            link.addEventListener('pointerenter', prefetchHome, { passive: true });
+            link.addEventListener('focus', prefetchHome);
+        });
+
+        document.querySelectorAll<HTMLAnchorElement>('a[href="/lab/"], a[href="/lab"]').forEach((link) => {
+            link.addEventListener('pointerenter', prewarmAll, { passive: true });
+            link.addEventListener('focus', prewarmAll);
+        });
     }
 
     #onPageLoad = () => {
@@ -110,14 +126,22 @@ class Experience {
     };
 
     #syncRouteFromDom() {
-        const isProjectsPage = window.location.pathname.includes('/projects');
-        const videoUrls = isProjectsPage
-            ? Array.from(document.querySelectorAll<HTMLVideoElement>('.js-projects-list-item__video')).map(
-                  resolveProjectListVideoUrl,
-              )
-            : [];
+        const onProjectsPage = isProjectsPage(window.location.pathname);
 
-        this.world?.applyRouteState({ isProjectsPage, videoUrls });
+        if (this.#lastIsProjectsPage === onProjectsPage) {
+            return;
+        }
+
+        this.#lastIsProjectsPage = onProjectsPage;
+        this.world?.applyRouteState({ isProjectsPage: onProjectsPage, videoUrls: [] });
+    }
+
+    suspend() {
+        this.world?.suspend();
+    }
+
+    resume() {
+        this.world?.resume();
     }
 
     get dpr() {
@@ -203,6 +227,7 @@ class Experience {
 
         if (this.#routeWired) {
             document.removeEventListener('astro:page-load', this.#onPageLoad);
+            document.removeEventListener('astro:before-preparation', this.#onBeforePreparation);
             document.removeEventListener('projects-prev', this.#onPrev);
             document.removeEventListener('projects-next', this.#onNext);
             this.#routeWired = false;

@@ -14,38 +14,35 @@ const splits: SplitText[] = [];
 const prefersReducedMotion = () =>
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function revealWords(root: HTMLElement) {
-    requestAnimationFrame(() => {
-        root.querySelectorAll<HTMLElement>(WORD_SELECTOR).forEach((el) => {
-            el.classList.add('is-visible');
+function revealWords(words: readonly HTMLElement[]) {
+    if (words.length === 0) {
+        return;
+    }
+
+    const animate = () => {
+        // Commit hidden state before revealing — otherwise transition is skipped.
+        void words[0]!.offsetHeight;
+
+        requestAnimationFrame(() => {
+            for (const word of words) {
+                word.classList.add('is-visible');
+            }
         });
-    });
+    };
+
+    requestAnimationFrame(animate);
 }
 
-function prepareExit() {
-    if (prefersReducedMotion()) {
-        return;
-    }
+function runSplitAndReveal(root: HTMLElement) {
+    const existingWords = Array.from(root.querySelectorAll<HTMLElement>(WORD_SELECTOR));
 
-    const root = document.querySelector<HTMLElement>(ROOT_SELECTOR);
+    if (existingWords.length > 0) {
+        for (const word of existingWords) {
+            word.classList.remove('is-visible');
+        }
 
-    if (!root) {
-        return;
-    }
+        revealWords(existingWords);
 
-    root.querySelectorAll<HTMLElement>(WORD_SELECTOR).forEach((el, index) => {
-        el.style.viewTransitionName = `${VT_LINE_PREFIX}-${index}`;
-    });
-}
-
-function init() {
-    const root = document.querySelector<HTMLElement>(ROOT_SELECTOR);
-
-    if (!root || root.querySelector(WORD_SELECTOR)) {
-        return;
-    }
-
-    if (prefersReducedMotion()) {
         return;
     }
 
@@ -62,7 +59,49 @@ function init() {
         splits.push(split);
     }
 
-    revealWords(root);
+    revealWords(Array.from(root.querySelectorAll<HTMLElement>(WORD_SELECTOR)));
+}
+
+function init() {
+    const root = document.querySelector<HTMLElement>(ROOT_SELECTOR);
+
+    if (!root) {
+        return;
+    }
+
+    if (prefersReducedMotion()) {
+        return;
+    }
+
+    const start = () => {
+        if (!root.isConnected) {
+            return;
+        }
+
+        runSplitAndReveal(root);
+    };
+
+    if (document.fonts?.ready) {
+        void document.fonts.ready.then(start);
+    } else {
+        start();
+    }
+}
+
+function prepareExit() {
+    if (prefersReducedMotion()) {
+        return;
+    }
+
+    const root = document.querySelector<HTMLElement>(ROOT_SELECTOR);
+
+    if (!root) {
+        return;
+    }
+
+    root.querySelectorAll<HTMLElement>(WORD_SELECTOR).forEach((el, index) => {
+        el.style.viewTransitionName = `${VT_LINE_PREFIX}-${index}`;
+    });
 }
 
 function destroy() {

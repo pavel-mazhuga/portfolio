@@ -3,6 +3,7 @@ import { Experience } from '../model';
 
 let experience: Experience | null = null;
 let isInitialized = false;
+let suspendedForLab = false;
 
 function init() {
     if (isInitialized) {
@@ -18,13 +19,24 @@ function init() {
     if (canvas) {
         experience = new Experience(canvas);
         isInitialized = true;
+        suspendedForLab = false;
     }
+}
+
+function suspendForLab() {
+    if (!isInitialized || !experience) {
+        return;
+    }
+
+    experience.suspend();
+    suspendedForLab = true;
 }
 
 function destroy() {
     if (!isInitialized || !experience) {
         isInitialized = false;
         experience = null;
+        suspendedForLab = false;
 
         return;
     }
@@ -32,13 +44,21 @@ function destroy() {
     experience.dispose();
     experience = null;
     isInitialized = false;
+    suspendedForLab = false;
 }
 
 /** Persisted canvas island does not re-run its script after View Transitions;
  * re-init on each landing. */
 function syncWithRoute() {
     if (isLabDetailPage(window.location.pathname)) {
-        destroy();
+        suspendForLab();
+
+        return;
+    }
+
+    if (experience && suspendedForLab) {
+        experience.resume();
+        suspendedForLab = false;
 
         return;
     }
@@ -46,4 +66,4 @@ function syncWithRoute() {
     init();
 }
 
-export default { init, destroy, syncWithRoute };
+export default { init, destroy, syncWithRoute, suspendForLab };

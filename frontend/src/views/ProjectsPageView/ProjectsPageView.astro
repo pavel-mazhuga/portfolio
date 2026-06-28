@@ -16,8 +16,10 @@ import RoundButton from '@/shared/ui/RoundButton';
                 class="js-projects-counter-current projects-counter-odometer"
                 data-total={projects.length}
                 role="status"
-                aria-atomic="true">01</div
+                aria-atomic="true"
             >
+                01
+            </div>
             /
             <span>{projects.length.toString().padStart(2, '0')}</span>
         </div>
@@ -214,13 +216,30 @@ import RoundButton from '@/shared/ui/RoundButton';
 </style>
 
 <script>
+    import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
+    import { isProjectsPage } from '@/shared/lib/router';
     import projectsPageView from './ProjectsPageView';
+
+    let pendingLeaveProjects = false;
+
+    document.addEventListener('astro:before-preparation', (event) => {
+        if (!isTransitionBeforePreparationEvent(event)) {
+            return;
+        }
+
+        pendingLeaveProjects = isProjectsPage(event.from.pathname) && !isProjectsPage(event.to.pathname);
+    });
 
     document.addEventListener('astro:page-load', () => {
         projectsPageView.init();
     });
 
-    document.addEventListener('astro:before-swap', () => {
+    document.addEventListener('astro:after-preparation', () => {
+        if (!pendingLeaveProjects) {
+            return;
+        }
+
         projectsPageView.destroy();
+        pendingLeaveProjects = false;
     });
 </script>

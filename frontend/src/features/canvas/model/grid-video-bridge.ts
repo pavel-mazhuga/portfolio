@@ -94,7 +94,9 @@ export class GridVideoBridge {
     }
 
     syncVideoUrls(urls: string[]): void {
-        if (this.disposed || urls.length === 0) return;
+        if (this.disposed || urls.length === 0) {
+            return;
+        }
 
         hydrateGridVideosNeighborFirst(this.videos, urls, this.lastWarmIndex);
     }
