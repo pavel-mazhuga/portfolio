@@ -9,6 +9,7 @@ import { APP_TITLE } from '@/shared/api/get-common-page-props';
 import { ClientRouter } from 'astro:transitions';
 import { isLabDetailPage } from '@/shared/lib/router';
 import Breadcrumbs from '@/shared/ui/Breadcrumbs.astro';
+import SkipLink from '@/shared/ui/SkipLink';
 
 type Props = {
     htmlClass?: string;
@@ -102,10 +103,11 @@ const getLocalizedUrl = (l: string) => {
         <script src="@/app/app.ts"></script>
     </head>
     <body>
+        <SkipLink />
         {!isLabDetailPage(pathname) && <Canvas transition:persist />}
         <Header transition:persist transition:animate="none" />
         {breadcrumbs?.length && <Breadcrumbs data={breadcrumbs} />}
-        <main class="main" transition:name="main" transition:animate="none">
+        <main id="main" class="main" tabindex="-1" transition:name="main" transition:animate="none">
             <slot />
         </main>
         {process.env.NODE_ENV === 'development' && <LayoutGrid />}
