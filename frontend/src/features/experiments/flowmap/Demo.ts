@@ -4,11 +4,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { add, pass, renderOutput, vec4 } from 'three/tsl';
 import {
-    AmbientLight,
-    DoubleSide,
+    DirectionalLight,
     Group,
     Mesh,
-    MeshBasicNodeMaterial,
+    MeshPhysicalNodeMaterial,
     PointLight,
     RenderPipeline,
     TimestampQuery,
@@ -96,7 +95,10 @@ class FlowmapDemo extends BaseExperience {
         this.controls.maxPolarAngle = Math.PI / 2;
         this.controls.enableDamping = true;
 
-        this.scene.add(new AmbientLight());
+        const directionalLight = new DirectionalLight(0xffffff, 1.4);
+
+        directionalLight.position.set(1, 1, 1);
+        this.scene.add(directionalLight);
 
         this.pointLight1 = new PointLight(0xff6b6b, 1.5, 10);
         this.pointLight2 = new PointLight(0x4ecdc4, 1.5, 10);
@@ -108,18 +110,19 @@ class FlowmapDemo extends BaseExperience {
 
         const loader = new GLTFLoader();
 
+        const suzanneMaterial = new MeshPhysicalNodeMaterial({
+            roughness: 0.2,
+            metalness: 0.9,
+        });
+
         loader.load('/static/gltf/suzanne.glb', (gltf) => {
             this.suzanne = gltf.scene;
+            const suzanneMesh = this.suzanne.children[0];
 
-            this.suzanne.traverse((child) => {
-                if (child instanceof Mesh) {
-                    child.material = new MeshBasicNodeMaterial({
-                        color: 0xffffff,
-                        toneMapped: false,
-                        side: DoubleSide,
-                    });
-                }
-            });
+            if (suzanneMesh instanceof Mesh) {
+                suzanneMesh.scale.setScalar(0.5);
+                suzanneMesh.material = suzanneMaterial;
+            }
 
             this.scene.add(this.suzanne);
             this.initTweakPane();
