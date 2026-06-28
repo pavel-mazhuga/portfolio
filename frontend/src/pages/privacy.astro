@@ -1,0 +1,29 @@
+---
+// eslint-disable-next-line fsd/layer-import-restrictions
+import RootLayout from '@/app/layouts/RootLayout';
+import { getCommonPageProps } from '@/shared/api/get-common-page-props';
+import type { AppBreadcrumbs } from '@/shared/model/types';
+import PrivacyPageView from '@/views/PrivacyPageView';
+
+const htmlClass = 'privacy-page';
+const breadcrumbs: AppBreadcrumbs = [
+    {
+        text: 'Home',
+        href: '/',
+    },
+    {
+        text: 'Privacy policy',
+        href: '/privacy/',
+    },
+];
+const commonPageProps = await getCommonPageProps();
+const meta = {
+    ...commonPageProps.meta,
+    title: 'Privacy policy',
+    description: 'Privacy policy for pavelmazhuga.com — what data is collected and how it is used.',
+};
+---
+
+<RootLayout htmlClass={htmlClass} meta={meta} breadcrumbs={breadcrumbs}>
+    <PrivacyPageView />
+</RootLayout>

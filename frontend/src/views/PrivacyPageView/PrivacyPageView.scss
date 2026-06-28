@@ -1,0 +1,12 @@
+@use '@/app/css/base/variables' as *;
+@use '@/app/css/utils/mixins' as *;
+
+.privacy-page__content {
+    @include grid-columns(6);
+
+    margin-inline: auto;
+
+    @include tablet {
+        width: 100%;
+    }
+}

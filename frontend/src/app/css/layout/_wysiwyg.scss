@@ -27,8 +27,6 @@
     a:not([class]) {
         @extend %link;
         @extend %link-underlined;
-
-        color: $primary;
     }
 
     /* stylelint-enable custom/no-nested-tag-selectors */
