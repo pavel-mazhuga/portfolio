@@ -881,99 +881,102 @@ export class HexagonalGrid {
 
         const generation = ++this.projectModeGeneration;
 
-        this.timeline = buildProjectModeTimeline(active, {
+        if (active) {
+            this.#commitProjectsGridEnter(viewportSize, skipLayoutRebuild, generation, () => {
+                if (generation !== this.projectModeGeneration) {
+                    return;
+                }
+
+                this.timeline = buildProjectModeTimeline(true, {
+                    uniforms: this.uniforms,
+                    resumeProjectPlayback: () => {
+                        this.playback.playOnly(this.currentVideoIndex);
+                    },
+                });
+            });
+
+            this.ensureLayoutCached(viewportSize, false);
+
+            return true;
+        }
+
+        this.timeline = buildProjectModeTimeline(false, {
             uniforms: this.uniforms,
             resumeProjectPlayback: () => {
                 this.playback.playOnly(this.currentVideoIndex);
             },
         });
 
-        if (!active) {
-            this.timeline.eventCallback('onComplete', () => {
-                this.playback.pauseAll();
-                this.timeline?.eventCallback('onComplete', null);
-            });
-        }
+        this.timeline.eventCallback('onComplete', () => {
+            this.playback.pauseAll();
+            this.timeline?.eventCallback('onComplete', null);
+        });
 
         void taskScheduler.schedule(() => {
             if (generation !== this.projectModeGeneration) {
                 return;
             }
 
-            this.#applyProjectModeGridWork(active, viewportSize, skipLayoutRebuild);
-        }, { priority: active ? 'background' : 'user-visible' });
+            this.#applyProjectModeGridLeave(viewportSize, skipLayoutRebuild);
+        }, { priority: 'user-visible' });
 
-        this.ensureLayoutCached(viewportSize, !active);
+        this.ensureLayoutCached(viewportSize, true);
 
         return true;
     }
 
-    #applyProjectModeGridWork(active: boolean, viewportSize: Vector2, skipLayoutRebuild: boolean): void {
-        if (!active) {
-            const targetAngles = this.targetAngleStorage.value?.array;
-            const currentFlipped = targetAngles !== undefined && Math.round(targetAngles[0] / Math.PI) % 2 !== 0;
+    #commitProjectsGridEnter(
+        viewportSize: Vector2,
+        skipLayoutRebuild: boolean,
+        generation: number,
+        onReady: () => void,
+    ): void {
+        if (skipLayoutRebuild) {
+            this.layoutWorldExtentY = viewportSize.y;
+            this.lastGridRebuildWasInPlace = true;
+            this.#applyProjectModeEnterStorageReset();
+            onReady();
 
-            if (currentFlipped) {
-                this.nextSlide();
+            return;
+        }
+
+        if (this.#tryCommitFromLayoutCache(true, viewportSize)) {
+            this.lastGridRebuildWasInPlace = false;
+            this.#applyProjectModeEnterStorageReset();
+            onReady();
+
+            return;
+        }
+
+        const rebuildGeneration = ++this.rebuildGeneration;
+
+        this.clearLayoutCache();
+        this.lastGridRebuildWasInPlace = false;
+
+        void this.#rebuildGridAsync(viewportSize, rebuildGeneration).then(() => {
+            if (generation !== this.projectModeGeneration || !this.projectModeActive) {
+                return;
             }
+
+            this.#applyProjectModeEnterStorageReset();
+            onReady();
+        });
+    }
+
+    #applyProjectModeGridLeave(viewportSize: Vector2, skipLayoutRebuild: boolean): void {
+        const targetAngles = this.targetAngleStorage.value?.array;
+        const currentFlipped = targetAngles !== undefined && Math.round(targetAngles[0] / Math.PI) % 2 !== 0;
+
+        if (currentFlipped) {
+            this.nextSlide();
         }
 
         let committedPrefetch = false;
 
         if (skipLayoutRebuild) {
-            if (active) {
-                this.layoutWorldExtentY = viewportSize.y;
-            }
-
             this.lastGridRebuildWasInPlace = true;
-        } else if (active) {
-            const cacheKey = this.#layoutCacheKey(viewportSize, true);
-            const cached = this.layoutCache.get(cacheKey);
-
-            if (cached) {
-                const generation = this.projectModeGeneration;
-
-                void taskScheduler.yieldFrame().then(() => {
-                    if (generation !== this.projectModeGeneration) {
-                        return;
-                    }
-
-                    const pending = this.layoutCache.get(cacheKey);
-
-                    if (!pending) {
-                        return;
-                    }
-
-                    this.layoutCache.delete(cacheKey);
-                    this.#applyBuiltGridState(pending);
-
-                    void taskScheduler.yieldFrame().then(() => {
-                        if (generation !== this.projectModeGeneration) {
-                            return;
-                        }
-
-                        this.#applyProjectModeEnterStorageReset();
-                    });
-                });
-
-                this.lastGridRebuildWasInPlace = false;
-
-                return;
-            }
-
-            const rebuildGeneration = ++this.rebuildGeneration;
-
-            this.clearLayoutCache();
-            void this.#rebuildGridAsync(viewportSize, rebuildGeneration).then(() => {
-                if (!this.projectModeActive) {
-                    return;
-                }
-
-                this.#applyProjectModeEnterStorageReset();
-            });
-            this.lastGridRebuildWasInPlace = false;
         } else {
-            committedPrefetch = this.#tryCommitFromLayoutCache(active, viewportSize);
+            committedPrefetch = this.#tryCommitFromLayoutCache(false, viewportSize);
 
             if (!committedPrefetch) {
                 const rebuildGeneration = ++this.rebuildGeneration;
@@ -983,16 +986,6 @@ export class HexagonalGrid {
             }
 
             this.lastGridRebuildWasInPlace = false;
-        }
-
-        if (active && (this.lastGridRebuildWasInPlace || committedPrefetch)) {
-            void taskScheduler.yieldFrame().then(() => {
-                if (!this.projectModeActive) {
-                    return;
-                }
-
-                this.#applyProjectModeEnterStorageReset();
-            });
         }
     }
 

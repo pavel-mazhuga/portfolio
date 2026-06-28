@@ -79,10 +79,26 @@ class Experience {
             return;
         }
 
-        const { to } = event;
+        const { from, to } = event;
+        const enteringProjects = isProjectsPage(to.pathname) && !isProjectsPage(from.pathname);
+        const leavingProjects = isProjectsPage(from.pathname) && !isProjectsPage(to.pathname);
 
-        if (isProjectsPage(to.pathname)) {
+        if (enteringProjects) {
             this.world?.prefetchProjectsRoute?.();
+
+            if (this.#lastIsProjectsPage !== true) {
+                this.#lastIsProjectsPage = true;
+                this.world?.applyRouteState({ isProjectsPage: true, videoUrls: [] });
+            }
+
+            return;
+        }
+
+        if (leavingProjects) {
+            if (this.#lastIsProjectsPage !== false) {
+                this.#lastIsProjectsPage = false;
+                this.world?.applyRouteState({ isProjectsPage: false, videoUrls: [] });
+            }
 
             return;
         }
