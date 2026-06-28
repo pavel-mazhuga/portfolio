@@ -1,2 +1,2 @@
 export type { IExperiment } from './model/experiment.interface';
-export { experiments } from './model/data';
+export { experiments, listedExperiments } from './model/data';

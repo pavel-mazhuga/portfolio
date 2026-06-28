@@ -4,6 +4,15 @@ type ExperimentInput = Omit<IExperiment, 'preview' | 'sourceLink'>;
 
 const experimentData: ExperimentInput[] = [
     {
+        name: 'Shadowed particles',
+        slug: 'shadowed-particles',
+        tags: ['webgpu', 'tsl', 'shaders', 'particles'],
+        seoTitle: 'Shadowed particles (hologram)',
+        tip: 'Move cursor',
+        active: false,
+    },
+
+    {
         name: 'Metaballs',
         slug: 'metaballs',
         tags: ['webgpu', 'tsl', 'shaders', 'raymarching', 'sdf'],
@@ -56,6 +65,13 @@ const experimentData: ExperimentInput[] = [
         name: 'Flow field',
         slug: 'flow-field',
         tags: ['webgpu', 'tsl', 'shaders', 'compute'],
+    },
+    {
+        name: 'Flowmap',
+        slug: 'flowmap',
+        tags: ['webgpu', 'tsl', 'shaders', 'postprocessing'],
+        tip: 'Move cursor',
+        active: false,
     },
     {
         name: 'Nightingale hover effect (recreated)',
@@ -178,7 +194,7 @@ const experimentData: ExperimentInput[] = [
     },
 ];
 
-export const experiments: IExperiment[] = experimentData.map((item) => ({
+const allExperiments: IExperiment[] = experimentData.map((item) => ({
     ...item,
     preview: {
         src: `/static/img/lab/${item.slug}/preview.jpeg`,
@@ -188,3 +204,7 @@ export const experiments: IExperiment[] = experimentData.map((item) => ({
     },
     sourceLink: `https://github.com/pavel-mazhuga/portfolio/tree/main/frontend/src/features/experiments/${item.slug}`,
 }));
+
+export const experiments = allExperiments;
+
+export const listedExperiments = allExperiments.filter((item) => item.active !== false);
