@@ -41,7 +41,6 @@ class Experience {
         this.canvasParent = canvas.parentElement;
         const searchParams = new URLSearchParams(window.location.search);
         const isDebug = searchParams.has('debug');
-        const skipWarmup = searchParams.has('noWarmup');
 
         this.world = new ProxyWorld(
             {
@@ -50,7 +49,6 @@ class Experience {
                 width: canvas.offsetWidth,
                 height: canvas.offsetHeight,
                 isDebug,
-                skipWarmup,
                 useCoarsePointer: matchMedia('(pointer: coarse)').matches,
             },
             isDebug,

@@ -13,7 +13,6 @@ export type ProxyWorldInitParams = {
     width: number;
     height: number;
     isDebug: boolean;
-    skipWarmup?: boolean;
     useCoarsePointer: boolean;
 };
 

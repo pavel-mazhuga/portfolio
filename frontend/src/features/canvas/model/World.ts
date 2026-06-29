@@ -1,10 +1,9 @@
 import Stats, { StatsProfiler } from 'stats-gl';
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 import GaussianBlurNode, { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
-import { Fn, add, float, max, mrt, mx_fractal_noise_vec3, output, pass, screenUV, time, vec3, vec4 } from 'three/tsl';
+import { add, float, Fn, max, mrt, mx_fractal_noise_vec3, output, pass, screenUV, time, vec3, vec4 } from 'three/tsl';
 import {
     ACESFilmicToneMapping,
-    type Node,
     PerspectiveCamera,
     Plane,
     RenderPipeline,
@@ -14,6 +13,7 @@ import {
     Vector2,
     Vector3,
     WebGPURenderer,
+    type Node,
 } from 'three/webgpu';
 import { Pane } from 'tweakpane';
 // eslint-disable-next-line fsd/layer-import-restrictions
@@ -21,7 +21,6 @@ import { projects } from '@/app/data/projects';
 import { Pointer } from '../utils/Pointer';
 import { resolveProjectVideoUrlFromSources } from '../utils/resolve-project-video-url';
 import { Noises } from '../utils/tsl/Noises';
-import { warmupWorld } from '../utils/warmup-world';
 import { HexagonalGrid } from './hexagonal-grid';
 import type { CanvasData, GridRouteState, IWorld } from './types';
 
@@ -156,24 +155,6 @@ export class World implements IWorld {
                 if (this.disposed) {
                     return;
                 }
-            }
-
-            if (!options.skipWarmup) {
-                void warmupWorld(
-                    {
-                        renderer: this.renderer,
-                        scene: this.scene,
-                        camera: this.camera,
-                        scenePass: this.scenePass,
-                        runCompute: () => {
-                            if (this.hexGrid?.group.visible) {
-                                this.renderer.compute(this.hexGrid.computeUpdate);
-                            }
-                        },
-                        renderFrame: () => this.render(),
-                    },
-                    { debug: options.isDebug, frameCount: 0 },
-                );
             }
 
             this.renderer.setAnimationLoop(this.render);

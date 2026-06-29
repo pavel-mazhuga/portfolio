@@ -13,7 +13,6 @@ export type CanvasData = {
     width: number;
     height: number;
     isDebug: boolean;
-    skipWarmup?: boolean;
     useCoarsePointer: boolean;
     videoPlayback?: GridVideoPlayback;
     onInitialized?: () => void;
