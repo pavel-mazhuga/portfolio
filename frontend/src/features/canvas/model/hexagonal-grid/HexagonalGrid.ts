@@ -875,8 +875,6 @@ export class HexagonalGrid {
 
         if (active) {
             this.currentVideoIndex = 0;
-            this.uniforms.projectTransition.value = 0;
-            this.uniforms.videoTransition.value = 0;
         }
 
         const generation = ++this.projectModeGeneration;
