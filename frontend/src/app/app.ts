@@ -4,15 +4,12 @@ import calculateScrollbarWidth from '@/shared/lib/dom/calculate-scrollbar-width'
 import vhMobileFix from '@/shared/lib/dom/vh-mobile-fix';
 import { isLabDetailPage, isLabIndexPage, isProjectsPage } from '@/shared/lib/router';
 import { taskScheduler } from '@/shared/lib/scheduler';
-import hover from '@/shared/ui/Hover/Hover';
 
 const CLIP_EL_SELECTOR = '.clip-container__el';
 const CLIP_VT_PREFIX = 'clip-line';
 const VT_LAB_FADE_ATTR = 'data-vt-lab-fade';
-const VT_LAB_VIEWPORT_LEAVE_ATTR = 'data-vt-lab-viewport-leave';
 const VT_LAB_VIEWPORT_ENTER_ATTR = 'data-vt-lab-viewport-enter';
 const VT_PROJECTS_LEAVE_ATTR = 'data-vt-projects-leave';
-const VT_CLIP_EXIT_ATTR = 'data-vt-clip-exit';
 const LAB_CARD_ITEM_SELECTOR = '.experiments-list__item';
 const LAB_CARD_CLIP_SELECTOR = `${LAB_CARD_ITEM_SELECTOR} ${CLIP_EL_SELECTOR}`;
 const PAGE_HEADER_CLIP_SELECTOR = '.page__header .clip-container__el';
@@ -26,8 +23,30 @@ function isClipVtOnceEl(el: HTMLElement): boolean {
     return el.closest('.clip-container')?.classList.contains('clip-container--view-transition-once') ?? false;
 }
 
+function getViewportBounds(): { top: number; left: number; bottom: number; right: number } {
+    const vv = window.visualViewport;
+
+    if (vv) {
+        return {
+            top: vv.offsetTop,
+            left: vv.offsetLeft,
+            bottom: vv.offsetTop + vv.height,
+            right: vv.offsetLeft + vv.width,
+        };
+    }
+
+    return {
+        top: 0,
+        left: 0,
+        bottom: window.innerHeight,
+        right: window.innerWidth,
+    };
+}
+
 function intersectsViewport(rect: DOMRect): boolean {
-    return rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
+    const vp = getViewportBounds();
+
+    return rect.bottom > vp.top && rect.top < vp.bottom && rect.right > vp.left && rect.left < vp.right;
 }
 
 function getLabCardItems(): HTMLElement[] {
@@ -35,13 +54,14 @@ function getLabCardItems(): HTMLElement[] {
 }
 
 function findFirstLabCardNotAbove(items: readonly HTMLElement[]): number {
+    const vpTop = getViewportBounds().top;
     let lo = 0;
     let hi = items.length;
 
     while (lo < hi) {
         const mid = (lo + hi) >> 1;
 
-        if (items[mid]!.getBoundingClientRect().bottom <= 0) {
+        if (items[mid]!.getBoundingClientRect().bottom <= vpTop) {
             lo = mid + 1;
         } else {
             hi = mid;
@@ -52,7 +72,7 @@ function findFirstLabCardNotAbove(items: readonly HTMLElement[]): number {
 }
 
 function findLastLabCardNotBelow(items: readonly HTMLElement[]): number {
-    const viewportBottom = window.innerHeight;
+    const viewportBottom = getViewportBounds().bottom;
     let lo = 0;
     let hi = items.length - 1;
     let last = -1;
@@ -102,25 +122,6 @@ function forEachLabViewportCardClip(onClip: (el: HTMLElement) => void): void {
     }
 }
 
-function pruneOffscreenLabCards(): void {
-    const items = getLabCardItems();
-
-    if (items.length === 0) {
-        return;
-    }
-
-    const first = findFirstLabCardNotAbove(items);
-    const last = findLastLabCardNotBelow(items);
-
-    for (let i = items.length - 1; i > last; i--) {
-        items[i]!.remove();
-    }
-
-    for (let i = first - 1; i >= 0; i--) {
-        items[i]!.remove();
-    }
-}
-
 function prepareProjectsVisibleClipLeave(): void {
     let clipVtIndex = 0;
 
@@ -142,10 +143,6 @@ function prepareProjectsVisibleClipLeave(): void {
 
             el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${clipVtIndex++}`;
         });
-}
-
-function markClipVtExit(): void {
-    document.documentElement.setAttribute(VT_CLIP_EXIT_ATTR, '');
 }
 
 async function addVisibleClassChunked(elements: readonly HTMLElement[]): Promise<void> {
@@ -197,18 +194,6 @@ async function revealProjectsClips(): Promise<void> {
     }
 }
 
-function prepareLabViewportClipLeave(): void {
-    let clipVtIndex = 0;
-
-    forEachLabViewportCardClip((el) => {
-        el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${clipVtIndex++}`;
-    });
-
-    document.querySelectorAll<HTMLElement>(PAGE_HEADER_CLIP_SELECTOR).forEach((el) => {
-        el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${clipVtIndex++}`;
-    });
-}
-
 function prepareClipVtExit() {
     if (prefersReducedMotion()) {
         return;
@@ -218,17 +203,8 @@ function prepareClipVtExit() {
         return;
     }
 
-    if (document.documentElement.hasAttribute(VT_LAB_VIEWPORT_LEAVE_ATTR)) {
-        prepareLabViewportClipLeave();
-        pruneOffscreenLabCards();
-        markClipVtExit();
-
-        return;
-    }
-
     if (document.documentElement.hasAttribute(VT_PROJECTS_LEAVE_ATTR)) {
         prepareProjectsVisibleClipLeave();
-        markClipVtExit();
 
         return;
     }
@@ -242,10 +218,6 @@ function prepareClipVtExit() {
 
         el.style.viewTransitionName = `${CLIP_VT_PREFIX}-${clipVtIndex++}`;
     });
-
-    if (clipVtIndex > 0) {
-        markClipVtExit();
-    }
 }
 
 function revealClipContainers() {
@@ -258,7 +230,7 @@ function revealClipContainers() {
 
         if (viewportEnter) {
             await addVisibleClassChunked(collectLabViewportClips());
-            addVisibleClassChunked(
+            await addVisibleClassChunked(
                 Array.from(document.querySelectorAll<HTMLElement>(LAB_CARD_CLIP_SELECTOR)).filter(
                     (el) => !el.classList.contains('is-visible'),
                 ),
@@ -278,27 +250,13 @@ function revealClipContainers() {
 }
 
 function resetClipContainers() {
-    if (
-        document.documentElement.hasAttribute(VT_LAB_FADE_ATTR) ||
-        document.documentElement.hasAttribute(VT_LAB_VIEWPORT_LEAVE_ATTR) ||
-        document.documentElement.hasAttribute(VT_PROJECTS_LEAVE_ATTR) ||
-        document.documentElement.hasAttribute(VT_CLIP_EXIT_ATTR)
-    ) {
-        return;
-    }
-
-    document.querySelectorAll<HTMLElement>(`${CLIP_EL_SELECTOR}.is-visible`).forEach((el) => {
+    document.querySelectorAll<HTMLElement>(CLIP_EL_SELECTOR).forEach((el) => {
         if (isClipVtOnceEl(el)) {
             return;
         }
 
         el.classList.remove('is-visible');
     });
-}
-
-function onAfterPreparation() {
-    prepareClipVtExit();
-    hover.destroy();
 }
 
 document.addEventListener('astro:page-load', () => {
@@ -320,15 +278,12 @@ document.addEventListener('astro:before-preparation', (event) => {
     const { from, to } = event;
     const labListToDetail = isLabIndexPage(from.pathname) && isLabDetailPage(to.pathname);
     const detailToLabList = isLabDetailPage(from.pathname) && isLabIndexPage(to.pathname);
-    const leavingLabIndex = isLabIndexPage(from.pathname) && !isLabIndexPage(to.pathname);
     const leavingProjects = isProjectsPage(from.pathname) && !isProjectsPage(to.pathname);
     const enteringLabIndex =
         isLabIndexPage(to.pathname) && !isLabIndexPage(from.pathname) && !isLabDetailPage(from.pathname);
 
     if (labListToDetail || detailToLabList) {
         document.documentElement.setAttribute(VT_LAB_FADE_ATTR, '');
-    } else if (leavingLabIndex) {
-        document.documentElement.setAttribute(VT_LAB_VIEWPORT_LEAVE_ATTR, '');
     } else if (leavingProjects) {
         document.documentElement.setAttribute(VT_PROJECTS_LEAVE_ATTR, '');
     } else if (enteringLabIndex) {
@@ -338,10 +293,8 @@ document.addEventListener('astro:before-preparation', (event) => {
 
 document.addEventListener('astro:after-swap', () => {
     document.documentElement.removeAttribute(VT_LAB_FADE_ATTR);
-    document.documentElement.removeAttribute(VT_LAB_VIEWPORT_LEAVE_ATTR);
     document.documentElement.removeAttribute(VT_PROJECTS_LEAVE_ATTR);
-    document.documentElement.removeAttribute(VT_CLIP_EXIT_ATTR);
 });
 
-document.addEventListener('astro:after-preparation', onAfterPreparation);
+document.addEventListener('astro:after-preparation', prepareClipVtExit);
 document.addEventListener('astro:before-swap', resetClipContainers);

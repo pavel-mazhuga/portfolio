@@ -1,6 +1,6 @@
 import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
 import debounce from 'lodash.debounce';
-import { isProjectsPage } from '@/shared/lib/router';
+import { isLabIndexPage, isProjectsPage } from '@/shared/lib/router';
 import { ProxyWorld } from './ProxyWorld';
 import type { IWorld } from './types';
 
@@ -84,25 +84,21 @@ class Experience {
         if (enteringProjects) {
             this.world?.prefetchProjectsRoute?.();
 
-            if (this.#lastIsProjectsPage !== true) {
-                this.#lastIsProjectsPage = true;
-                this.world?.applyRouteState({ isProjectsPage: true, videoUrls: [] });
-            }
-
             return;
         }
 
         if (leavingProjects) {
-            if (this.#lastIsProjectsPage !== false) {
-                this.#lastIsProjectsPage = false;
-                this.world?.applyRouteState({ isProjectsPage: false, videoUrls: [] });
+            if (to.pathname === '/' || to.pathname === '') {
+                this.world?.prefetchHomeRoute?.();
             }
 
             return;
         }
 
         if (to.pathname === '/' || to.pathname === '') {
-            this.world?.prefetchHomeRoute?.();
+            if (!isLabIndexPage(from.pathname)) {
+                this.world?.prefetchHomeRoute?.();
+            }
         }
     };
 

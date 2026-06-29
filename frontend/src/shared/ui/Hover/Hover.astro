@@ -41,5 +41,6 @@ const Element = tag;
 
     document.addEventListener('astro:before-swap', () => {
         hoverMq.removeEventListener('change', onHoverMqChange);
+        hover.destroy();
     });
 </script>
