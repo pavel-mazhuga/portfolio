@@ -216,17 +216,13 @@ import RoundButton from '@/shared/ui/RoundButton';
 </style>
 
 <script>
-    import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
+    import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
     import { isProjectsPage } from '@/shared/lib/router';
     import projectsPageView from './ProjectsPageView';
 
     let pendingLeaveProjects = false;
 
-    document.addEventListener('astro:before-preparation', (event) => {
-        if (!isTransitionBeforePreparationEvent(event)) {
-            return;
-        }
-
+    document.addEventListener('astro:before-preparation', (event: TransitionBeforePreparationEvent) => {
         pendingLeaveProjects = isProjectsPage(event.from.pathname) && !isProjectsPage(event.to.pathname);
     });
 

@@ -1,4 +1,4 @@
-import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
+import { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 import debounce from 'lodash.debounce';
 import { isLabIndexPage, isProjectsPage } from '@/shared/lib/router';
 import { ProxyWorld } from './ProxyWorld';
@@ -73,7 +73,7 @@ class Experience {
     }
 
     #onBeforePreparation = (event: Event) => {
-        if (!isTransitionBeforePreparationEvent(event)) {
+        if (!(event instanceof TransitionBeforePreparationEvent)) {
             return;
         }
 

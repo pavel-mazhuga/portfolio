@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-export type Props = HTMLAttributes<'div'>;
+export type Props = HTMLAttributes;
 
 const { ...props } = Astro.props;
 ---
@@ -15,19 +15,15 @@ const { ...props } = Astro.props;
 </style>
 
 <script>
-    import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
-    import canvas from './Canvas';
+    import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
     import { isLabDetailPage } from '@/shared/lib/router';
+    import canvas from './Canvas';
 
     document.addEventListener('astro:page-load', () => {
         canvas.syncWithRoute();
     });
 
-    document.addEventListener('astro:before-preparation', (event) => {
-        if (!isTransitionBeforePreparationEvent(event)) {
-            return;
-        }
-
+    document.addEventListener('astro:before-preparation', (event: TransitionBeforePreparationEvent) => {
         if (isLabDetailPage(event.to.pathname)) {
             canvas.suspendForLab();
         }

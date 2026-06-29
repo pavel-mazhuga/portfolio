@@ -2,7 +2,7 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
-import astroParser from 'astro-eslint-parser';
+import * as astroParser from 'astro-eslint-parser';
 import eslintPluginAstro from 'eslint-plugin-astro';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
 import sonarjs from 'eslint-plugin-sonarjs';

@@ -1,5 +1,5 @@
 import { InstancedMesh, PlaneGeometry, SRGBColorSpace, Texture, TextureLoader, Vector3 } from 'three';
-import { Fn, If, PI2, deltaTime, float, hash, instanceIndex, instancedArray, time, uniform, vec3 } from 'three/tsl';
+import { Fn, If, PI2, deltaTime, float, hash, instanceIndex, instancedArray, time, uint, uniform, vec3 } from 'three/tsl';
 import { SpriteNodeMaterial, type StorageBufferNode, WebGPURenderer } from 'three/webgpu';
 import { Pane } from 'tweakpane';
 import { simplexNoise3d } from '@/features/experiments/lib/nodes/noise/simplexNoise3d';
@@ -68,13 +68,13 @@ class Snowflakes extends InstancedMesh<PlaneGeometry, SpriteNodeMaterial> {
 
         const getStartPosition = () =>
             vec3(
-                hash(instanceIndex.add(time))
+                hash(instanceIndex.add(uint(time)))
                     .sub(0.5)
                     .mul(this.viewport.width * 2),
-                hash(instanceIndex.add(time).add(1))
+                hash(instanceIndex.add(uint(time)).add(1))
                     .mul(this.viewport.height * 1.5)
                     .add(this.viewport.height / 2),
-                hash(instanceIndex.add(time).add(2)).negate().mul(5),
+                hash(instanceIndex.add(uint(time)).add(2)).negate().mul(5),
             );
 
         this.renderer.computeAsync(

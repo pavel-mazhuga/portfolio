@@ -95,7 +95,7 @@
 .index-page__info {
     padding-top: vh(15, 1svh);
     display: grid;
-    grid-gap: var(--grid-gap);
+    gap: var(--grid-gap);
     grid-template-columns: repeat(var(--grid-columns), 1fr);
     margin-bottom: 20px;
 

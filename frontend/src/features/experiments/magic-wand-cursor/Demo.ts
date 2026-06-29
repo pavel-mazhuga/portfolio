@@ -15,6 +15,7 @@ import {
     smoothstep,
     storage,
     time,
+    uint,
     uniform,
     uv,
     vec2,
@@ -131,9 +132,9 @@ class Demo extends BaseExperience {
             If(life.lessThan(0), () => {
                 const randomDir = normalize(
                     vec3(
-                        hash(instanceIndex.mul(time)),
-                        hash(instanceIndex.mul(time.add(1))),
-                        hash(instanceIndex.mul(time.add(2))),
+                        hash(instanceIndex.mul(uint(time))),
+                        hash(instanceIndex.mul(uint(time).add(1))),
+                        hash(instanceIndex.mul(uint(time).add(2))),
                     ).sub(0.5),
                 );
 
@@ -145,7 +146,7 @@ class Demo extends BaseExperience {
                             .add(this.uniforms.pointerVelocity)
                             .mul(this.uniforms.sparkSpread),
                     );
-                    life.assign(hash(instanceIndex.add(time)).mul(1).add(0.5));
+                    life.assign(hash(instanceIndex.add(uint(time))).mul(1).add(0.5));
                 }).Else(() => {
                     position.xyz.assign(vec3(0));
                     velocity.xyz.assign(vec3(0));

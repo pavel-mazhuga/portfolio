@@ -1,4 +1,4 @@
-import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
+import { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 import { isLabDetailPage } from '@/shared/lib/router';
 
 type LabExperienceInstance = {
@@ -65,7 +65,7 @@ async function tryMount(slug: string, canvas: HTMLCanvasElement, generation: num
 }
 
 document.addEventListener('astro:before-preparation', (event) => {
-    if (!isTransitionBeforePreparationEvent(event)) {
+    if (!(event instanceof TransitionBeforePreparationEvent)) {
         return;
     }
 

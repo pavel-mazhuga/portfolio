@@ -1,4 +1,4 @@
-import { isTransitionBeforePreparationEvent } from 'astro:transitions/client';
+import { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 import '@/features/experiments/lib/lab-experiment-runtime';
 import calculateScrollbarWidth from '@/shared/lib/dom/calculate-scrollbar-width';
 import vhMobileFix from '@/shared/lib/dom/vh-mobile-fix';
@@ -271,7 +271,7 @@ document.addEventListener('astro:page-load', () => {
 });
 
 document.addEventListener('astro:before-preparation', (event) => {
-    if (!isTransitionBeforePreparationEvent(event)) {
+    if (!(event instanceof TransitionBeforePreparationEvent)) {
         return;
     }
 

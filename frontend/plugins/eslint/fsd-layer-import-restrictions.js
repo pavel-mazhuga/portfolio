@@ -81,7 +81,7 @@ export default {
     },
 
     create(context) {
-        const filePath = context.getFilename();
+        const filePath = context.filename;
         const currentLayer = extractLayerFromPath(filePath);
 
         // Если не удалось определить слой текущего файла, пропускаем

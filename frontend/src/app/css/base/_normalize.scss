@@ -260,7 +260,7 @@ pre {
 code {
     // @include font-size($code-font-size);
     // color: var(--#{$prefix}code-color);
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     // Streamline the style when inside anchors to avoid broken underline and more
     a > & {
@@ -388,7 +388,7 @@ select {
 select {
     // Remove the inheritance of word-wrap in Safari.
     // See https://github.com/twbs/bootstrap/issues/24990
-    word-wrap: normal;
+    overflow-wrap: normal;
 
     // Undo the opacity change from Chrome
     &:disabled {
