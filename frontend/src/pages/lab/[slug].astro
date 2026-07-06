@@ -42,6 +42,7 @@ const commonPageProps = await getCommonPageProps();
 const meta = {
     ...commonPageProps.meta,
     title: experiment.seoTitle ?? experiment.name,
+    description: experiment.seoDescription,
 };
 ---
 
