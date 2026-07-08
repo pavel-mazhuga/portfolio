@@ -1,5 +1,5 @@
 ---
-description: Run linters and tsc after creating or editing files
+description: Run prettier, linters and tsc after creating or editing files
 globs: frontend/**/*
 alwaysApply: true
 ---
@@ -11,6 +11,9 @@ After creating or changing files under `frontend/`, run checks **on the affected
 ## Commands (from `frontend/`)
 
 ```bash
+# Format (JS/TS/Astro/CSS/SCSS/JSON)
+pnpm exec prettier --write --ignore-unknown "path/to/changed/**/*.{ts,tsx,js,jsx,astro,css,scss,json}"
+
 # JS/TS/Astro
 pnpm exec eslint "path/to/changed/**/*.{ts,tsx,js,jsx,astro}"
 
@@ -26,6 +29,7 @@ For a single file, pass the exact path, e.g. `src/shared/ui/RoundButton/RoundBut
 ## Order
 
 1. Make the changes.
-2. Run `eslint` and `stylelint` on the changed files or folder.
-3. Run `pnpm tsc` (whole project — types are cross-module).
-4. Fix errors before replying to the user.
+2. Run `prettier --write` on the changed files or folder.
+3. Run `eslint` and `stylelint` on the changed files or folder.
+4. Run `pnpm tsc` (whole project — types are cross-module).
+5. Fix errors before replying to the user.
