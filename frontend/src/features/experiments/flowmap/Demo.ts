@@ -1,5 +1,5 @@
-import { texture } from 'three/tsl';
-import { RenderPipeline, SRGBColorSpace, TextureLoader, TimestampQuery, Vector2 } from 'three/webgpu';
+import { renderOutput, texture } from 'three/tsl';
+import { NoToneMapping, RenderPipeline, SRGBColorSpace, TextureLoader, TimestampQuery, Vector2 } from 'three/webgpu';
 import BaseExperience from '../model/BaseExperience';
 import { FlowmapNode } from './FlowmapNode';
 import { FlowmapSimulator } from './FlowmapSimulator';
@@ -35,23 +35,55 @@ class FlowmapDemo extends BaseExperience {
         flowmap: { ...FLOWMAP_DEFAULTS },
     };
 
-    private readonly onPointerMove = (event: PointerEvent) => {
+    private readonly updatePointer = (event: PointerEvent) => {
+        const rect = this.canvas.getBoundingClientRect();
+
         this.hasPointer = true;
-        this.normalizedMouse.set(event.clientX / this.canvas.offsetWidth, 1 - event.clientY / this.canvas.offsetHeight);
+        this.normalizedMouse.set(
+            (event.clientX - rect.left) / rect.width,
+            1 - (event.clientY - rect.top) / rect.height,
+        );
+    };
+
+    private readonly onPointerDown = (event: PointerEvent) => {
+        this.canvas.setPointerCapture(event.pointerId);
+        this.updatePointer(event);
+    };
+
+    private readonly onPointerMove = (event: PointerEvent) => {
+        if (event.pointerType !== 'mouse' && !this.canvas.hasPointerCapture(event.pointerId)) {
+            return;
+        }
+
+        this.updatePointer(event);
+    };
+
+    private readonly onPointerUp = (event: PointerEvent) => {
+        if (this.canvas.hasPointerCapture(event.pointerId)) {
+            this.canvas.releasePointerCapture(event.pointerId);
+        }
     };
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas, { antialias: false });
 
+        this.renderer.toneMapping = NoToneMapping;
+
         const width = canvas.parentElement?.offsetWidth || 1;
         const height = canvas.parentElement?.offsetHeight || 1;
 
-        const sourceTexture = new TextureLoader().load(SOURCE_URL, (tex) => {
+        const loader = new TextureLoader();
+
+        loader.setCrossOrigin('anonymous');
+
+        const sourceTexture = loader.load(SOURCE_URL, (tex) => {
             tex.colorSpace = SRGBColorSpace;
+            tex.flipY = false;
             this.flowmapPass.imageNaturalSize.value.set(tex.image.naturalWidth, tex.image.naturalHeight);
         });
 
         sourceTexture.colorSpace = SRGBColorSpace;
+        sourceTexture.flipY = false;
 
         this.sourceColor = texture(sourceTexture);
 
@@ -69,14 +101,19 @@ class FlowmapDemo extends BaseExperience {
 
         this.postProcessing = new RenderPipeline(this.renderer);
         this.postProcessing.outputColorTransform = false;
-        this.postProcessing.outputNode = this.flowmapPass;
+        this.updateOutputNode();
 
-        window.addEventListener('pointermove', this.onPointerMove);
+        this.canvas.addEventListener('pointerdown', this.onPointerDown);
+        this.canvas.addEventListener('pointermove', this.onPointerMove);
+        this.canvas.addEventListener('pointerup', this.onPointerUp);
+        this.canvas.addEventListener('pointercancel', this.onPointerUp);
         this.initTweakPane();
     }
 
     private updateOutputNode() {
-        this.postProcessing.outputNode = this.params.flowmap.enabled ? this.flowmapPass : this.sourceColor;
+        const color = this.params.flowmap.enabled ? this.flowmapPass : this.sourceColor;
+
+        this.postProcessing.outputNode = renderOutput(color);
     }
 
     override onWindowResize() {
@@ -133,7 +170,10 @@ class FlowmapDemo extends BaseExperience {
     }
 
     override destroy() {
-        window.removeEventListener('pointermove', this.onPointerMove);
+        this.canvas.removeEventListener('pointerdown', this.onPointerDown);
+        this.canvas.removeEventListener('pointermove', this.onPointerMove);
+        this.canvas.removeEventListener('pointerup', this.onPointerUp);
+        this.canvas.removeEventListener('pointercancel', this.onPointerUp);
 
         this.simulator.dispose();
         this.postProcessing.dispose();

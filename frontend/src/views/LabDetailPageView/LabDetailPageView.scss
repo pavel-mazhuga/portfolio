@@ -1,6 +1,10 @@
 @use '@/app/css/base/variables' as *;
 @use '@/app/css/utils/mixins' as *;
 
+html.lab-detail-page {
+    overscroll-behavior: none;
+}
+
 .lab-detail-page-content {
     flex: 1;
     display: flex;
@@ -27,6 +31,7 @@
     inset: 0;
     width: 100%;
     height: 100%;
+    touch-action: none;
 }
 
 .tip {
