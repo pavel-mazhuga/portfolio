@@ -77,22 +77,6 @@ class FlowmapDemo extends BaseExperience {
     };
 
     private readonly onPointerMove = (event: PointerEvent) => {
-        if (this.canvas.hasPointerCapture(event.pointerId)) {
-            return;
-        }
-
-        if (event.pointerType !== 'mouse') {
-            return;
-        }
-
-        this.processPointerEvent(event);
-    };
-
-    private readonly onWindowPointerMove = (event: PointerEvent) => {
-        if (!this.canvas.hasPointerCapture(event.pointerId)) {
-            return;
-        }
-
         this.processPointerEvent(event);
     };
 
@@ -169,10 +153,9 @@ class FlowmapDemo extends BaseExperience {
         this.postProcessing.outputNode = renderOutput(this.flowmapPass);
 
         this.canvas.addEventListener('pointerdown', this.onPointerDown);
-        this.canvas.addEventListener('pointermove', this.onPointerMove);
         this.canvas.addEventListener('pointerup', this.onPointerUp);
         this.canvas.addEventListener('pointercancel', this.onPointerUp);
-        window.addEventListener('pointermove', this.onWindowPointerMove);
+        window.addEventListener('pointermove', this.onPointerMove);
         this.initTweakPane();
     }
 
@@ -210,10 +193,9 @@ class FlowmapDemo extends BaseExperience {
 
     override destroy() {
         this.canvas.removeEventListener('pointerdown', this.onPointerDown);
-        this.canvas.removeEventListener('pointermove', this.onPointerMove);
         this.canvas.removeEventListener('pointerup', this.onPointerUp);
         this.canvas.removeEventListener('pointercancel', this.onPointerUp);
-        window.removeEventListener('pointermove', this.onWindowPointerMove);
+        window.removeEventListener('pointermove', this.onPointerMove);
 
         this.canvasPointer.dispose();
         this.simulator.dispose();
