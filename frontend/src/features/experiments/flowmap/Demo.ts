@@ -1,4 +1,4 @@
-import { float, Fn, renderOutput, select, texture, uniform, vec4 } from 'three/tsl';
+import { float, Fn, renderOutput, select, texture, uniform, vec3, vec4 } from 'three/tsl';
 import {
     NoToneMapping,
     RenderPipeline,
@@ -9,48 +9,60 @@ import {
     type Node,
 } from 'three/webgpu';
 import { CanvasUvPointer } from '../../canvas/utils/CanvasUvPointer';
-import { FlowmapNode, FlowmapSimulator } from '../../canvas/utils/tsl/flowmap';
+import {
+    FlowmapNode,
+    FlowmapSimulator,
+    passThroughUv,
+    type FlowmapColorResolver,
+    type FlowmapMotionUvResolver,
+} from '../../canvas/utils/tsl/flowmap';
 import { quantizeUv } from '../../canvas/utils/tsl/pixel';
 import { sampleRgbShift, type TextureSampleNode } from '../../canvas/utils/tsl/rgb-shift';
 import { coverTextureUv } from '../../canvas/utils/tsl/uv-cover';
+import { curlNoise } from '../lib/nodes/noise/curlNoise3d';
 import BaseExperience from '../model/BaseExperience';
 
 const SOURCE_URL =
     'https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=2370&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
+type MotionUvMode = 'normal' | 'pixel' | 'curl';
+
 class FlowmapDemo extends BaseExperience {
     simulator: FlowmapSimulator;
-    flowmapPass: FlowmapNode;
+    flowmapPass!: FlowmapNode;
     sourceColor: ReturnType<typeof texture>;
     postProcessing: RenderPipeline;
-
-    flowmapAspect = uniform(1);
-    flowmapPixelMode = uniform(false);
-    flowmapPixel = uniform(20);
-    flowmapRgbShift = uniform(true);
-    flowmapRgbShiftStrength = uniform(1);
-    flowmapShowMotion = uniform(false);
-    flowmapImageNaturalSize = uniform(new Vector2(0, 0));
-    flowmapViewportSize = uniform(new Vector2(1, 1));
-
-    canvasPointer: CanvasUvPointer;
-    private hasPointer = false;
 
     params = {
         power: 0.3,
         range: 0.15,
         viscosity: 0.03,
         strength: 5,
-        isPixel: false,
+        motionUvMode: 'normal' as MotionUvMode,
         pixel: 20,
+        curlScale: 10,
+        curlStrength: 0.05,
+        curlSpeed: 1,
         rgbShift: false,
         rgbShiftStrength: 1,
         showMotion: false,
     };
 
-    private readonly updatePointer = (event: PointerEvent) => {
-        this.canvasPointer.setFromEvent(event);
-    };
+    flowmapAspect = uniform(1);
+    flowmapPixel = uniform(this.params.pixel);
+    flowmapCurlScale = uniform(this.params.curlScale);
+    flowmapCurlStrength = uniform(this.params.curlStrength);
+    flowmapTime = uniform(this.params.curlSpeed);
+    flowmapRgbShift = uniform(this.params.rgbShift);
+    flowmapRgbShiftStrength = uniform(this.params.rgbShiftStrength);
+    flowmapShowMotion = uniform(this.params.showMotion);
+    flowmapImageNaturalSize = uniform(new Vector2(0, 0));
+    flowmapViewportSize = uniform(new Vector2(1, 1));
+
+    canvasPointer: CanvasUvPointer;
+    private hasPointer = false;
+    private motionUvMode: MotionUvMode | null = null;
+    private resolveColor!: FlowmapColorResolver;
 
     private stepSimulation(seed = false) {
         this.simulator.compute(
@@ -62,6 +74,42 @@ class FlowmapDemo extends BaseExperience {
             seed,
         );
         this.flowmapPass.setMotionTexture(this.simulator.texture);
+    }
+
+    private readonly updatePointer = (event: PointerEvent) => {
+        this.canvasPointer.setFromEvent(event);
+    };
+
+    private createResolveMotionUv(mode: MotionUvMode): FlowmapMotionUvResolver {
+        if (mode === 'pixel') {
+            return Fn(([vUv]: [Node<'vec2'>]) => quantizeUv(vUv, this.flowmapAspect, this.flowmapPixel));
+        }
+
+        if (mode === 'curl') {
+            return Fn(([vUv]: [Node<'vec2'>]) => {
+                const scaledUv = vUv.mul(this.flowmapCurlScale).toVar();
+                const curl = curlNoise(vec3(scaledUv.x, scaledUv.y, this.flowmapTime)).toVar();
+
+                return vUv.add(curl.xy.mul(this.flowmapCurlStrength));
+            });
+        }
+
+        return passThroughUv;
+    }
+
+    private rebuildFlowmapPass(mode: MotionUvMode) {
+        if (mode === this.motionUvMode) {
+            return;
+        }
+
+        this.motionUvMode = mode;
+        this.flowmapPass = new FlowmapNode(this.sourceColor, this.simulator.texture, {
+            power: this.params.power,
+            resolveMotionUv: this.createResolveMotionUv(mode),
+            resolveColor: this.resolveColor,
+        });
+        this.postProcessing.outputNode = renderOutput(this.flowmapPass);
+        this.postProcessing.needsUpdate = true;
     }
 
     private readonly processPointerEvent = (event: PointerEvent) => {
@@ -118,17 +166,14 @@ class FlowmapDemo extends BaseExperience {
 
         this.flowmapAspect.value = width / height;
         this.flowmapViewportSize.value.set(width, height);
-        this.flowmapPixelMode.value = this.params.isPixel;
         this.flowmapPixel.value = this.params.pixel;
+        this.flowmapCurlScale.value = this.params.curlScale;
+        this.flowmapCurlStrength.value = this.params.curlStrength;
         this.flowmapRgbShift.value = this.params.rgbShift;
         this.flowmapRgbShiftStrength.value = this.params.rgbShiftStrength;
         this.flowmapShowMotion.value = this.params.showMotion;
 
-        const resolveMotionUv = Fn(([vUv]: [Node<'vec2'>]) =>
-            select(this.flowmapPixelMode, quantizeUv(vUv, this.flowmapAspect, this.flowmapPixel), vUv),
-        );
-
-        const resolveColor = Fn(
+        this.resolveColor = Fn(
             ([tex, vUv, distortion, motion]: [TextureSampleNode, Node<'vec2'>, Node<'vec2'>, Node<'vec4'>]) => {
                 const mapUv = select(
                     this.flowmapImageNaturalSize.x.greaterThan(float(0)),
@@ -145,15 +190,9 @@ class FlowmapDemo extends BaseExperience {
             },
         );
 
-        this.flowmapPass = new FlowmapNode(this.sourceColor, this.simulator.texture, {
-            power: this.params.power,
-            resolveMotionUv,
-            resolveColor,
-        });
-
         this.postProcessing = new RenderPipeline(this.renderer);
         this.postProcessing.outputColorTransform = false;
-        this.postProcessing.outputNode = renderOutput(this.flowmapPass);
+        this.rebuildFlowmapPass(this.params.motionUvMode);
 
         this.canvas.addEventListener('pointerdown', this.onPointerDown);
         this.canvas.addEventListener('pointerup', this.onPointerUp);
@@ -186,8 +225,10 @@ class FlowmapDemo extends BaseExperience {
 
         this.stepSimulation();
         this.flowmapPass.power.value = this.params.power;
-        this.flowmapPixelMode.value = this.params.isPixel;
         this.flowmapPixel.value = this.params.pixel;
+        this.flowmapCurlScale.value = this.params.curlScale;
+        this.flowmapCurlStrength.value = this.params.curlStrength;
+        this.flowmapTime.value = this.clock.getElapsed() * this.params.curlSpeed;
         this.flowmapRgbShift.value = this.params.rgbShift;
         this.flowmapRgbShiftStrength.value = this.params.rgbShiftStrength;
         this.flowmapShowMotion.value = this.params.showMotion;
@@ -233,8 +274,58 @@ class FlowmapDemo extends BaseExperience {
             max: 2,
             step: 0.01,
         });
-        distortionFolder.addBinding(this.params, 'isPixel', { label: 'Pixel Mode' });
-        distortionFolder.addBinding(this.params, 'pixel', { min: 4, max: 80, step: 1 });
+
+        const motionUvFolder = distortionFolder.addFolder({ title: 'Motion UV', expanded: true });
+
+        const pixelBinding = motionUvFolder.addBinding(this.params, 'pixel', {
+            label: 'Pixel Size',
+            min: 4,
+            max: 80,
+            step: 1,
+        });
+        const curlScaleBinding = motionUvFolder.addBinding(this.params, 'curlScale', {
+            label: 'Curl Scale',
+            min: 0.5,
+            max: 20,
+            step: 0.1,
+        });
+        const curlStrengthBinding = motionUvFolder.addBinding(this.params, 'curlStrength', {
+            label: 'Curl Strength',
+            min: 0,
+            max: 0.3,
+            step: 0.005,
+        });
+        const curlSpeedBinding = motionUvFolder.addBinding(this.params, 'curlSpeed', {
+            label: 'Curl Speed',
+            min: 0,
+            max: 5,
+            step: 0.01,
+        });
+
+        const syncMotionUvBindings = (mode = this.params.motionUvMode) => {
+            pixelBinding.hidden = mode !== 'pixel';
+            curlScaleBinding.hidden = mode !== 'curl';
+            curlStrengthBinding.hidden = mode !== 'curl';
+            curlSpeedBinding.hidden = mode !== 'curl';
+        };
+
+        motionUvFolder
+            .addBinding(this.params, 'motionUvMode', {
+                label: 'Mode',
+                options: {
+                    Normal: 'normal',
+                    Pixel: 'pixel',
+                    Curl: 'curl',
+                },
+            })
+            .on('change', (event) => {
+                const mode = event.value as MotionUvMode;
+
+                syncMotionUvBindings(mode);
+                this.rebuildFlowmapPass(mode);
+            });
+
+        syncMotionUvBindings();
 
         flowmapFolder.addBinding(this.params, 'showMotion', { label: 'Show Motion Map' });
     }
