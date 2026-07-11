@@ -13,7 +13,14 @@ const experimentData: ExperimentInput[] = [
         tip: 'Move pointer',
         active: false,
     },
-
+    {
+        name: 'Flowmap',
+        slug: 'flowmap',
+        tags: ['webgpu', 'tsl', 'shaders', 'postprocessing'],
+        seoDescription: 'Cursor-driven flowmap distorts a texture. WebGPU post-processing with TSL.',
+        tip: 'Move pointer',
+        active: false,
+    },
     {
         name: 'Metaballs',
         slug: 'metaballs',
@@ -78,14 +85,6 @@ const experimentData: ExperimentInput[] = [
         slug: 'flow-field',
         tags: ['webgpu', 'tsl', 'shaders', 'compute'],
         seoDescription: 'Particles flow along a vector field simulation. WebGPU compute shaders with TSL.',
-    },
-    {
-        name: 'Flowmap',
-        slug: 'flowmap',
-        tags: ['webgpu', 'tsl', 'shaders', 'postprocessing'],
-        seoDescription: 'Cursor-driven flowmap distorts a texture. WebGPU post-processing with TSL.',
-        tip: 'Move pointer',
-        active: false,
     },
     {
         name: 'Nightingale hover effect (recreated)',
