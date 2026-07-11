@@ -118,9 +118,22 @@ export class FlowmapSimulator {
         this.uVelocity.value.set(0, 0);
     }
 
-    compute(renderer: WebGPURenderer, mouse: Vector2, range: number, viscosity: number, strength: number) {
-        this.uVelocity.value.set(mouse.x - this.lastMouse.x, mouse.y - this.lastMouse.y);
-        this.lastMouse.copy(mouse);
+    compute(
+        renderer: WebGPURenderer,
+        mouse: Vector2,
+        range: number,
+        viscosity: number,
+        strength: number,
+        seed = false,
+    ) {
+        if (seed) {
+            this.lastMouse.copy(mouse);
+            this.uVelocity.value.set(0, 0);
+        } else {
+            this.uVelocity.value.set(mouse.x - this.lastMouse.x, mouse.y - this.lastMouse.y);
+            this.lastMouse.copy(mouse);
+        }
+
         this.uMousePos.value.copy(mouse);
         this.uRange.value = range;
         this.uViscosity.value = viscosity;

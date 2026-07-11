@@ -34,6 +34,7 @@ class FlowmapDemo extends BaseExperience {
     flowmapViewportSize = uniform(new Vector2(1, 1));
 
     canvasPointer: CanvasUvPointer;
+    private hasPointer = false;
 
     params = {
         power: 0.3,
@@ -51,13 +52,14 @@ class FlowmapDemo extends BaseExperience {
         this.canvasPointer.setFromEvent(event);
     };
 
-    private stepSimulation() {
+    private stepSimulation(seed = false) {
         this.simulator.compute(
             this.renderer,
             this.canvasPointer.uv,
             this.params.range,
             this.params.viscosity,
             this.params.strength,
+            seed,
         );
         this.flowmapPass.setMotionTexture(this.simulator.texture);
     }
@@ -67,7 +69,8 @@ class FlowmapDemo extends BaseExperience {
 
         for (const coalescedEvent of events) {
             this.updatePointer(coalescedEvent);
-            this.stepSimulation();
+            this.stepSimulation(!this.hasPointer);
+            this.hasPointer = true;
         }
     };
 
@@ -171,6 +174,7 @@ class FlowmapDemo extends BaseExperience {
 
         this.simulator.setSize(width, height);
         this.canvasPointer.updateRect();
+        this.hasPointer = false;
         this.flowmapAspect.value = width / height;
         this.flowmapViewportSize.value.set(width, height);
     }
