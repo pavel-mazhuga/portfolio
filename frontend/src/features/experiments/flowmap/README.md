@@ -1,8 +1,6 @@
 # Flowmap
 
-Mouse-driven flowmap distortion on an Unsplash photo.
-
-Inspired by [Alien.js flowmap](https://alien.js.org/examples/shader_flowmap_rgbshift.html).
+Pointer-driven flowmap distorts a texture. WebGPU post-processing with TSL.
 
 ## Demo
 
