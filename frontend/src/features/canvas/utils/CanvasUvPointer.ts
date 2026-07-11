@@ -39,6 +39,16 @@ export class CanvasUvPointer {
         return this.setFromClient(event.clientX, event.clientY, target);
     }
 
+    setNdcFromClient(clientX: number, clientY: number, target: Vector2) {
+        this.setFromClient(clientX, clientY);
+
+        return target.set(this.uv.x * 2 - 1, -(this.uv.y * 2 - 1));
+    }
+
+    setNdcFromEvent(event: PointerEvent, target: Vector2) {
+        return this.setNdcFromClient(event.clientX, event.clientY, target);
+    }
+
     dispose() {
         window.removeEventListener('resize', this.onLayoutChange);
         window.removeEventListener('scroll', this.onLayoutChange);

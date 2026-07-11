@@ -10,15 +10,16 @@ import {
     PlaneGeometry,
     Points,
     Raycaster,
-    SRGBColorSpace,
     Scene,
     ShaderMaterial,
     Spherical,
+    SRGBColorSpace,
     Vector2,
     Vector3,
     WebGLRenderer,
 } from 'three';
 import { Pane } from 'tweakpane';
+import { CanvasUvPointer } from '@/features/canvas/utils/CanvasUvPointer';
 import { lerp } from '@/shared/lib/math/lerp';
 import fragmentShader from './shaders/fragment.glsl?raw';
 import vertexShader from './shaders/vertex.glsl?raw';
@@ -74,6 +75,7 @@ class Demo {
     private prevTime = 0;
     private readonly raycaster = new Raycaster();
     private readonly pointerNdc = new Vector2();
+    private readonly canvasPointer: CanvasUvPointer;
     private readonly hitPlane: Mesh;
     private readonly points: Points<BufferGeometry, ShaderMaterial>;
     private tweakPane?: Pane;
@@ -89,6 +91,7 @@ class Demo {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
+        this.canvasPointer = new CanvasUvPointer(canvas);
 
         this.renderer = new WebGLRenderer({
             canvas,
@@ -144,15 +147,14 @@ class Demo {
     }
 
     private onPointerMove(event: PointerEvent) {
-        const rect = this.canvas.getBoundingClientRect();
-
-        this.pointerNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        this.pointerNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        this.canvasPointer.setNdcFromEvent(event, this.pointerNdc);
     }
 
     onWindowResize() {
         const width = this.canvas.parentElement?.offsetWidth || 1;
         const height = this.canvas.parentElement?.offsetHeight || 1;
+
+        this.canvasPointer.updateRect();
 
         this.renderer.setPixelRatio(this.dpr);
         this.renderer.setSize(width, height);
@@ -216,6 +218,7 @@ class Demo {
         this.canvas.removeEventListener('pointermove', this.onPointerMove);
         window.removeEventListener('resize', this.onWindowResize);
 
+        this.canvasPointer.dispose();
         this.tweakPane?.dispose();
 
         this.scene.remove(this.hitPlane);

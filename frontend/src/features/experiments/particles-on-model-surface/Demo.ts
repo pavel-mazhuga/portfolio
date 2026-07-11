@@ -19,6 +19,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
+import { CanvasUvPointer } from '@/features/canvas/utils/CanvasUvPointer';
 
 /** Порядок и количества частиц совпадают с прежним `SampledGeometry` в R3F. */
 const PARTICLE_COUNTS = [3000, 4000, 1200, 3000, 3000, 3000, 1200, 1200];
@@ -170,6 +171,7 @@ class Demo {
     private readonly controls: OrbitControls;
     private readonly clock = new Clock();
     private readonly material: ShaderMaterial;
+    private readonly canvasPointer: CanvasUvPointer;
     private readonly boundResize: () => void;
     private readonly boundPointerMove: (e: PointerEvent) => void;
 
@@ -180,6 +182,7 @@ class Demo {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
+        this.canvasPointer = new CanvasUvPointer(canvas);
 
         this.renderer = new WebGLRenderer({
             canvas,
@@ -277,11 +280,7 @@ class Demo {
     }
 
     private onPointerMove(event: PointerEvent) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        const y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
-
-        this.material.uniforms.uMouse.value.set(x, y);
+        this.canvasPointer.setNdcFromEvent(event, this.material.uniforms.uMouse.value);
     }
 
     private renderFrame() {
@@ -294,6 +293,7 @@ class Demo {
         const width = this.canvas.parentElement?.offsetWidth || 1;
         const height = this.canvas.parentElement?.offsetHeight || 1;
 
+        this.canvasPointer.updateRect();
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -304,6 +304,7 @@ class Demo {
         this.disposed = true;
         window.removeEventListener('resize', this.boundResize);
         this.canvas.removeEventListener('pointermove', this.boundPointerMove);
+        this.canvasPointer.dispose();
         this.renderer.setAnimationLoop(null);
         this.controls.dispose();
 
