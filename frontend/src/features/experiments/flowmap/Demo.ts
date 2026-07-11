@@ -1,7 +1,7 @@
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
-import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
 import { add, pass, renderOutput, vec4 } from 'three/tsl';
 import {
     DirectionalLight,
@@ -14,8 +14,8 @@ import {
     Vector2,
     type Node,
 } from 'three/webgpu';
+import { FlowmapNode } from '../../canvas/utils/tsl/flowmap';
 import BaseExperience from '../model/BaseExperience';
-import { FlowmapNode } from './FlowmapNode';
 import { FlowmapSimulator } from './FlowmapSimulator';
 import { ReflectorFloor } from './ReflectorFloor';
 
@@ -67,10 +67,7 @@ class FlowmapDemo extends BaseExperience {
 
     private readonly onPointerMove = (event: PointerEvent) => {
         this.hasPointer = true;
-        this.normalizedMouse.set(
-            event.clientX / this.canvas.offsetWidth,
-            1 - event.clientY / this.canvas.offsetHeight,
-        );
+        this.normalizedMouse.set(event.clientX / this.canvas.offsetWidth, 1 - event.clientY / this.canvas.offsetHeight);
     };
 
     constructor(canvas: HTMLCanvasElement) {
@@ -135,10 +132,7 @@ class FlowmapDemo extends BaseExperience {
         this.sceneColor = scenePass.getTextureNode('output');
         this.fxaaColor = fxaa(renderOutput(scenePass));
         this.bloomPass = bloom(scenePass, BLOOM_DEFAULTS.strength, BLOOM_DEFAULTS.radius, BLOOM_DEFAULTS.threshold);
-        this.combinedColor = add(
-            this.fxaaColor as unknown as Node<'vec4'>,
-            this.bloomPass as unknown as Node<'vec4'>,
-        );
+        this.combinedColor = add(this.fxaaColor as unknown as Node<'vec4'>, this.bloomPass as unknown as Node<'vec4'>);
 
         this.flowmapPass = new FlowmapNode(this.combinedColor, this.simulator.texture, {
             power: FLOWMAP_DEFAULTS.power,
@@ -212,12 +206,7 @@ class FlowmapDemo extends BaseExperience {
         if (this.params.flowmap.enabled) {
             const mouse = this.hasPointer ? this.normalizedMouse : this.defaultMouse;
 
-            this.simulator.compute(
-                this.renderer,
-                mouse,
-                this.params.flowmap.range,
-                this.params.flowmap.viscosity,
-            );
+            this.simulator.compute(this.renderer, mouse, this.params.flowmap.range, this.params.flowmap.viscosity);
             this.flowmapPass.setMotionTexture(this.simulator.texture);
             this.flowmapPass.power.value = this.params.flowmap.power;
             this.flowmapPass.pixelMode.value = this.params.flowmap.isPixel;
@@ -228,9 +217,7 @@ class FlowmapDemo extends BaseExperience {
         this.bloomPass.strength.value = this.params.bloom.strength;
         this.bloomPass.radius.value = this.params.bloom.radius;
         this.bloomPass.threshold.value = this.params.bloom.threshold;
-        this.renderer.toneMappingExposure = this.params.bloom.enabled
-            ? Math.pow(this.params.bloom.exposure, 4)
-            : 1;
+        this.renderer.toneMappingExposure = this.params.bloom.enabled ? Math.pow(this.params.bloom.exposure, 4) : 1;
 
         this.updateOutputNode();
 

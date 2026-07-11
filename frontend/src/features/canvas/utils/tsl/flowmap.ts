@@ -1,4 +1,4 @@
-import { Fn, If, convertToTexture, floor, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
+import { convertToTexture, floor, Fn, If, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
 import { TempNode, type Node, type Texture } from 'three/webgpu';
 
 export type FlowmapPassParams = {

@@ -2,16 +2,16 @@
 // @ts-nocheck
 // Three.js Transpiler r172
 import {
-    Fn,
-    If,
-    Loop,
     add,
     dot,
     float,
     floor,
+    Fn,
     fract,
+    If,
     int,
     length,
+    Loop,
     mul,
     overloadingFn,
     sin,
