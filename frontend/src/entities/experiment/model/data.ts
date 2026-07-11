@@ -17,7 +17,7 @@ const experimentData: ExperimentInput[] = [
         name: 'Flowmap',
         slug: 'flowmap',
         tags: ['webgpu', 'tsl', 'shaders', 'postprocessing'],
-        seoDescription: 'Cursor-driven flowmap distorts a texture. WebGPU post-processing with TSL.',
+        seoDescription: 'Pointer-driven flowmap distorts a texture. WebGPU post-processing with TSL.',
         tip: 'Move pointer',
         active: false,
     },
