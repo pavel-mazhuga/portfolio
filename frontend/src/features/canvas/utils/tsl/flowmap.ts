@@ -8,6 +8,7 @@ export type FlowmapColorResolver = (
     tex: ReturnType<typeof convertToTexture>,
     vUv: Node<'vec2'>,
     distortion: Node<'vec2'>,
+    motion: Node<'vec4'>,
 ) => Node<'vec4'>;
 
 export type FlowmapCoreParams = {
@@ -61,10 +62,11 @@ export class FlowmapNode extends TempNode {
         return Fn(() => {
             const vUv = uv();
             const st = this.resolveMotionUv(vUv);
-            const distortion = this.motionTextureNode.sample(st).xy.mul(this.power).mul(-1);
+            const motion = this.motionTextureNode.sample(st);
+            const distortion = motion.xy.mul(this.power).mul(-1);
 
-            return this.resolveColor(this.inputNode, vUv, distortion);
-        })();
+            return this.resolveColor(this.inputNode, vUv, distortion, motion);
+        })() as Node<'vec4'>;
     }
 }
 

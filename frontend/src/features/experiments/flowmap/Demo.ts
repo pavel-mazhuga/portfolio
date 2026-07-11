@@ -1,59 +1,51 @@
-import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import BloomNode, { bloom } from 'three/examples/jsm/tsl/display/BloomNode.js';
-import { add, pass, renderOutput, vec4 } from 'three/tsl';
+import { float, Fn, renderOutput, select, texture, uniform, vec4 } from 'three/tsl';
 import {
-    DirectionalLight,
-    Group,
-    Mesh,
-    MeshPhysicalNodeMaterial,
-    PointLight,
+    NoToneMapping,
     RenderPipeline,
+    SRGBColorSpace,
+    TextureLoader,
     TimestampQuery,
     Vector2,
     type Node,
 } from 'three/webgpu';
 import { FlowmapNode } from '../../canvas/utils/tsl/flowmap';
+import { quantizeUv } from '../../canvas/utils/tsl/pixel';
+import { sampleRgbShift, type TextureSampleNode } from '../../canvas/utils/tsl/rgb-shift';
+import { coverTextureUv } from '../../canvas/utils/tsl/uv-cover';
 import BaseExperience from '../model/BaseExperience';
 import { FlowmapSimulator } from './FlowmapSimulator';
-import { ReflectorFloor } from './ReflectorFloor';
+
+const SOURCE_URL =
+    'https://images.unsplash.com/photo-1649706796644-c507eb2835bb?q=80&w=3121&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
 const FLOWMAP_DEFAULTS = {
     enabled: true,
     power: 0.3,
     range: 0.1,
     viscosity: 0.04,
+    strength: 5,
     isPixel: false,
     pixel: 20,
     rgbShift: true,
-};
-
-const BLOOM_DEFAULTS = {
-    enabled: true,
-    exposure: 0.8,
-    strength: 0.5,
-    radius: 1.45,
-    threshold: 0.15,
-};
-
-const FXAA_DEFAULTS = {
-    enabled: true,
+    rgbShiftStrength: 1,
+    showMotion: false,
+    autoPlay: true,
 };
 
 class FlowmapDemo extends BaseExperience {
-    controls: OrbitControls;
-    suzanne?: Group;
-    floor: ReflectorFloor;
-    pointLight1: PointLight;
-    pointLight2: PointLight;
     simulator: FlowmapSimulator;
     flowmapPass: FlowmapNode;
-    bloomPass: BloomNode;
+    sourceColor: ReturnType<typeof texture>;
     postProcessing: RenderPipeline;
-    sceneColor: Node<'vec4'>;
-    fxaaColor: ReturnType<typeof fxaa>;
-    combinedColor: Node<'vec4'>;
+
+    flowmapAspect = uniform(1);
+    flowmapPixelMode = uniform(false);
+    flowmapPixel = uniform(20);
+    flowmapRgbShift = uniform(true);
+    flowmapRgbShiftStrength = uniform(1);
+    flowmapShowMotion = uniform(false);
+    flowmapImageNaturalSize = uniform(new Vector2(0, 0));
+    flowmapViewportSize = uniform(new Vector2(1, 1));
 
     normalizedMouse = new Vector2(0, 0);
     defaultMouse = new Vector2(0, 0);
@@ -61,102 +53,109 @@ class FlowmapDemo extends BaseExperience {
 
     params = {
         flowmap: { ...FLOWMAP_DEFAULTS },
-        bloom: { ...BLOOM_DEFAULTS },
-        fxaa: { ...FXAA_DEFAULTS },
+    };
+
+    private readonly updatePointer = (event: PointerEvent) => {
+        const rect = this.canvas.getBoundingClientRect();
+
+        this.hasPointer = true;
+        this.normalizedMouse.set((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+    };
+
+    private readonly onPointerDown = (event: PointerEvent) => {
+        this.canvas.setPointerCapture(event.pointerId);
+        this.updatePointer(event);
     };
 
     private readonly onPointerMove = (event: PointerEvent) => {
-        this.hasPointer = true;
-        this.normalizedMouse.set(event.clientX / this.canvas.offsetWidth, 1 - event.clientY / this.canvas.offsetHeight);
+        if (event.pointerType !== 'mouse' && !this.canvas.hasPointerCapture(event.pointerId)) {
+            return;
+        }
+
+        this.updatePointer(event);
+    };
+
+    private readonly onPointerUp = (event: PointerEvent) => {
+        if (this.canvas.hasPointerCapture(event.pointerId)) {
+            this.canvas.releasePointerCapture(event.pointerId);
+        }
     };
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas, { antialias: false });
 
+        this.renderer.toneMapping = NoToneMapping;
+
         const width = canvas.parentElement?.offsetWidth || 1;
         const height = canvas.parentElement?.offsetHeight || 1;
 
-        this.camera.fov = 50;
-        this.camera.near = 0.1;
-        this.camera.far = 2000;
-        this.camera.position.set(0, 0, 10);
-        this.camera.updateProjectionMatrix();
+        const loader = new TextureLoader();
 
-        this.scene.backgroundNode = vec4(0, 0, 0, 1);
+        loader.setCrossOrigin('anonymous');
 
-        this.controls = new OrbitControls(this.camera, this.canvas);
-        this.controls.target.set(0, 1.5, 0);
-        this.controls.enablePan = false;
-        this.controls.enableZoom = false;
-        this.controls.minPolarAngle = Math.PI / 4;
-        this.controls.maxPolarAngle = Math.PI / 2;
-        this.controls.enableDamping = true;
-
-        const directionalLight = new DirectionalLight(0xffffff, 1.4);
-
-        directionalLight.position.set(1, 1, 1);
-        this.scene.add(directionalLight);
-
-        this.pointLight1 = new PointLight(0xff6b6b, 1.5, 10);
-        this.pointLight2 = new PointLight(0x4ecdc4, 1.5, 10);
-        this.scene.add(this.pointLight1);
-        this.scene.add(this.pointLight2);
-
-        this.floor = new ReflectorFloor('/static/textures/flowmap/SurfaceImperfections003_1K_var1.jpg');
-        this.scene.add(this.floor);
-
-        const loader = new GLTFLoader();
-
-        const suzanneMaterial = new MeshPhysicalNodeMaterial({
-            roughness: 0.2,
-            metalness: 0.9,
+        const sourceTexture = loader.load(SOURCE_URL, (tex) => {
+            tex.colorSpace = SRGBColorSpace;
+            tex.flipY = false;
+            this.flowmapImageNaturalSize.value.set(tex.image.naturalWidth, tex.image.naturalHeight);
         });
 
-        loader.load('/static/gltf/suzanne.glb', (gltf) => {
-            this.suzanne = gltf.scene;
-            const suzanneMesh = this.suzanne.children[0];
+        sourceTexture.colorSpace = SRGBColorSpace;
+        sourceTexture.flipY = false;
 
-            if (suzanneMesh instanceof Mesh) {
-                suzanneMesh.scale.setScalar(0.5);
-                suzanneMesh.material = suzanneMaterial;
-            }
-
-            this.scene.add(this.suzanne);
-            this.initTweakPane();
-        });
+        this.sourceColor = texture(sourceTexture);
 
         this.simulator = new FlowmapSimulator(width, height);
 
-        const scenePass = pass(this.scene, this.camera);
+        this.flowmapAspect.value = width / height;
+        this.flowmapViewportSize.value.set(width, height);
+        this.flowmapPixelMode.value = FLOWMAP_DEFAULTS.isPixel;
+        this.flowmapPixel.value = FLOWMAP_DEFAULTS.pixel;
+        this.flowmapRgbShift.value = FLOWMAP_DEFAULTS.rgbShift;
+        this.flowmapRgbShiftStrength.value = FLOWMAP_DEFAULTS.rgbShiftStrength;
+        this.flowmapShowMotion.value = FLOWMAP_DEFAULTS.showMotion;
 
-        this.sceneColor = scenePass.getTextureNode('output');
-        this.fxaaColor = fxaa(renderOutput(scenePass));
-        this.bloomPass = bloom(scenePass, BLOOM_DEFAULTS.strength, BLOOM_DEFAULTS.radius, BLOOM_DEFAULTS.threshold);
-        this.combinedColor = add(this.fxaaColor as unknown as Node<'vec4'>, this.bloomPass as unknown as Node<'vec4'>);
+        const resolveMotionUv = Fn(([vUv]: [Node<'vec2'>]) =>
+            select(this.flowmapPixelMode, quantizeUv(vUv, this.flowmapAspect, this.flowmapPixel), vUv),
+        );
 
-        this.flowmapPass = new FlowmapNode(this.combinedColor, this.simulator.texture, {
+        const resolveColor = Fn(
+            ([tex, vUv, distortion, motion]: [TextureSampleNode, Node<'vec2'>, Node<'vec2'>, Node<'vec4'>]) => {
+                const mapUv = select(
+                    this.flowmapImageNaturalSize.x.greaterThan(float(0)),
+                    coverTextureUv(this.flowmapImageNaturalSize, this.flowmapViewportSize, vUv),
+                    vUv,
+                );
+                const color = select(
+                    this.flowmapRgbShift,
+                    sampleRgbShift(tex, mapUv, distortion, this.flowmapRgbShiftStrength),
+                    tex.sample(mapUv.add(distortion)),
+                );
+
+                return select(this.flowmapShowMotion, vec4(motion.xy.mul(0.5).add(0.5), 0, 1), color);
+            },
+        );
+
+        this.flowmapPass = new FlowmapNode(this.sourceColor, this.simulator.texture, {
             power: FLOWMAP_DEFAULTS.power,
-            aspect: width / height,
-            pixelMode: FLOWMAP_DEFAULTS.isPixel,
-            pixel: FLOWMAP_DEFAULTS.pixel,
-            rgbShift: FLOWMAP_DEFAULTS.rgbShift,
+            resolveMotionUv,
+            resolveColor,
         });
 
         this.postProcessing = new RenderPipeline(this.renderer);
         this.postProcessing.outputColorTransform = false;
-        this.postProcessing.outputNode = this.flowmapPass;
-        this.renderer.toneMappingExposure = Math.pow(BLOOM_DEFAULTS.exposure, 4);
+        this.updateOutputNode();
 
-        window.addEventListener('pointermove', this.onPointerMove);
+        this.canvas.addEventListener('pointerdown', this.onPointerDown);
+        this.canvas.addEventListener('pointermove', this.onPointerMove);
+        this.canvas.addEventListener('pointerup', this.onPointerUp);
+        this.canvas.addEventListener('pointercancel', this.onPointerUp);
+        this.initTweakPane();
     }
 
     private updateOutputNode() {
-        const color = this.params.fxaa.enabled ? this.fxaaColor : this.sceneColor;
-        const withBloom = this.params.bloom.enabled
-            ? add(color as unknown as Node<'vec4'>, this.bloomPass as unknown as Node<'vec4'>)
-            : color;
+        const color = this.params.flowmap.enabled ? this.flowmapPass : this.sourceColor;
 
-        this.postProcessing.outputNode = this.params.flowmap.enabled ? this.flowmapPass : withBloom;
+        this.postProcessing.outputNode = renderOutput(color);
     }
 
     override onWindowResize() {
@@ -170,10 +169,8 @@ class FlowmapDemo extends BaseExperience {
         const height = this.canvas.parentElement?.offsetHeight || 1;
 
         this.simulator.setSize(width, height);
-
-        if (this.flowmapPass) {
-            this.flowmapPass.aspect.value = width / height;
-        }
+        this.flowmapAspect.value = width / height;
+        this.flowmapViewportSize.value.set(width, height);
     }
 
     async render() {
@@ -181,43 +178,30 @@ class FlowmapDemo extends BaseExperience {
             this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
         }
 
-        this.controls.update();
-
-        const elapsedTime = this.clock.getElapsed();
-        const lightTime = elapsedTime * 0.8;
-        const radius = 4;
-
-        this.pointLight1.position.set(
-            radius * Math.sin(lightTime),
-            radius * Math.sin(lightTime) * Math.cos(lightTime),
-            0,
-        );
-
-        this.pointLight2.position.set(
-            radius * Math.sin(lightTime + Math.PI + 0.3),
-            radius * Math.sin(lightTime + Math.PI + 0.3) * Math.cos(lightTime + Math.PI + 0.3),
-            0,
-        );
-
-        if (this.suzanne) {
-            this.suzanne.position.y = 0.7 * Math.sin(elapsedTime * 0.3) + 1.0;
-        }
-
         if (this.params.flowmap.enabled) {
+            if (!this.hasPointer && this.params.flowmap.autoPlay) {
+                const t = this.clock.getElapsed();
+
+                this.defaultMouse.set(0.5 + 0.3 * Math.sin(t * 0.5), 0.5 + 0.3 * Math.cos(t * 0.7));
+            }
+
             const mouse = this.hasPointer ? this.normalizedMouse : this.defaultMouse;
 
-            this.simulator.compute(this.renderer, mouse, this.params.flowmap.range, this.params.flowmap.viscosity);
+            this.simulator.compute(
+                this.renderer,
+                mouse,
+                this.params.flowmap.range,
+                this.params.flowmap.viscosity,
+                this.params.flowmap.strength,
+            );
             this.flowmapPass.setMotionTexture(this.simulator.texture);
             this.flowmapPass.power.value = this.params.flowmap.power;
-            this.flowmapPass.pixelMode.value = this.params.flowmap.isPixel;
-            this.flowmapPass.pixel.value = this.params.flowmap.pixel;
-            this.flowmapPass.rgbShift.value = this.params.flowmap.rgbShift;
+            this.flowmapPixelMode.value = this.params.flowmap.isPixel;
+            this.flowmapPixel.value = this.params.flowmap.pixel;
+            this.flowmapRgbShift.value = this.params.flowmap.rgbShift;
+            this.flowmapRgbShiftStrength.value = this.params.flowmap.rgbShiftStrength;
+            this.flowmapShowMotion.value = this.params.flowmap.showMotion;
         }
-
-        this.bloomPass.strength.value = this.params.bloom.strength;
-        this.bloomPass.radius.value = this.params.bloom.radius;
-        this.bloomPass.threshold.value = this.params.bloom.threshold;
-        this.renderer.toneMappingExposure = this.params.bloom.enabled ? Math.pow(this.params.bloom.exposure, 4) : 1;
 
         this.updateOutputNode();
 
@@ -225,23 +209,12 @@ class FlowmapDemo extends BaseExperience {
     }
 
     override destroy() {
-        window.removeEventListener('pointermove', this.onPointerMove);
-
-        this.controls.dispose();
-        this.scene.remove(this.floor);
-        this.floor.dispose();
-
-        if (this.suzanne) {
-            this.scene.remove(this.suzanne);
-        }
-
-        this.scene.remove(this.pointLight1);
-        this.scene.remove(this.pointLight2);
-        this.pointLight1.dispose();
-        this.pointLight2.dispose();
+        this.canvas.removeEventListener('pointerdown', this.onPointerDown);
+        this.canvas.removeEventListener('pointermove', this.onPointerMove);
+        this.canvas.removeEventListener('pointerup', this.onPointerUp);
+        this.canvas.removeEventListener('pointercancel', this.onPointerUp);
 
         this.simulator.dispose();
-        this.bloomPass.dispose();
         this.postProcessing.dispose();
 
         super.destroy();
@@ -259,28 +232,28 @@ class FlowmapDemo extends BaseExperience {
         flowmapFolder.addBinding(this.params.flowmap, 'enabled', { label: 'Enabled' }).on('change', () => {
             this.updateOutputNode();
         });
-        flowmapFolder.addBinding(this.params.flowmap, 'power', { min: 0.1, max: 0.5, step: 0.01 });
-        flowmapFolder.addBinding(this.params.flowmap, 'range', { min: 0.1, max: 0.2, step: 0.01 });
-        flowmapFolder.addBinding(this.params.flowmap, 'viscosity', { min: 0.01, max: 0.1, step: 0.01 });
-        flowmapFolder.addBinding(this.params.flowmap, 'isPixel', { label: 'Pixel Mode' });
-        flowmapFolder.addBinding(this.params.flowmap, 'pixel', { min: 10, max: 50, step: 10 });
-        flowmapFolder.addBinding(this.params.flowmap, 'rgbShift', { label: 'RGB Shift' });
+        flowmapFolder.addBinding(this.params.flowmap, 'autoPlay', { label: 'Auto Play' });
 
-        const bloomFolder = this.tweakPane.addFolder({ title: 'Bloom', expanded: false });
+        const simFolder = flowmapFolder.addFolder({ title: 'Simulation', expanded: true });
 
-        bloomFolder.addBinding(this.params.bloom, 'enabled', { label: 'Enabled' }).on('change', () => {
-            this.updateOutputNode();
+        simFolder.addBinding(this.params.flowmap, 'range', { label: 'Brush Size', min: 0.01, max: 0.5, step: 0.01 });
+        simFolder.addBinding(this.params.flowmap, 'viscosity', { min: 0.001, max: 0.3, step: 0.001 });
+        simFolder.addBinding(this.params.flowmap, 'strength', { min: 0, max: 20, step: 0.1 });
+
+        const distortionFolder = flowmapFolder.addFolder({ title: 'Distortion', expanded: true });
+
+        distortionFolder.addBinding(this.params.flowmap, 'power', { min: 0.01, max: 1, step: 0.01 });
+        distortionFolder.addBinding(this.params.flowmap, 'rgbShift', { label: 'RGB Shift' });
+        distortionFolder.addBinding(this.params.flowmap, 'rgbShiftStrength', {
+            label: 'RGB Shift Strength',
+            min: 0,
+            max: 2,
+            step: 0.01,
         });
-        bloomFolder.addBinding(this.params.bloom, 'exposure', { min: 0.1, max: 2, step: 0.01 });
-        bloomFolder.addBinding(this.params.bloom, 'strength', { min: 0, max: 10, step: 0.1 });
-        bloomFolder.addBinding(this.params.bloom, 'radius', { min: 0, max: 2, step: 0.01 });
-        bloomFolder.addBinding(this.params.bloom, 'threshold', { min: 0, max: 1, step: 0.01 });
+        distortionFolder.addBinding(this.params.flowmap, 'isPixel', { label: 'Pixel Mode' });
+        distortionFolder.addBinding(this.params.flowmap, 'pixel', { min: 4, max: 80, step: 1 });
 
-        const fxaaFolder = this.tweakPane.addFolder({ title: 'FXAA', expanded: false });
-
-        fxaaFolder.addBinding(this.params.fxaa, 'enabled', { label: 'Enabled' }).on('change', () => {
-            this.updateOutputNode();
-        });
+        flowmapFolder.addBinding(this.params.flowmap, 'showMotion', { label: 'Show Motion Map' });
     }
 }
 

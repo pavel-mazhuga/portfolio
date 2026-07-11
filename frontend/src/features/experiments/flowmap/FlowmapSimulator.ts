@@ -1,15 +1,4 @@
-import {
-    Fn,
-    If,
-    clamp,
-    distance,
-    float,
-    smoothstep,
-    texture,
-    uniform,
-    uv,
-    vec4,
-} from 'three/tsl';
+import { clamp, distance, float, Fn, If, smoothstep, texture, uniform, uv, vec4 } from 'three/tsl';
 import {
     DataTexture,
     FloatType,
@@ -17,10 +6,10 @@ import {
     NearestFilter,
     NodeMaterial,
     QuadMesh,
-    RepeatWrapping,
-    RGBAFormat,
     RendererUtils,
     RenderTarget,
+    RepeatWrapping,
+    RGBAFormat,
     Vector2,
     type TextureNode,
     type WebGPURenderer,
@@ -71,6 +60,7 @@ export class FlowmapSimulator {
     readonly uMousePos = uniform(new Vector2(0, 0));
     readonly uRange = uniform(0.1);
     readonly uViscosity = uniform(0.04);
+    readonly uStrength = uniform(5);
 
     constructor(width: number, height: number) {
         this.width = Math.max(2, Math.floor(width));
@@ -92,16 +82,14 @@ export class FlowmapSimulator {
 
             If(dist.greaterThan(0), () => {
                 const speed = this.uMousePos.sub(tmp.zw);
-                const distortion = speed.mul(dist).mul(5);
+                const distortion = speed.mul(dist).mul(this.uStrength);
 
                 tmp.xy.addAssign(distortion);
             });
 
             const result = vec4(0).toVar();
 
-            result.xy.assign(
-                defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(float(1).sub(this.uViscosity))),
-            );
+            result.xy.assign(defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(float(1).sub(this.uViscosity))));
             result.xy.assign(clamp(result.xy, float(-1), float(1)));
             result.zw.assign(this.uMousePos);
 
@@ -129,10 +117,11 @@ export class FlowmapSimulator {
         this.motionTextureNode.value = this.rtA.texture;
     }
 
-    compute(renderer: WebGPURenderer, mouse: Vector2, range: number, viscosity: number) {
+    compute(renderer: WebGPURenderer, mouse: Vector2, range: number, viscosity: number, strength: number) {
         this.uMousePos.value.copy(mouse);
         this.uRange.value = range;
         this.uViscosity.value = viscosity;
+        this.uStrength.value = strength;
 
         const readTarget = this.readIndex === 0 ? this.rtA : this.rtB;
         const writeTarget = this.readIndex === 0 ? this.rtB : this.rtA;

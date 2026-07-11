@@ -1,6 +1,6 @@
 # Flowmap
 
-Mouse-driven flowmap distortion with reflective floor.
+Mouse-driven flowmap distortion on an Unsplash photo.
 
 Inspired by [Alien.js flowmap](https://alien.js.org/examples/shader_flowmap_rgbshift.html).
 
