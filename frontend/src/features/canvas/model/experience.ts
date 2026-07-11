@@ -51,7 +51,8 @@ class Experience {
                 isDebug,
                 useCoarsePointer: matchMedia('(pointer: coarse)').matches,
             },
-            isDebug,
+            // isDebug,
+            true,
             () => this.#onWorldReady(),
         );
 
