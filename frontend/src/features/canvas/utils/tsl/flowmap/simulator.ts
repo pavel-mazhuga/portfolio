@@ -82,12 +82,9 @@ export class FlowmapSimulator {
             const defTmp = this.defaultTextureNode.sample(st);
 
             const dist = float(1).sub(smoothstep(float(0), this.uRange, distance(this.uMousePos, st)));
+            const distortion = this.uVelocity.mul(dist).mul(this.uStrength);
 
-            If(dist.greaterThan(0), () => {
-                const distortion = this.uVelocity.mul(dist).mul(this.uStrength);
-
-                tmp.xy.addAssign(distortion);
-            });
+            tmp.xy.addAssign(distortion);
 
             const result = vec4(0).toVar();
 
