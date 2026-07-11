@@ -12,9 +12,13 @@ const FLOWMAP_DEFAULTS = {
     power: 0.3,
     range: 0.1,
     viscosity: 0.04,
+    strength: 5,
     isPixel: false,
     pixel: 20,
     rgbShift: true,
+    rgbShiftStrength: 1,
+    showMotion: false,
+    autoPlay: true,
 };
 
 class FlowmapDemo extends BaseExperience {
@@ -59,6 +63,7 @@ class FlowmapDemo extends BaseExperience {
             pixelMode: FLOWMAP_DEFAULTS.isPixel,
             pixel: FLOWMAP_DEFAULTS.pixel,
             rgbShift: FLOWMAP_DEFAULTS.rgbShift,
+            rgbShiftStrength: FLOWMAP_DEFAULTS.rgbShiftStrength,
             viewportSize: new Vector2(width, height),
         });
 
@@ -98,14 +103,28 @@ class FlowmapDemo extends BaseExperience {
         }
 
         if (this.params.flowmap.enabled) {
+            if (!this.hasPointer && this.params.flowmap.autoPlay) {
+                const t = this.clock.getElapsed();
+
+                this.defaultMouse.set(0.5 + 0.3 * Math.sin(t * 0.5), 0.5 + 0.3 * Math.cos(t * 0.7));
+            }
+
             const mouse = this.hasPointer ? this.normalizedMouse : this.defaultMouse;
 
-            this.simulator.compute(this.renderer, mouse, this.params.flowmap.range, this.params.flowmap.viscosity);
+            this.simulator.compute(
+                this.renderer,
+                mouse,
+                this.params.flowmap.range,
+                this.params.flowmap.viscosity,
+                this.params.flowmap.strength,
+            );
             this.flowmapPass.setMotionTexture(this.simulator.texture);
             this.flowmapPass.power.value = this.params.flowmap.power;
             this.flowmapPass.pixelMode.value = this.params.flowmap.isPixel;
             this.flowmapPass.pixel.value = this.params.flowmap.pixel;
             this.flowmapPass.rgbShift.value = this.params.flowmap.rgbShift;
+            this.flowmapPass.rgbShiftStrength.value = this.params.flowmap.rgbShiftStrength;
+            this.flowmapPass.showMotion.value = this.params.flowmap.showMotion;
         }
 
         this.updateOutputNode();
@@ -134,12 +153,28 @@ class FlowmapDemo extends BaseExperience {
         flowmapFolder.addBinding(this.params.flowmap, 'enabled', { label: 'Enabled' }).on('change', () => {
             this.updateOutputNode();
         });
-        flowmapFolder.addBinding(this.params.flowmap, 'power', { min: 0.1, max: 0.5, step: 0.01 });
-        flowmapFolder.addBinding(this.params.flowmap, 'range', { min: 0.1, max: 0.2, step: 0.01 });
-        flowmapFolder.addBinding(this.params.flowmap, 'viscosity', { min: 0.01, max: 0.1, step: 0.01 });
-        flowmapFolder.addBinding(this.params.flowmap, 'isPixel', { label: 'Pixel Mode' });
-        flowmapFolder.addBinding(this.params.flowmap, 'pixel', { min: 10, max: 50, step: 10 });
-        flowmapFolder.addBinding(this.params.flowmap, 'rgbShift', { label: 'RGB Shift' });
+        flowmapFolder.addBinding(this.params.flowmap, 'autoPlay', { label: 'Auto Play' });
+
+        const simFolder = flowmapFolder.addFolder({ title: 'Simulation', expanded: true });
+
+        simFolder.addBinding(this.params.flowmap, 'range', { label: 'Brush Size', min: 0.01, max: 0.5, step: 0.01 });
+        simFolder.addBinding(this.params.flowmap, 'viscosity', { min: 0.001, max: 0.3, step: 0.001 });
+        simFolder.addBinding(this.params.flowmap, 'strength', { min: 0, max: 20, step: 0.1 });
+
+        const distortionFolder = flowmapFolder.addFolder({ title: 'Distortion', expanded: true });
+
+        distortionFolder.addBinding(this.params.flowmap, 'power', { min: 0.01, max: 1, step: 0.01 });
+        distortionFolder.addBinding(this.params.flowmap, 'rgbShift', { label: 'RGB Shift' });
+        distortionFolder.addBinding(this.params.flowmap, 'rgbShiftStrength', {
+            label: 'RGB Shift Strength',
+            min: 0,
+            max: 2,
+            step: 0.01,
+        });
+        distortionFolder.addBinding(this.params.flowmap, 'isPixel', { label: 'Pixel Mode' });
+        distortionFolder.addBinding(this.params.flowmap, 'pixel', { min: 4, max: 80, step: 1 });
+
+        flowmapFolder.addBinding(this.params.flowmap, 'showMotion', { label: 'Show Motion Map' });
     }
 }
 
