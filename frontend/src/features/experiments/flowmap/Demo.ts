@@ -39,10 +39,7 @@ class FlowmapDemo extends BaseExperience {
         const rect = this.canvas.getBoundingClientRect();
 
         this.hasPointer = true;
-        this.normalizedMouse.set(
-            (event.clientX - rect.left) / rect.width,
-            1 - (event.clientY - rect.top) / rect.height,
-        );
+        this.normalizedMouse.set((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
     };
 
     private readonly onPointerDown = (event: PointerEvent) => {
