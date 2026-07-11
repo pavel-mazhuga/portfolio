@@ -42,3 +42,15 @@ html.lab-detail-page {
     transform: translateX(-50%);
     text-transform: uppercase;
 }
+
+html.lab-detail-page--ui-hidden {
+    .header,
+    .skip-link,
+    .page__header,
+    .tip,
+    .stats-gl,
+    .tp-dfwv,
+    #layout-grid {
+        display: none;
+    }
+}

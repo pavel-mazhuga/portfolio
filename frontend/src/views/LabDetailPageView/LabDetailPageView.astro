@@ -61,3 +61,5 @@ const { experiment } = Astro.props;
 <style lang="scss" is:global>
     @use './LabDetailPageView';
 </style>
+
+{process.env.NODE_ENV === 'development' && <script>import './lab-detail-ui-toggle';</script>}
