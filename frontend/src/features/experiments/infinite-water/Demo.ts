@@ -40,8 +40,6 @@ class Demo extends BaseExperience {
         this.light.position.set(0, 3, 3);
         this.scene.add(this.light);
 
-        document.documentElement.style.overscrollBehavior = 'none';
-
         // Listeners after bind: BaseExperience calls initEvents() inside super() before these bindings exist.
         window.addEventListener('wheel', this.onWheel, { passive: true });
         this.canvas.addEventListener('touchstart', this.onTouchStart);
