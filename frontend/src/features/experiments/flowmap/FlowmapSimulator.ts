@@ -1,15 +1,4 @@
-import {
-    Fn,
-    If,
-    clamp,
-    distance,
-    float,
-    smoothstep,
-    texture,
-    uniform,
-    uv,
-    vec4,
-} from 'three/tsl';
+import { clamp, distance, float, Fn, If, smoothstep, texture, uniform, uv, vec4 } from 'three/tsl';
 import {
     DataTexture,
     FloatType,
@@ -17,10 +6,10 @@ import {
     NearestFilter,
     NodeMaterial,
     QuadMesh,
-    RepeatWrapping,
-    RGBAFormat,
     RendererUtils,
     RenderTarget,
+    RepeatWrapping,
+    RGBAFormat,
     Vector2,
     type TextureNode,
     type WebGPURenderer,
@@ -99,9 +88,7 @@ export class FlowmapSimulator {
 
             const result = vec4(0).toVar();
 
-            result.xy.assign(
-                defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(float(1).sub(this.uViscosity))),
-            );
+            result.xy.assign(defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(float(1).sub(this.uViscosity))));
             result.xy.assign(clamp(result.xy, float(-1), float(1)));
             result.zw.assign(this.uMousePos);
 
