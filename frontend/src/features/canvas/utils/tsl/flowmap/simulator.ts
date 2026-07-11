@@ -1,4 +1,4 @@
-import { clamp, distance, float, Fn, If, smoothstep, texture, uniform, uv, vec4 } from 'three/tsl';
+import { distance, Fn, texture, uniform, uv, vec4 } from 'three/tsl';
 import {
     DataTexture,
     FloatType,
@@ -77,19 +77,19 @@ export class FlowmapSimulator {
         this.defaultTextureNode = texture(this.defaultTexture);
 
         this.material.fragmentNode = Fn(() => {
-            const st = uv();
+            const st = uv().toVar();
             const tmp = this.motionTextureNode.sample(st).toVar();
-            const defTmp = this.defaultTextureNode.sample(st);
+            const defTmp = this.defaultTextureNode.sample(st).toVar();
 
-            const dist = float(1).sub(smoothstep(float(0), this.uRange, distance(this.uMousePos, st)));
-            const distortion = this.uVelocity.mul(dist).mul(this.uStrength);
+            const dist = distance(this.uMousePos, st).smoothstep(0, this.uRange).oneMinus();
+            const distortion = this.uVelocity.mul(dist).mul(this.uStrength).toVar();
 
             tmp.xy.addAssign(distortion);
 
             const result = vec4(0).toVar();
 
-            result.xy.assign(defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(float(1).sub(this.uViscosity))));
-            result.xy.assign(clamp(result.xy, float(-1), float(1)));
+            result.xy.assign(defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(this.uViscosity.oneMinus())));
+            result.xy.assign(result.xy.clamp(-1, 1));
             result.zw.assign(this.uMousePos);
 
             return result;

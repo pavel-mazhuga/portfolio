@@ -1,0 +1,25 @@
+---
+description: Prefer Three.js TSL node method chaining over standalone function calls
+globs: frontend/**/*.ts
+alwaysApply: false
+---
+
+# TSL node chaining
+
+In `three/tsl` shader code, prefer **method chaining on nodes** over standalone function wrappers.
+
+```ts
+// prefer
+distance(a, b).smoothstep(0, range).oneMinus();
+result.xy.clamp(-1, 1);
+uniform.oneMinus();
+
+// avoid
+smoothstep(float(0), range, distance(a, b));
+clamp(result.xy, float(-1), float(1));
+float(1).sub(uniform);
+```
+
+Chain further when it reads left-to-right: `.mul()`, `.add()`, `.div()`, `.pow()`, `.mix()`, etc.
+
+Keep standalone imports only when chaining is awkward (e.g. `Fn`, `If`, `texture`, `uniform`, `uv`) or no chain method exists.
