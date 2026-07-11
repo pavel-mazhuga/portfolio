@@ -58,9 +58,12 @@ export class FlowmapSimulator {
     private defaultTextureNode!: TextureNode;
 
     readonly uMousePos = uniform(new Vector2(0, 0));
+    readonly uVelocity = uniform(new Vector2(0, 0));
     readonly uRange = uniform(0.1);
     readonly uViscosity = uniform(0.04);
     readonly uStrength = uniform(5);
+
+    private readonly lastMouse = new Vector2(0, 0);
 
     constructor(width: number, height: number) {
         this.width = Math.max(2, Math.floor(width));
@@ -81,8 +84,7 @@ export class FlowmapSimulator {
             const dist = float(1).sub(smoothstep(float(0), this.uRange, distance(this.uMousePos, st)));
 
             If(dist.greaterThan(0), () => {
-                const speed = this.uMousePos.sub(tmp.zw);
-                const distortion = speed.mul(dist).mul(this.uStrength);
+                const distortion = this.uVelocity.mul(dist).mul(this.uStrength);
 
                 tmp.xy.addAssign(distortion);
             });
@@ -115,9 +117,13 @@ export class FlowmapSimulator {
         this.defaultTextureNode.value = this.defaultTexture;
         this.readIndex = 0;
         this.motionTextureNode.value = this.rtA.texture;
+        this.lastMouse.set(0, 0);
+        this.uVelocity.value.set(0, 0);
     }
 
     compute(renderer: WebGPURenderer, mouse: Vector2, range: number, viscosity: number, strength: number) {
+        this.uVelocity.value.set(mouse.x - this.lastMouse.x, mouse.y - this.lastMouse.y);
+        this.lastMouse.copy(mouse);
         this.uMousePos.value.copy(mouse);
         this.uRange.value = range;
         this.uViscosity.value = viscosity;

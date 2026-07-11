@@ -8,6 +8,7 @@ import {
     Vector2,
     type Node,
 } from 'three/webgpu';
+import { CanvasUvPointer } from '../../canvas/utils/CanvasUvPointer';
 import { FlowmapNode, FlowmapSimulator } from '../../canvas/utils/tsl/flowmap';
 import { quantizeUv } from '../../canvas/utils/tsl/pixel';
 import { sampleRgbShift, type TextureSampleNode } from '../../canvas/utils/tsl/rgb-shift';
@@ -15,7 +16,7 @@ import { coverTextureUv } from '../../canvas/utils/tsl/uv-cover';
 import BaseExperience from '../model/BaseExperience';
 
 const SOURCE_URL =
-    'https://images.unsplash.com/photo-1649706796644-c507eb2835bb?q=80&w=3121&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    'https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=2370&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
 class FlowmapDemo extends BaseExperience {
     simulator: FlowmapSimulator;
@@ -32,37 +33,67 @@ class FlowmapDemo extends BaseExperience {
     flowmapImageNaturalSize = uniform(new Vector2(0, 0));
     flowmapViewportSize = uniform(new Vector2(1, 1));
 
-    normalizedMouse = new Vector2(0, 0);
+    canvasPointer: CanvasUvPointer;
 
     params = {
         power: 0.3,
-        range: 0.1,
-        viscosity: 0.04,
+        range: 0.15,
+        viscosity: 0.03,
         strength: 5,
         isPixel: false,
         pixel: 20,
-        rgbShift: true,
+        rgbShift: false,
         rgbShiftStrength: 1,
         showMotion: false,
     };
 
     private readonly updatePointer = (event: PointerEvent) => {
-        const rect = this.canvas.getBoundingClientRect();
+        this.canvasPointer.setFromEvent(event);
+    };
 
-        this.normalizedMouse.set((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+    private stepSimulation() {
+        this.simulator.compute(
+            this.renderer,
+            this.canvasPointer.uv,
+            this.params.range,
+            this.params.viscosity,
+            this.params.strength,
+        );
+        this.flowmapPass.setMotionTexture(this.simulator.texture);
+    }
+
+    private readonly processPointerEvent = (event: PointerEvent) => {
+        const events = typeof event.getCoalescedEvents === 'function' ? event.getCoalescedEvents() : [event];
+
+        for (const coalescedEvent of events) {
+            this.updatePointer(coalescedEvent);
+            this.stepSimulation();
+        }
     };
 
     private readonly onPointerDown = (event: PointerEvent) => {
         this.canvas.setPointerCapture(event.pointerId);
-        this.updatePointer(event);
+        this.processPointerEvent(event);
     };
 
     private readonly onPointerMove = (event: PointerEvent) => {
-        if (event.pointerType !== 'mouse' && !this.canvas.hasPointerCapture(event.pointerId)) {
+        if (this.canvas.hasPointerCapture(event.pointerId)) {
             return;
         }
 
-        this.updatePointer(event);
+        if (event.pointerType !== 'mouse') {
+            return;
+        }
+
+        this.processPointerEvent(event);
+    };
+
+    private readonly onWindowPointerMove = (event: PointerEvent) => {
+        if (!this.canvas.hasPointerCapture(event.pointerId)) {
+            return;
+        }
+
+        this.processPointerEvent(event);
     };
 
     private readonly onPointerUp = (event: PointerEvent) => {
@@ -73,6 +104,8 @@ class FlowmapDemo extends BaseExperience {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas, { antialias: false });
+
+        this.canvasPointer = new CanvasUvPointer(canvas);
 
         this.renderer.toneMapping = NoToneMapping;
 
@@ -121,7 +154,7 @@ class FlowmapDemo extends BaseExperience {
                     tex.sample(mapUv.add(distortion)),
                 );
 
-                return select(this.flowmapShowMotion, vec4(motion.xy, 0, 1), color);
+                return select(this.flowmapShowMotion, vec4(motion.xy.mul(0.5).add(0.5), 0, 1), color);
             },
         );
 
@@ -139,6 +172,7 @@ class FlowmapDemo extends BaseExperience {
         this.canvas.addEventListener('pointermove', this.onPointerMove);
         this.canvas.addEventListener('pointerup', this.onPointerUp);
         this.canvas.addEventListener('pointercancel', this.onPointerUp);
+        window.addEventListener('pointermove', this.onWindowPointerMove);
         this.initTweakPane();
     }
 
@@ -153,6 +187,7 @@ class FlowmapDemo extends BaseExperience {
         const height = this.canvas.parentElement?.offsetHeight || 1;
 
         this.simulator.setSize(width, height);
+        this.canvasPointer.updateRect();
         this.flowmapAspect.value = width / height;
         this.flowmapViewportSize.value.set(width, height);
     }
@@ -162,14 +197,7 @@ class FlowmapDemo extends BaseExperience {
             this.renderer.resolveTimestampsAsync(TimestampQuery.COMPUTE);
         }
 
-        this.simulator.compute(
-            this.renderer,
-            this.normalizedMouse,
-            this.params.range,
-            this.params.viscosity,
-            this.params.strength,
-        );
-        this.flowmapPass.setMotionTexture(this.simulator.texture);
+        this.stepSimulation();
         this.flowmapPass.power.value = this.params.power;
         this.flowmapPixelMode.value = this.params.isPixel;
         this.flowmapPixel.value = this.params.pixel;
@@ -185,7 +213,9 @@ class FlowmapDemo extends BaseExperience {
         this.canvas.removeEventListener('pointermove', this.onPointerMove);
         this.canvas.removeEventListener('pointerup', this.onPointerUp);
         this.canvas.removeEventListener('pointercancel', this.onPointerUp);
+        window.removeEventListener('pointermove', this.onWindowPointerMove);
 
+        this.canvasPointer.dispose();
         this.simulator.dispose();
         this.postProcessing.dispose();
 
