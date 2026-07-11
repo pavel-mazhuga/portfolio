@@ -1,7 +1,7 @@
+import { resolve } from 'path';
 import node from '@astrojs/node';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, envField } from 'astro/config';
-import { resolve } from 'path';
 import { loadEnv } from 'vite';
 import { IS_EXTERNAL_TEMPLATING, SSR_ENABLED } from './config';
 import { generateAssetsFilesPlugin } from './plugins/vite/generate-assets-files';
@@ -22,6 +22,10 @@ export default defineConfig({
 
     server: {
         port: Number(PORT),
+    },
+
+    devToolbar: {
+        enabled: false,
     },
 
     vite: IS_EXTERNAL_TEMPLATING
