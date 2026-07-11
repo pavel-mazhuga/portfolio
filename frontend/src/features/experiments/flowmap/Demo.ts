@@ -1,4 +1,4 @@
-import { float, Fn, renderOutput, select, texture, uniform, vec3, vec4 } from 'three/tsl';
+import { float, Fn, renderOutput, select, texture, uniform, vec4 } from 'three/tsl';
 import {
     NoToneMapping,
     RenderPipeline,
@@ -10,6 +10,7 @@ import {
 } from 'three/webgpu';
 import { CanvasUvPointer } from '../../canvas/utils/CanvasUvPointer';
 import {
+    CurlUvField,
     FlowmapNode,
     FlowmapSimulator,
     passThroughUv,
@@ -19,16 +20,26 @@ import {
 import { quantizeUv } from '../../canvas/utils/tsl/pixel';
 import { sampleRgbShift, type TextureSampleNode } from '../../canvas/utils/tsl/rgb-shift';
 import { coverTextureUv } from '../../canvas/utils/tsl/uv-cover';
-import { curlNoise } from '../lib/nodes/noise/curlNoise3d';
 import BaseExperience from '../model/BaseExperience';
+
+type MotionUvMode = 'normal' | 'pixel' | 'curl';
+
+function normalizeMotionUvMode(mode: string): MotionUvMode {
+    const normalized = mode.toLowerCase();
+
+    if (normalized === 'pixel' || normalized === 'curl') {
+        return normalized;
+    }
+
+    return 'normal';
+}
 
 const SOURCE_URL =
     'https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=2370&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
-type MotionUvMode = 'normal' | 'pixel' | 'curl';
-
 class FlowmapDemo extends BaseExperience {
     simulator: FlowmapSimulator;
+    curlUvField: CurlUvField;
     flowmapPass!: FlowmapNode;
     sourceColor: ReturnType<typeof texture>;
     postProcessing: RenderPipeline;
@@ -43,6 +54,7 @@ class FlowmapDemo extends BaseExperience {
         curlScale: 10,
         curlStrength: 0.05,
         curlSpeed: 1,
+        curlPixel: 64,
         rgbShift: false,
         rgbShiftStrength: 1,
         showMotion: false,
@@ -50,9 +62,6 @@ class FlowmapDemo extends BaseExperience {
 
     flowmapAspect = uniform(1);
     flowmapPixel = uniform(this.params.pixel);
-    flowmapCurlScale = uniform(this.params.curlScale);
-    flowmapCurlStrength = uniform(this.params.curlStrength);
-    flowmapTime = uniform(this.params.curlSpeed);
     flowmapRgbShift = uniform(this.params.rgbShift);
     flowmapRgbShiftStrength = uniform(this.params.rgbShiftStrength);
     flowmapShowMotion = uniform(this.params.showMotion);
@@ -87,10 +96,9 @@ class FlowmapDemo extends BaseExperience {
 
         if (mode === 'curl') {
             return Fn(([vUv]: [Node<'vec2'>]) => {
-                const scaledUv = vUv.mul(this.flowmapCurlScale).toVar();
-                const curl = curlNoise(vec3(scaledUv.x, scaledUv.y, this.flowmapTime)).toVar();
+                const offset = this.curlUvField.textureNode.sample(vUv).xy.toVar();
 
-                return vUv.add(curl.xy.mul(this.flowmapCurlStrength));
+                return vUv.add(offset);
             });
         }
 
@@ -98,14 +106,17 @@ class FlowmapDemo extends BaseExperience {
     }
 
     private rebuildFlowmapPass(mode: MotionUvMode) {
-        if (mode === this.motionUvMode) {
+        const nextMode = normalizeMotionUvMode(mode);
+
+        if (nextMode === this.motionUvMode) {
             return;
         }
 
-        this.motionUvMode = mode;
+        this.motionUvMode = nextMode;
+        this.params.motionUvMode = nextMode;
         this.flowmapPass = new FlowmapNode(this.sourceColor, this.simulator.texture, {
             power: this.params.power,
-            resolveMotionUv: this.createResolveMotionUv(mode),
+            resolveMotionUv: this.createResolveMotionUv(nextMode),
             resolveColor: this.resolveColor,
         });
         this.postProcessing.outputNode = renderOutput(this.flowmapPass);
@@ -163,12 +174,11 @@ class FlowmapDemo extends BaseExperience {
         this.sourceColor = texture(sourceTexture);
 
         this.simulator = new FlowmapSimulator(width, height);
+        this.curlUvField = new CurlUvField(width / height, this.params.curlPixel);
 
         this.flowmapAspect.value = width / height;
         this.flowmapViewportSize.value.set(width, height);
         this.flowmapPixel.value = this.params.pixel;
-        this.flowmapCurlScale.value = this.params.curlScale;
-        this.flowmapCurlStrength.value = this.params.curlStrength;
         this.flowmapRgbShift.value = this.params.rgbShift;
         this.flowmapRgbShiftStrength.value = this.params.rgbShiftStrength;
         this.flowmapShowMotion.value = this.params.showMotion;
@@ -212,6 +222,7 @@ class FlowmapDemo extends BaseExperience {
         const height = this.canvas.parentElement?.offsetHeight || 1;
 
         this.simulator.setSize(width, height);
+        this.curlUvField.setSize(width / height, this.params.curlPixel);
         this.canvasPointer.updateRect();
         this.hasPointer = false;
         this.flowmapAspect.value = width / height;
@@ -224,11 +235,19 @@ class FlowmapDemo extends BaseExperience {
         }
 
         this.stepSimulation();
+
+        if (normalizeMotionUvMode(this.params.motionUvMode) === 'curl') {
+            this.curlUvField.setSize(this.flowmapAspect.value, this.params.curlPixel);
+            this.curlUvField.compute(
+                this.renderer,
+                this.params.curlScale,
+                this.clock.getElapsed() * this.params.curlSpeed,
+                this.params.curlStrength,
+            );
+        }
+
         this.flowmapPass.power.value = this.params.power;
         this.flowmapPixel.value = this.params.pixel;
-        this.flowmapCurlScale.value = this.params.curlScale;
-        this.flowmapCurlStrength.value = this.params.curlStrength;
-        this.flowmapTime.value = this.clock.getElapsed() * this.params.curlSpeed;
         this.flowmapRgbShift.value = this.params.rgbShift;
         this.flowmapRgbShiftStrength.value = this.params.rgbShiftStrength;
         this.flowmapShowMotion.value = this.params.showMotion;
@@ -244,6 +263,7 @@ class FlowmapDemo extends BaseExperience {
 
         this.canvasPointer.dispose();
         this.simulator.dispose();
+        this.curlUvField.dispose();
         this.postProcessing.dispose();
 
         super.destroy();
@@ -277,6 +297,21 @@ class FlowmapDemo extends BaseExperience {
 
         const motionUvFolder = distortionFolder.addFolder({ title: 'Motion UV', expanded: true });
 
+        motionUvFolder
+            .addBinding(this.params, 'motionUvMode', {
+                label: 'Mode',
+                options: {
+                    Normal: 'normal',
+                    Pixel: 'pixel',
+                    Curl: 'curl',
+                },
+            })
+            .on('change', () => {
+                this.params.motionUvMode = normalizeMotionUvMode(this.params.motionUvMode);
+                syncMotionUvBindings();
+                this.rebuildFlowmapPass(this.params.motionUvMode);
+            });
+
         const pixelBinding = motionUvFolder.addBinding(this.params, 'pixel', {
             label: 'Pixel Size',
             min: 4,
@@ -301,29 +336,20 @@ class FlowmapDemo extends BaseExperience {
             max: 5,
             step: 0.01,
         });
+        const curlPixelBinding = motionUvFolder.addBinding(this.params, 'curlPixel', {
+            label: 'Curl Map Size',
+            min: 4,
+            max: 128,
+            step: 1,
+        });
 
-        const syncMotionUvBindings = (mode = this.params.motionUvMode) => {
+        const syncMotionUvBindings = (mode = normalizeMotionUvMode(this.params.motionUvMode)) => {
             pixelBinding.hidden = mode !== 'pixel';
             curlScaleBinding.hidden = mode !== 'curl';
             curlStrengthBinding.hidden = mode !== 'curl';
             curlSpeedBinding.hidden = mode !== 'curl';
+            curlPixelBinding.hidden = mode !== 'curl';
         };
-
-        motionUvFolder
-            .addBinding(this.params, 'motionUvMode', {
-                label: 'Mode',
-                options: {
-                    Normal: 'normal',
-                    Pixel: 'pixel',
-                    Curl: 'curl',
-                },
-            })
-            .on('change', (event) => {
-                const mode = event.value as MotionUvMode;
-
-                syncMotionUvBindings(mode);
-                this.rebuildFlowmapPass(mode);
-            });
 
         syncMotionUvBindings();
 

@@ -1,6 +1,5 @@
 import { convertToTexture, Fn, texture, uniform, uv, vec2 } from 'three/tsl';
 import { TempNode, type Node, type Texture } from 'three/webgpu';
-import type { TextureSampleNode } from '../rgb-shift';
 
 export type FlowmapMotionUvResolver = (vUv: Node<'vec2'>) => Node;
 
@@ -21,18 +20,6 @@ export const passThroughUv = /*#__PURE__*/ Fn(([vUv]: [Node<'vec2'>]) => vec2(vU
     name: 'passThroughUv',
     type: 'vec2',
     inputs: [{ name: 'vUv', type: 'vec2' }],
-});
-
-export const sampleDistorted = /*#__PURE__*/ Fn(
-    ([tex, vUv, distortion]: [TextureSampleNode, Node<'vec2'>, Node<'vec2'>]) => tex.sample(vUv.add(distortion)),
-).setLayout({
-    name: 'sampleDistorted',
-    type: 'vec4',
-    inputs: [
-        { name: 'tex', type: 'vec4' },
-        { name: 'vUv', type: 'vec2' },
-        { name: 'distortion', type: 'vec2' },
-    ],
 });
 
 export class FlowmapNode extends TempNode {
@@ -68,8 +55,4 @@ export class FlowmapNode extends TempNode {
             return this.resolveColor(this.inputNode, vUv, distortion, motion);
         })() as Node<'vec4'>;
     }
-}
-
-export function flowmap(inputNode: Node, motionTexture: Texture, params: FlowmapCoreParams) {
-    return new FlowmapNode(inputNode, motionTexture, params);
 }
