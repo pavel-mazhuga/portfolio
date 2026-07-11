@@ -3,12 +3,12 @@ import {
     DataTexture,
     FloatType,
     HalfFloatType,
+    MirroredRepeatWrapping,
     NearestFilter,
     NodeMaterial,
     QuadMesh,
     RendererUtils,
     RenderTarget,
-    RepeatWrapping,
     RGBAFormat,
     Vector2,
     type TextureNode,
@@ -27,8 +27,8 @@ function createRenderTarget(width: number, height: number) {
         magFilter: NearestFilter,
     });
 
-    target.texture.wrapS = RepeatWrapping;
-    target.texture.wrapT = RepeatWrapping;
+    target.texture.wrapS = MirroredRepeatWrapping;
+    target.texture.wrapT = MirroredRepeatWrapping;
 
     return target;
 }
@@ -39,8 +39,8 @@ function createDefaultTexture(width: number, height: number) {
 
     defaultTexture.minFilter = NearestFilter;
     defaultTexture.magFilter = NearestFilter;
-    defaultTexture.wrapS = RepeatWrapping;
-    defaultTexture.wrapT = RepeatWrapping;
+    defaultTexture.wrapS = MirroredRepeatWrapping;
+    defaultTexture.wrapT = MirroredRepeatWrapping;
     defaultTexture.needsUpdate = true;
 
     return defaultTexture;
