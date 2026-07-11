@@ -8,13 +8,9 @@ import {
     Vector2,
     type Node,
 } from 'three/webgpu';
-import {
-    FlowmapNode,
-    FlowmapSimulator,
-    quantizeUv,
-    sampleRgbShift,
-    type TextureSampleNode,
-} from '../../canvas/utils/tsl/flowmap';
+import { FlowmapNode, FlowmapSimulator } from '../../canvas/utils/tsl/flowmap';
+import { quantizeUv } from '../../canvas/utils/tsl/pixel';
+import { sampleRgbShift, type TextureSampleNode } from '../../canvas/utils/tsl/rgb-shift';
 import { coverTextureUv } from '../../canvas/utils/tsl/uv-cover';
 import BaseExperience from '../model/BaseExperience';
 

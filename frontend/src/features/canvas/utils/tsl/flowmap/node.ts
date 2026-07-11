@@ -1,6 +1,6 @@
 import { convertToTexture, Fn, texture, uniform, uv, vec2 } from 'three/tsl';
 import { TempNode, type Node, type Texture } from 'three/webgpu';
-import type { TextureSampleNode } from './rgb-shift';
+import type { TextureSampleNode } from '../rgb-shift';
 
 export type FlowmapMotionUvResolver = (vUv: Node<'vec2'>) => Node;
 
