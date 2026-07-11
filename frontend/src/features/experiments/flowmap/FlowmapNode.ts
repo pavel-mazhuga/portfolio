@@ -1,5 +1,6 @@
-import { Fn, If, convertToTexture, floor, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
-import { TempNode, type Node, type Texture } from 'three/webgpu';
+import { convertToTexture, float, floor, Fn, If, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
+import { TempNode, Vector2, type Node, type Texture } from 'three/webgpu';
+import { coverTextureUv } from '../../canvas/utils/tsl/uv-cover';
 
 export type FlowmapPassParams = {
     power: number;
@@ -7,6 +8,9 @@ export type FlowmapPassParams = {
     pixelMode: boolean;
     pixel: number;
     rgbShift: boolean;
+    rgbShiftStrength?: number;
+    imageNaturalSize?: Vector2;
+    viewportSize?: Vector2;
 };
 
 export class FlowmapNode extends TempNode {
@@ -18,6 +22,10 @@ export class FlowmapNode extends TempNode {
     pixelMode = uniform(false);
     pixel = uniform(20);
     rgbShift = uniform(true);
+    rgbShiftStrength = uniform(1);
+    showMotion = uniform(false);
+    imageNaturalSize = uniform(new Vector2(0, 0));
+    viewportSize = uniform(new Vector2(1, 1));
 
     constructor(inputNode: Node, motionTexture: Texture, params: FlowmapPassParams) {
         super('vec4');
@@ -30,6 +38,15 @@ export class FlowmapNode extends TempNode {
         this.pixelMode.value = params.pixelMode;
         this.pixel.value = params.pixel;
         this.rgbShift.value = params.rgbShift;
+        this.rgbShiftStrength.value = params.rgbShiftStrength ?? 1;
+
+        if (params.imageNaturalSize) {
+            this.imageNaturalSize.value.copy(params.imageNaturalSize);
+        }
+
+        if (params.viewportSize) {
+            this.viewportSize.value.copy(params.viewportSize);
+        }
     }
 
     setMotionTexture(motionTexture: Texture) {
@@ -47,17 +64,29 @@ export class FlowmapNode extends TempNode {
                 st.assign(floor(vUv.mul(pixel)).div(pixel));
             });
 
+            const mapUv = vUv.toVar();
+
+            If(this.imageNaturalSize.x.greaterThan(float(0)), () => {
+                mapUv.assign(coverTextureUv(this.imageNaturalSize, this.viewportSize, vUv));
+            });
+
             const motion = this.motionTextureNode.sample(st);
             const distortion = motion.xy.mul(this.power).mul(-1);
-            const sampleUv = vUv.add(distortion);
+            const sampleUv = mapUv.add(distortion);
             const color = this.inputNode.sample(sampleUv).toVar();
 
             If(this.rgbShift, () => {
-                const texR = this.inputNode.sample(vUv.add(distortion.mul(0.5))).r;
-                const texG = this.inputNode.sample(vUv.add(distortion.mul(0.75))).g;
-                const texB = this.inputNode.sample(vUv.add(distortion)).b;
+                const shift = this.rgbShiftStrength.toVar();
+
+                const texR = this.inputNode.sample(mapUv.add(distortion.mul(shift.mul(0.5)))).r;
+                const texG = this.inputNode.sample(mapUv.add(distortion.mul(shift.mul(0.75)))).g;
+                const texB = this.inputNode.sample(mapUv.add(distortion.mul(shift))).b;
 
                 color.assign(vec4(texR, texG, texB, color.a));
+            });
+
+            If(this.showMotion, () => {
+                color.assign(vec4(motion.xy.mul(0.5).add(0.5), 0, 1));
             });
 
             return color;
