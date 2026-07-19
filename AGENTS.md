@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-Project: Astro 5 site (creative-developer portfolio + a `lab/` of Three.js / WebGPU
+Project: Astro 7 site (creative-developer portfolio + a `lab/` of Three.js / WebGPU
 experiments), Feature-Sliced Design. All app code and commands live in `frontend/`.
 Node 22+, pnpm. Standard scripts are documented in `frontend/README.md` and
 `frontend/package.json` (`pnpm dev`, `pnpm build`, `pnpm tsc`, `pnpm lint`, `pnpm test`).
