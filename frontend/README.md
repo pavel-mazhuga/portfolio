@@ -16,7 +16,8 @@
 - `pnpm lint` — run linters;
 - `pnpm pc` — run typescript type checking + linters;
 - `pnpm format` — format files using [prettier](https://prettier.io/);
-- `pnpm icons` - generate icon types;
+- `pnpm icons` — generate UI icon types (sprite);
+- `pnpm pwa-icons` — generate PNG icons for web app manifest from `public/static/img/favicon.svg`
 
 ## Frontend Application Structure
 
@@ -57,10 +58,7 @@ The second argument of the function is `locale`:
 ```tsx
 import { tp } from '@/shared/lib/formatting';
 
-const typografedText = tp(
-    'This string will be typografed following Russian typography rules (default behavior)',
-    'ru',
-);
+const typografedText = tp('This string will be typografed following Russian typography rules (default behavior)', 'ru');
 ```
 
 ```tsx
@@ -68,6 +66,27 @@ import { tp } from '@/shared/lib/formatting';
 
 const typografedText = tp('This string will be typografed following English typography rules', 'en');
 ```
+
+## Website metadata and web app manifest
+
+Single brand config: [`src/shared/config/website-metadata.ts`](src/shared/config/website-metadata.ts) (`WEBSITE_METADATA`).
+
+Used for:
+
+- `name` / `shortName` / `themeColor` / `backgroundColor` / icon paths;
+- title in `getCommonPageProps`;
+- `<meta name="theme-color">` and `<link rel="apple-touch-icon">` in `RootLayout`;
+- `/site.webmanifest` — endpoint [`src/pages/site.webmanifest.ts`](src/pages/site.webmanifest.ts) builds JSON via `buildManifest()` at build time (`Content-Type: application/manifest+json`).
+
+### Manifest icons
+
+Source — `public/static/img/favicon.svg`. Script `pnpm pwa-icons` writes into `public/static/img/`:
+
+- `icon-192.png`, `icon-512.png` — installability (Chrome);
+- `icon-maskable-512.png` — adaptive icon (safe zone ~80%);
+- `apple-touch-icon.png` — iOS home screen.
+
+PNGs are committed. After changing favicon — run `pnpm pwa-icons` again.
 
 ## Seo
 

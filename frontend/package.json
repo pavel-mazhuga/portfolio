@@ -24,6 +24,7 @@
         "test:general:ci": "dotenv -- sh -c 'pnpm test:general'",
         "mkac": "node ./codegen/make-astro-component.js",
         "icons": "node ./scripts/generate-icon-types.js",
+        "pwa-icons": "node ./scripts/generate-pwa-icons.mjs",
         "ts-zod": "node ./generate-zod-schemas-openapi.mjs https://[DOMAIN].chipsa.ru/docs/api.json",
         "api-types": "openapi-typescript https://[DOMAIN].chipsa.ru/docs/api.json -o src/shared/api/generated/api.d.ts && prettier --write src/shared/api/generated/api.d.ts",
         "api": "concurrently 'pnpm api-types' 'pnpm ts-zod'"

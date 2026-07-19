@@ -1,15 +1,16 @@
 ---
 import type { AppBreadcrumbs, PageMeta } from '@/shared/model/types';
 import '@/app/css/app.scss';
-import { type AppLocale, DEFAULT_LOCALE, LOCALES } from '@/shared/config/i18n';
-import LayoutGrid from '@/shared/ui/LayoutGrid';
-import { Canvas } from '@/features/canvas';
-import Header from '@/widgets/Header';
-import { APP_TITLE } from '@/shared/api/get-common-page-props';
 import { ClientRouter } from 'astro:transitions';
+import { Canvas } from '@/features/canvas';
+import { APP_TITLE } from '@/shared/api/get-common-page-props';
+import { DEFAULT_LOCALE, LOCALES, type AppLocale } from '@/shared/config/i18n';
+import { WEBSITE_METADATA } from '@/shared/config/website-metadata';
 import { isLabDetailPage } from '@/shared/lib/router';
 import Breadcrumbs from '@/shared/ui/Breadcrumbs.astro';
+import LayoutGrid from '@/shared/ui/LayoutGrid';
 import SkipLink from '@/shared/ui/SkipLink';
+import Header from '@/widgets/Header';
 
 type Props = {
     htmlClass?: string;
@@ -50,6 +51,9 @@ const getLocalizedUrl = (l: string) => {
         <meta name="twitter:description" content={meta.description} />
 
         <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg" />
+        <link rel="apple-touch-icon" href={WEBSITE_METADATA.icons.appleTouch} />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content={WEBSITE_METADATA.themeColor} />
 
         {
             HOST && (
