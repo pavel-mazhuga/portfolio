@@ -1,0 +1,33 @@
+---
+description: Use TSL .toVar() for named intermediates and to avoid recomputing nodes
+globs: frontend/**/*.ts
+alwaysApply: false
+---
+
+# TSL `.toVar()`
+
+In `three/tsl` graphs, **nodes are expressions**. Reusing a node without `.toVar()` can emit the same subgraph multiple times. Assign intermediates with `.toVar('name')`.
+
+```ts
+// prefer — compute once, reuse, readable WGSL/GLSL names
+const wipeField = texMask.sample(screenUv).r.toVar("wipeField");
+const mixFactor = softProgress
+  .smoothstep(wipeField.sub(uEdge), wipeField.add(uEdge))
+  .toVar("mixFactor");
+
+// avoid — opaque names, wipeField / sample may be duplicated in the graph
+const f = texMask.sample(uv()).r;
+const t = p.smoothstep(f.sub(uEdge), f.add(uEdge));
+```
+
+## When to use
+
+- Intermediate used **more than once** (`.sub` + `.add`, mix args, etc.)
+- Value **mutated** later (`.assign` / `.addAssign` inside `Loop` / `Fn`) — required
+- Non-trivial step worth a **stable debug name** in generated shaders
+
+## When to skip
+
+- Single-use throwaway in a short chain: `positionLocal.mul(uScale)` passed once into a call
+
+Always pass a string name: `.toVar('heightNormalized')`, not bare `.toVar()`.
