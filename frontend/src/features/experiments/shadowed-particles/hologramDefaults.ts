@@ -1,11 +1,5 @@
-/**
- * Runtime defaults from hologram-particles playground:
- * useHologramControls() leva values + PRESETS.light overrides.
- *
- * https://github.com/cortiz2894/hologram-particles
- */
 export const HOLOGRAM_DEFAULTS = {
-    particleCount: 60_000,
+    particleCount: 60000,
     autoRotateSpeed: 2.53,
     color: '#99a5b7',
     floatAmp: 0.01,
