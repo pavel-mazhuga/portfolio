@@ -157,6 +157,10 @@
             }
         }
     }
+
+    @media screen and (max-width: 420px) {
+        width: 100%;
+    }
 }
 
 .projects-list-item__info-inner {
