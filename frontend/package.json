@@ -5,7 +5,8 @@
     "scripts": {
         "dev": "astro dev --host",
         "build": "astro build",
-        "postbuild": "node ./scripts/prepare-sitemap.js",
+        "postbuild": "node ./scripts/prepare-sitemap.js && node ./scripts/dcz/generate.mjs",
+        "dcz:prev": "node --env-file-if-exists=.env ./scripts/dcz/fetch-prev.mjs",
         "preview": "astro preview --host",
         "start": "dotenv -- sh -c 'node build/server/entry.mjs'",
         "astro": "astro",
