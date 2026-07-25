@@ -65,6 +65,79 @@ nginx -t && systemctl reload nginx
 
 Конфиг не содержит ни одного хеша, поэтому при последующих деплоях его трогать не нужно.
 
+### Конкретно pavelmazhuga.com (ISPmanager)
+
+Панель генерирует vhost `/etc/nginx/vhosts/www-root/pavelmazhuga.com.conf` и может его перезаписать,
+поэтому всё своё держим в подключаемых каталогах, а в самом vhost правим ровно два символа.
+
+**1. `/etc/nginx/conf.d/dcz-map.conf`** — содержимое `compression-dictionary-map.conf` (нужен
+http-контекст). Сначала проверить, что каталог подключён в `http{}`:
+
+```bash
+grep -n 'include' /etc/nginx/nginx.conf
+# должно быть include /etc/nginx/conf.d/*.conf;
+```
+
+**2. `/etc/nginx/vhosts-resources/pavelmazhuga.com/dcz.conf`** — этот каталог уже подключается обоими
+`server`-блоками через `include /etc/nginx/vhosts-resources/pavelmazhuga.com/*.conf;`. Это копия
+`compression-dictionary.conf` с двумя добавлениями под текущий конфиг: `access_log off;` (как в
+существующем `_astro`) и `include ... security-headers.conf;` — **обязательно**, потому что `add_header`
+внутри `location` отменяет все унаследованные `add_header`, и без этой строки ассеты потеряют
+security-заголовки:
+
+```nginx
+location ~ "\.dcz\.(?:js|css)$" {
+    return 404;
+}
+
+location ~ "^/_astro/(?<dcz_family>.+?)[.-](?<dcz_hash>[A-Za-z0-9_-]{8})\.(?<dcz_ext>js|css)$" {
+    access_log off;
+    include /etc/nginx/vhosts-resources/pavelmazhuga.com/security-headers.conf;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    add_header Vary "Accept-Encoding, Available-Dictionary" always;
+    add_header Use-As-Dictionary 'match="/_astro/$dcz_family*.$dcz_ext", id="$dcz_hash"' always;
+    add_header Content-Encoding "dcz" always;
+
+    gzip off;
+    brotli off;
+    max_ranges 0;
+
+    try_files "${uri}.${dcz_id}.dcz.${dcz_ext}" @astro_asset;
+}
+
+location @astro_asset {
+    access_log off;
+    include /etc/nginx/vhosts-resources/pavelmazhuga.com/security-headers.conf;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    add_header Vary "Accept-Encoding, Available-Dictionary" always;
+    add_header Use-As-Dictionary 'match="/_astro/$dcz_family*.$dcz_ext", id="$dcz_hash"' always;
+}
+```
+
+**3. В vhost (панель → Сайты → pavelmazhuga.com → конфигурация nginx) убрать `^~`:**
+
+```diff
+-    location ^~ /_astro {
++    location /_astro {
+```
+
+Это единственная обязательная правка в панельном файле, и она критична: `^~` заставляет nginx вообще
+не проверять regex-`location`, поэтому со `^~` сниппет мёртв — ассеты отдаются обычным brotli без
+`Use-As-Dictionary`. Без `^~` js/css уходят в наш regex-`location`, а всё остальное в `_astro`
+(`.wasm`, картинки, шрифты) продолжает обслуживаться прежним prefix-`location`.
+
+Заодно можно убрать оттуда `expires 1y;`: вместе с `add_header Cache-Control` он даёт два
+заголовка `Cache-Control` в одном ответе.
+
+Дальше `nginx -t && systemctl reload nginx` и проверки из следующего раздела.
+
+Отдельно про ISPmanager: если после правок в панели vhost перегенерируется и `^~` вернётся, dcz
+просто тихо отключится (все ответы станут `br`), поэтому после любых изменений сайта в панели стоит
+прогнать проверку №1 из следующего раздела.
+
+Блок для 80 порта тоже подключит `dcz.conf`, но там `return 301` стоит на уровне `server` и
+выполняется в rewrite-фазе — до выбора `location`, так что редирект на https не ломается.
+
 ### Если `_astro` отдаётся через `alias`
 
 `try_files` внутри сниппета опирается на `$uri` относительно `root`. С `alias` эта конструкция
