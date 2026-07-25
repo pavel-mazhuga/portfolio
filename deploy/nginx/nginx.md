@@ -10,82 +10,124 @@ Compression Dictionary Transport ([RFC 9842](https://www.rfc-editor.org/rfc/rfc9
 1. отдать правильный заголовок `Use-As-Dictionary` на обычных ассетах;
 2. подменить ответ на заранее сжатый файл, если браузер сообщил подходящий словарь.
 
-**Модуль zstd для nginx не нужен** — тела уже сжаты на этапе билда. До установки сниппетов
+**Модуль zstd для nginx не нужен** — тела уже сжаты на этапе билда. До установки конфигов
 `.dcz.js` файлы просто лежат в `_astro/` и никем не запрашиваются, сайт работает как раньше.
+
+Этот файл — единственный источник правды по nginx для dcz. Отдельных `.conf` в репо нет:
+конфиги ниже копируются на сервер вручную (один раз).
 
 ## Что требуется на сервере
 
-- nginx с поддержкой регулярных `location` и именованных групп (любой современный, на проде 1.30.1);
+- nginx с поддержкой регулярных `location` и именованных групп (на проде 1.30.1);
 - HTTPS с сертификатом от публично доверенного CA (Let's Encrypt подходит) — Chrome не использует
   словари на нештатных сертификатах, исключение только для `localhost`;
 - каталог сборки, куда `rsync` кладёт `frontend/build` (далее `$TARGET/build`).
 
-`ngx_brotli` не обязателен, но если его нет — удали строку `brotli off;` из
-`compression-dictionary.conf`, иначе nginx не стартует с `unknown directive "brotli"`.
+`ngx_brotli` не обязателен, но если его нет — удали строку `brotli off;` из `dcz.conf`,
+иначе nginx не стартует с `unknown directive "brotli"`.
 
-## Установка (один раз)
+## Два фрагмента конфига
 
-1. Скопировать сниппеты:
+### A. `map` — контекст `http {}`
 
-```bash
-scp deploy/nginx/compression-dictionary*.conf $REMOTE_USER@$REMOTE_HOST:/etc/nginx/snippets/
-```
-
-2. Подключить их в конфиге сайта. `map` живёт в `http{}`, `location`-блоки — в `server{}`:
+Переменная `$dcz_id`: клиент должен и предложить кодировку `dcz`, и прислать
+`Dictionary-ID` (8 символов хеша билда). `Available-Dictionary` — base64, в имя файла
+не годится. Класс символов режет path traversal из клиентского ввода.
 
 ```nginx
-http {
-    # ...
-    include /etc/nginx/snippets/compression-dictionary-map.conf;
-
-    server {
-        listen 443 ssl;
-        http2 on;
-        server_name pavelmazhuga.com;
-        root /var/www/pavelmazhuga.com/build;
-
-        # ВАЖНО: строго до любых других regex-location, которые матчат .js / .css,
-        # и до prefix-location вида `location ^~ /_astro/` — nginx берёт первый
-        # подошедший regex-location, а `^~` вообще отменяет проверку регулярок.
-        include /etc/nginx/snippets/compression-dictionary.conf;
-
-        location / {
-            expires -1;              # HTML остаётся no-cache
-            try_files $uri $uri/ =404;
-        }
-    }
+# /etc/nginx/conf.d/dcz-map.conf  (или любой include внутри http{})
+map "$http_accept_encoding:$http_dictionary_id" $dcz_id {
+    default                                      "";
+    "~*\bdcz\b.*:\"?(?<id>[A-Za-z0-9_-]{8})\"?$" $id;
 }
 ```
 
-3. Проверить и применить:
+### B. `location` — контекст `server {}`
 
-```bash
-nginx -t && systemctl reload nginx
+Варианты на диске: `<asset>.<dictionary-hash>.dcz.<ext>`. Нет варианта → fallback на обычный
+ассет (`@astro_asset`). Прямой запрос `*.dcz.js` / `*.dcz.css` → 404.
+
+Базовый вид (без security-headers панели):
+
+```nginx
+# Variants are an implementation detail of the negotiation above.
+location ~ "\.dcz\.(?:js|css)$" {
+    return 404;
+}
+
+location ~ "^/_astro/(?<dcz_family>.+?)[.-](?<dcz_hash>[A-Za-z0-9_-]{8})\.(?<dcz_ext>js|css)$" {
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    add_header Vary "Accept-Encoding, Available-Dictionary" always;
+    add_header Use-As-Dictionary 'match="/_astro/$dcz_family*.$dcz_ext", id="$dcz_hash"' always;
+    add_header Content-Encoding "dcz" always;
+
+    # nginx does not know the body is already compressed, and a 206 would ship the encoded
+    # bytes without the Content-Encoding header.
+    gzip off;
+    brotli off;
+    max_ranges 0;
+
+    try_files "${uri}.${dcz_id}.dcz.${dcz_ext}" @astro_asset;
+}
+
+location @astro_asset {
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    add_header Vary "Accept-Encoding, Available-Dictionary" always;
+    add_header Use-As-Dictionary 'match="/_astro/$dcz_family*.$dcz_ext", id="$dcz_hash"' always;
+}
 ```
 
-Конфиг не содержит ни одного хеша, поэтому при последующих деплоях его трогать не нужно.
+**Порядок location критичен:** эти regex должны идти до любых других regex, матчащих `.js`/`.css`,
+и до `location ^~ /_astro/` — nginx берёт первый подошедший regex, а `^~` отменяет проверку
+регулярок вообще.
 
-### Конкретно pavelmazhuga.com (ISPmanager)
+`try_files` опирается на `$uri` относительно `root`. С `alias` для `/_astro` конструкция
+ломается — лучше `root`, либо собрать путь из `$dcz_family` / `$dcz_hash` вручную.
 
-Панель генерирует vhost `/etc/nginx/vhosts/www-root/pavelmazhuga.com.conf` и может его перезаписать,
-поэтому всё своё держим в подключаемых каталогах, а в самом vhost правим ровно два символа.
+---
 
-**1. `/etc/nginx/conf.d/dcz-map.conf`** — содержимое `compression-dictionary-map.conf` (нужен
-http-контекст). Сначала проверить, что каталог подключён в `http{}`:
+## Установка на pavelmazhuga.com (ISPmanager)
+
+Панель генерирует vhost `/etc/nginx/vhosts/www-root/pavelmazhuga.com.conf` и может его
+перезаписать. Своё держим в подключаемых каталогах; в панельном vhost — минимум правок.
+
+### 1. Map → `/etc/nginx/conf.d/dcz-map.conf`
+
+Проверить, что `conf.d` подключён в `http{}`:
 
 ```bash
 grep -n 'include' /etc/nginx/nginx.conf
-# должно быть include /etc/nginx/conf.d/*.conf;
+# должно быть: include /etc/nginx/conf.d/*.conf;
 ```
 
-**2. `/etc/nginx/vhosts-resources/pavelmazhuga.com/dcz.conf`** — этот каталог уже подключается обоими
-`server`-блоками через `include /etc/nginx/vhosts-resources/pavelmazhuga.com/*.conf;`. Это копия
-`compression-dictionary.conf` с двумя добавлениями под текущий конфиг: `access_log off;` (как в
-существующем `_astro`) и `include ... security-headers.conf;` — **обязательно**, потому что `add_header`
-внутри `location` отменяет все унаследованные `add_header`, и без этой строки ассеты потеряют
-security-заголовки:
+Создать файл (содержимое = фрагмент A выше):
+
+```bash
+sudo tee /etc/nginx/conf.d/dcz-map.conf <<'EOF'
+map "$http_accept_encoding:$http_dictionary_id" $dcz_id {
+    default                                      "";
+    "~*\bdcz\b.*:\"?(?<id>[A-Za-z0-9_-]{8})\"?$" $id;
+}
+EOF
+```
+
+В панельном vhost **не** должно быть `map ... $dcz_id` и include map-файла — иначе дубль
+переменной или потеря map при перегенерации панели.
+
+### 2. Locations → `/etc/nginx/vhosts-resources/pavelmazhuga.com/dcz.conf`
+
+Каталог уже подключается обоими `server`-блоками:
 
 ```nginx
+include /etc/nginx/vhosts-resources/pavelmazhuga.com/*.conf;
+```
+
+Нужна копия фрагмента B плюс `access_log off;` и `include .../security-headers.conf` —
+**обязательно**: `add_header` внутри `location` отменяет унаследованные `add_header`, без
+этого js/css потеряют HSTS/XFO/etc.
+
+```bash
+sudo tee /etc/nginx/vhosts-resources/pavelmazhuga.com/dcz.conf <<'EOF'
 location ~ "\.dcz\.(?:js|css)$" {
     return 404;
 }
@@ -112,58 +154,78 @@ location @astro_asset {
     add_header Vary "Accept-Encoding, Available-Dictionary" always;
     add_header Use-As-Dictionary 'match="/_astro/$dcz_family*.$dcz_ext", id="$dcz_hash"' always;
 }
+EOF
 ```
 
-**3. В vhost (панель → Сайты → pavelmazhuga.com → конфигурация nginx) убрать `^~`:**
+Нет `ngx_brotli` → удали `brotli off;` из этого файла.
+
+**Не** подключай тот же блок ещё раз через `include /etc/nginx/snippets/...` в vhost —
+будет duplicate location.
+
+### 3. Правки в панельном vhost
+
+Панель → Сайты → pavelmazhuga.com → конфигурация nginx.
+
+Обязательно убрать `^~`:
 
 ```diff
 -    location ^~ /_astro {
 +    location /_astro {
 ```
 
-Это единственная обязательная правка в панельном файле, и она критична: `^~` заставляет nginx вообще
-не проверять regex-`location`, поэтому со `^~` сниппет мёртв — ассеты отдаются обычным brotli без
-`Use-As-Dictionary`. Без `^~` js/css уходят в наш regex-`location`, а всё остальное в `_astro`
-(`.wasm`, картинки, шрифты) продолжает обслуживаться прежним prefix-`location`.
+Со `^~` regex из `dcz.conf` мёртв — ассеты идут обычным brotli без `Use-As-Dictionary`.
+Без `^~` js/css попадают в наш regex; остальное в `_astro` (`.wasm`, картинки, шрифты)
+обслуживает prefix-`location /_astro`.
 
-Заодно можно убрать оттуда `expires 1y;`: вместе с `add_header Cache-Control` он даёт два
-заголовка `Cache-Control` в одном ответе.
+Заодно:
 
-Дальше `nginx -t && systemctl reload nginx` и проверки из следующего раздела.
+- убрать `expires 1y;` у `/_astro` — вместе с `add_header Cache-Control` даёт два
+  `Cache-Control` в одном ответе;
+- не дублировать `include .../security-headers.conf` на уровне `server`, если он уже
+  есть в каждом `location` / в `dcz.conf` (иначе риск двойных заголовков);
+- в `security-headers.conf` каждая директива `add_header` — **один раз** (двойной HSTS
+  был из двух одинаковых строк в этом файле).
 
-Отдельно про ISPmanager: если после правок в панели vhost перегенерируется и `^~` вернётся, dcz
-просто тихо отключится (все ответы станут `br`), поэтому после любых изменений сайта в панели стоит
-прогнать проверку №1 из следующего раздела.
+Блок порта 80 тоже подхватит `dcz.conf` через `*.conf`, но `return 301` на уровне `server`
+идёт в rewrite-фазе до выбора `location` — https-редирект не ломается.
 
-Блок для 80 порта тоже подключит `dcz.conf`, но там `return 301` стоит на уровне `server` и
-выполняется в rewrite-фазе — до выбора `location`, так что редирект на https не ломается.
+### 4. Применить
 
-### Если `_astro` отдаётся через `alias`
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
 
-`try_files` внутри сниппета опирается на `$uri` относительно `root`. С `alias` эта конструкция
-работает иначе (известный подвох nginx), поэтому проще переключить каталог на `root` или
-скопировать сниппет и заменить в нём `${uri}` на полный путь через `$dcz_family`/`$dcz_hash`.
+Конфиг без хешей билда — при деплоях фронта nginx трогать не нужно.
+
+Если панель перегенерирует vhost и вернёт `^~`, dcz тихо отключится (все ответы снова `br`).
+После правок сайта в панели — прогнать проверку №1 ниже.
+
+---
 
 ## Проверка после reload
 
 ```bash
-# 1. Обычный ассет объявляет себя словарём для своего семейства чанков
-curl -sSI https://pavelmazhuga.com/_astro/client.BFvOi2Pq.js |
-    grep -iE 'use-as-dictionary|vary|cache-control'
-# use-as-dictionary: match="/_astro/client*.js", id="BFvOi2Pq"
+# 1. Обычный ассет = словарь + security headers (HSTS ровно один раз)
+ASSET=$(curl -sS https://pavelmazhuga.com/ | grep -oE '/_astro/[^"[:space:]]+\.js' | head -1)
+curl -sSI "https://pavelmazhuga.com$ASSET" |
+    grep -iE 'use-as-dictionary|vary|cache-control|strict-transport|x-frame|content-encoding'
+# use-as-dictionary: match="/_astro/....*.js", id="........"
 # vary: Accept-Encoding, Available-Dictionary
 # cache-control: public, max-age=31536000, immutable
+# content-encoding: br   (без словаря)
+curl -sSI https://pavelmazhuga.com/ | grep -ci 'strict-transport-security'
+# → 1
 ```
 
 ```bash
-# 2. Найти на сервере готовую пару: <цель>.<id словаря>.dcz.<ext>
+# 2. На сервере готовая пара: <цель>.<id словаря>.dcz.<ext>
 ls $TARGET/build/_astro/*.dcz.* | head
 # .../Canvas.astro_..._lang.xiDgNZdE.js.BMyXVY8u.dcz.js
 #     ^ цель: Canvas.astro_..._lang.xiDgNZdE.js    ^ Dictionary-ID: BMyXVY8u
 ```
 
 ```bash
-# 3. Клиент со словарём BMyXVY8u должен получить дельту
+# 3. Клиент со словарём BMyXVY8u → дельта
 curl -sS -o /dev/null -D - \
     -H 'Accept-Encoding: gzip, br, zstd, dcz' \
     -H 'Dictionary-ID: "BMyXVY8u"' \
@@ -172,7 +234,7 @@ curl -sS -o /dev/null -D - \
 # content-encoding: dcz
 # content-length: 102
 
-# 4. Тот же URL без словаря — обычный brotli
+# 4. Тот же URL без словаря → brotli
 curl -sS -o /dev/null -D - -H 'Accept-Encoding: gzip, br' <тот же URL> |
     grep -iE 'content-(encoding|length)'
 # content-encoding: br
@@ -182,37 +244,39 @@ curl -s -o /dev/null -w '%{http_code}\n' 'https://pavelmazhuga.com/_astro/<...>.
 # 404
 ```
 
-В браузере: `chrome://net-internals/#sharedDictionary` показывает сохранённые словари,
-в DevTools → Network у изменившихся чанков будет `Content-Encoding: dcz` и размер в сотни байт.
+В браузере: `chrome://net-internals/#sharedDictionary` — сохранённые словари;
+DevTools → Network у изменившихся чанков — `Content-Encoding: dcz`, размер в сотни байт.
 
 ## Порядок деплоев
 
 Билд берёт словари из **предыдущего** деплоя: перед сборкой CI скачивает
 `https://pavelmazhuga.com/_astro/dcz-manifest.json` и сами файлы в `frontend/.dcz-prev/`.
 
-- **Первый деплой** после мержа: манифеста на проде ещё нет, `pnpm dcz:prev` пишет warning и
-  выходит с нулём. Появляются только пары внутри одного билда (родственные чанки), а сам манифест
-  выкладывается на прод.
-- **Со второго деплоя** появляются межбилдовые дельты — то, ради чего всё это делалось.
+- **Первый деплой** после настройки: манифеста на проде ещё нет, `pnpm dcz:prev` пишет warning
+  и выходит с нулём. Появляются только пары внутри одного билда, манифест выкладывается на прод.
+- **Со второго деплоя** — межбилдовые дельты.
 
-`rsync --delete-after` сам подчищает варианты прошлого билда, отдельного обслуживания нет.
-Клиент со словарём двухлетней давности просто не найдёт свой вариант и получит brotli.
+`rsync --delete-after` чистит варианты прошлого билда. Клиент со старым словарём не найдёт
+вариант и получит brotli.
 
 ## Диагностика
 
-| Симптом                                                        | Причина                                                                                                     |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `nginx: [emerg] unknown "dcz_id" variable`                     | не подключён `compression-dictionary-map.conf` в `http{}`                                                   |
-| `unknown directive "brotli" in ...compression-dictionary.conf` | нет `ngx_brotli` — удалить строку `brotli off;` из сниппета                                                 |
-| В ответе нет `Use-As-Dictionary`                               | сниппет подключён после другого `location`, матчащего `.js`/`.css` (или после `location ^~ /_astro/`)       |
-| `Use-As-Dictionary` есть, но `Content-Encoding` всегда `br`    | на диске нет варианта под этот `Dictionary-ID` — норма для первого деплоя и для клиентов со старым словарём |
-| Chrome не присылает `Available-Dictionary`                     | сайт открыт по http или сертификат не от публичного CA; либо ассет отдан с `no-store`/`no-cache`            |
-| В ответе два заголовка `Content-Encoding` (`dcz` и `br`)       | тело пережали поверх `dcz` — вернуть в dcz-location `gzip off; brotli off;`, иначе браузер не декодирует    |
+| Симптом                                                        | Причина                                                                                              |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `nginx: [emerg] unknown "dcz_id" variable`                     | нет `/etc/nginx/conf.d/dcz-map.conf` (или не в `http{}`)                                             |
+| `duplicate "dcz_id" variable`                                  | map объявлен дважды (conf.d + vhost)                                                                 |
+| `unknown directive "brotli"`                                   | нет `ngx_brotli` — удалить `brotli off;` из `dcz.conf`                                               |
+| `duplicate location`                                           | `dcz.conf` и ещё один include того же блока в vhost                                                  |
+| В ответе нет `Use-As-Dictionary`                               | `location ^~ /_astro` или другой regex раньше матчит `.js`/`.css`                                    |
+| `Use-As-Dictionary` есть, но `Content-Encoding` всегда `br`    | нет файла под этот `Dictionary-ID` — норма для первого деплоя / старого словаря                      |
+| Chrome не шлёт `Available-Dictionary`                          | http или непубличный CA; либо ассет с `no-store`/`no-cache`                                          |
+| Два `Content-Encoding` (`dcz` и `br`)                          | тело пережали — вернуть `gzip off; brotli off;` в dcz-location                                       |
+| Два `Strict-Transport-Security`                                | дубль строки в `security-headers.conf` или двойной include этого файла на один ответ                 |
 
-`brotli_static on;` / `gzip_static on;` совместимы: `try_files` отрабатывает раньше, поэтому
-ветка со словарём отдаёт `.dcz`-файл, а ветка без словаря — заранее сжатый `.br`.
+`brotli_static on;` / `gzip_static on;` совместимы: `try_files` раньше, ветка со словарём
+отдаёт `.dcz`, без словаря — `.br`.
 
-Полезный log_format на время обкатки:
+Log format на обкатку:
 
 ```nginx
 log_format dcz '$remote_addr $request_uri $status '
@@ -225,23 +289,22 @@ access_log /var/log/nginx/pavelmazhuga.access.log dcz;
 /_astro/World.D-aHXIT4.js 200 enc=br  bytes=10916 dict=-
 ```
 
-Кавычки вокруг `Dictionary-ID` nginx экранирует как `\x22` — так и должно быть.
+Кавычки вокруг `Dictionary-ID` в логе как `\x22` — норма.
 
 ## Откат
 
-Убрать оба `include`, `nginx -t && systemctl reload nginx`. Лишние `.dcz.*` файлы в `_astro/`
-безвредны (сейчас это ~44 KB на билд), пересборка не нужна. Браузеры, у которых остались словари,
-просто не получат на них ответ с `dcz` и продолжат качать обычный brotli.
+Удалить `/etc/nginx/conf.d/dcz-map.conf` и
+`/etc/nginx/vhosts-resources/pavelmazhuga.com/dcz.conf`, затем
+`nginx -t && systemctl reload nginx`. Файлы `.dcz.*` в `_astro/` безвредны (~десятки KB на
+билд), пересборка не нужна. Клиенты со словарями просто снова качают brotli.
 
 ## Границы применимости
 
-- Работает в Chromium 130+. Остальные браузеры игнорируют `Use-As-Dictionary` и получают brotli.
-- HTML не участвует: он отдаётся с `Cache-Control: no-cache`, такой ответ браузер словарём не
-  сохраняет.
-- `Vary: Accept-Encoding, Available-Dictionary` обязателен: он не даёт промежуточным кешам отдать
-  дельту клиенту без словаря.
-- Значение `Dictionary-ID` приходит от клиента, поэтому `map` пропускает ровно 8 символов из
-  `[A-Za-z0-9_-]` — путь для `try_files` собрать из чужого ввода нельзя.
-- Chrome не сохраняет словарём top-level скрипт web worker'а, поэтому билд дописывает в страницы,
-  запускающие воркер, `<link rel="compression-dictionary" href="/_astro/canvas.worker-*.js">`. Это
-  ожидаемый тег в HTML, а не мусор; на стороне nginx для него ничего настраивать не нужно.
+- Chromium 130+. Остальные игнорируют `Use-As-Dictionary` → brotli.
+- HTML не участвует (`Cache-Control: no-cache` — браузер таким словарём не сохраняет).
+- `Vary: Accept-Encoding, Available-Dictionary` обязателен — иначе промежуточный кеш может
+  отдать дельту клиенту без словаря.
+- `Dictionary-ID` с клиента: map пропускает ровно 8 символов `[A-Za-z0-9_-]`.
+- Chrome не сохраняет словарём top-level скрипт web worker'а — билд дописывает
+  `<link rel="compression-dictionary" href="/_astro/canvas.worker-*.js">`. На nginx для
+  этого ничего не нужно.
