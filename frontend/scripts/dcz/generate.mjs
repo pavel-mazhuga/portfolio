@@ -13,7 +13,7 @@ const BROTLI_QUALITY = 6;
 const MAX_RATIO_VS_BROTLI = 0.9;
 const MIN_SAVED_BYTES = 1024;
 /**
- * ponytail: pairs grow as O(dictionaries × targets) inside a chunk family, so the run is
+ * pairs grow as O(dictionaries × targets) inside a chunk family, so the run is
  * capped instead of being smart about it. If a family ever gets big enough to hit these,
  * pick dictionaries by traffic data instead of generating every pair.
  */
