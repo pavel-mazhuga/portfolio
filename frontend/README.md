@@ -18,6 +18,9 @@
 - `pnpm format` — format files using [prettier](https://prettier.io/);
 - `pnpm icons` — generate UI icon types (sprite);
 - `pnpm pwa-icons` — generate PNG icons for web app manifest from `public/static/img/favicon.svg`
+- `pnpm dcz:prev` — download the deployed build (`$HOST/_astro/dcz-manifest.json`) into `.dcz-prev/`, so
+  that `postbuild` can compress the new assets against it (see [deploy/nginx](../deploy/nginx/README.md));
+  Node 22.19+ is required for the zstd part, older versions just skip it
 
 ## Frontend Application Structure
 
