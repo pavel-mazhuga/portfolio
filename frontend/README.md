@@ -19,8 +19,9 @@
 - `pnpm icons` — generate UI icon types (sprite);
 - `pnpm pwa-icons` — generate PNG icons for web app manifest from `public/static/img/favicon.svg`
 - `pnpm dcz:prev` — download the deployed build (`$HOST/_astro/dcz-manifest.json`) into `.dcz-prev/`, so
-  that `postbuild` can compress the new assets against it (see [deploy/nginx/nginx.md](../deploy/nginx/nginx.md));
-  Node 22.19+ is required for the zstd part, older versions just skip it
+  that `postbuild` can compress the new assets against it; Node 22.19+ is required for the zstd part,
+  older versions just skip it. Chunk names in `_astro` must stay unique — Chrome keeps a single
+  dictionary per `Use-As-Dictionary` match pattern (see `plugins/vite/unique-experiment-chunk-names.ts`)
 
 ## Frontend Application Structure
 

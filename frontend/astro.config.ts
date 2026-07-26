@@ -5,6 +5,7 @@ import { defineConfig, envField } from 'astro/config';
 import { loadEnv } from 'vite';
 import { IS_EXTERNAL_TEMPLATING, SSR_ENABLED } from './config';
 import { generateAssetsFilesPlugin } from './plugins/vite/generate-assets-files';
+import { uniqueExperimentChunkNamesPlugin } from './plugins/vite/unique-experiment-chunk-names';
 import { DEFAULT_LOCALE, LOCALES } from './src/shared/config/i18n';
 
 const { HOST, PORT = 3000 } = loadEnv(process.env.NODE_ENV || 'production', process.cwd(), '');
@@ -58,6 +59,7 @@ export default defineConfig({
               },
           }
         : {
+              plugins: [uniqueExperimentChunkNamesPlugin()],
               resolve: {
                   alias: {
                       '@': resolve(process.cwd(), 'src'),
