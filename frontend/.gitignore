@@ -1,6 +1,8 @@
 # build output
 dist/
 build/
+# previous build downloaded for dictionary compression
+.dcz-prev/
 # generated types
 .astro/
 public/static/icons/icons-list.json
