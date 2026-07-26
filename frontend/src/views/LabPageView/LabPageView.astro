@@ -16,7 +16,7 @@ import Image from '@/shared/ui/Image';
         <ul class="list-unstyled experiments-list" style={`--clip-container-delay: 0.08s;`}>
             {
                 listedExperiments.map((experiment, i) => (
-                    <li class="experiments-list__item">
+                    <li class="experiments-list__item js-experiments-list-item">
                         <a href={`/lab/${experiment.slug}/`} class="experiment-card" data-astro-reload>
                             <div class="clip-container">
                                 <div class="experiment-card__image-wrapper clip-container__el">
