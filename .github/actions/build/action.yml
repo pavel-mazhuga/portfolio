@@ -32,6 +32,12 @@ runs:
         cd frontend
         pnpm rebuild sharp
 
+    - name: Download previous build for compression dictionaries
+      shell: bash
+      run: |
+        cd frontend
+        pnpm dcz:prev
+
     - name: Build
       shell: bash
       run: |
