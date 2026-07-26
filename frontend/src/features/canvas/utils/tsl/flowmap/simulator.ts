@@ -53,9 +53,9 @@ export class FlowmapSimulator {
     private readonly rtA: RenderTarget;
     private readonly rtB: RenderTarget;
     private defaultTexture: DataTexture;
-    private readonly material = new NodeMaterial();
-    private motionTextureNode!: TextureNode;
-    private defaultTextureNode!: TextureNode;
+    private readonly defaultTextureNode: TextureNode;
+    private readonly materialAtoB: NodeMaterial;
+    private readonly materialBtoA: NodeMaterial;
 
     readonly uMousePos = uniform(new Vector2(0, 0));
     readonly uVelocity = uniform(new Vector2(0, 0));
@@ -72,21 +72,30 @@ export class FlowmapSimulator {
         this.rtA = createRenderTarget(this.width, this.height);
         this.rtB = createRenderTarget(this.width, this.height);
         this.defaultTexture = createDefaultTexture(this.width, this.height);
-
-        this.motionTextureNode = texture(this.rtA.texture);
         this.defaultTextureNode = texture(this.defaultTexture);
 
-        this.material.fragmentNode = Fn(() => {
-            const st = uv().toVar();
-            const tmp = this.motionTextureNode.sample(st).toVar();
-            const defTmp = this.defaultTextureNode.sample(st).toVar();
+        const sampleA = texture(this.rtA.texture);
+        const sampleB = texture(this.rtB.texture);
+
+        this.materialAtoB = new NodeMaterial();
+        this.materialAtoB.fragmentNode = this.createFragmentNode(sampleA);
+
+        this.materialBtoA = new NodeMaterial();
+        this.materialBtoA.fragmentNode = this.createFragmentNode(sampleB);
+    }
+
+    private createFragmentNode(motionTextureNode: TextureNode) {
+        return Fn(() => {
+            const st = uv().toVar('st');
+            const tmp = motionTextureNode.sample(st).toVar('tmp');
+            const defTmp = this.defaultTextureNode.sample(st).toVar('defTmp');
 
             const dist = distance(this.uMousePos, st).smoothstep(0, this.uRange).oneMinus();
-            const distortion = this.uVelocity.mul(dist).mul(this.uStrength).toVar();
+            const distortion = this.uVelocity.mul(dist).mul(this.uStrength).toVar('distortion');
 
             tmp.xy.addAssign(distortion);
 
-            const result = vec4(0).toVar();
+            const result = vec4(0).toVar('result');
 
             result.xy.assign(defTmp.xy.mul(this.uViscosity).add(tmp.xy.mul(this.uViscosity.oneMinus())));
             result.xy.assign(result.xy.clamp(-1, 1));
@@ -113,7 +122,6 @@ export class FlowmapSimulator {
         this.defaultTexture = createDefaultTexture(nextWidth, nextHeight);
         this.defaultTextureNode.value = this.defaultTexture;
         this.readIndex = 0;
-        this.motionTextureNode.value = this.rtA.texture;
         this.lastMouse.set(0, 0);
         this.uVelocity.value.set(0, 0);
     }
@@ -139,19 +147,16 @@ export class FlowmapSimulator {
         this.uViscosity.value = viscosity;
         this.uStrength.value = strength;
 
-        const readTarget = this.readIndex === 0 ? this.rtA : this.rtB;
         const writeTarget = this.readIndex === 0 ? this.rtB : this.rtA;
-
-        this.motionTextureNode.value = readTarget.texture;
+        const material = this.readIndex === 0 ? this.materialAtoB : this.materialBtoA;
 
         rendererState = RendererUtils.resetRendererState(renderer, rendererState as never);
 
         renderer.setRenderTarget(writeTarget);
-        quadMesh.material = this.material;
+        quadMesh.material = material;
         quadMesh.render(renderer);
-        renderer.setRenderTarget(null);
-
         RendererUtils.restoreRendererState(renderer, rendererState);
+        renderer.setRenderTarget(null);
 
         this.readIndex = 1 - this.readIndex;
     }
@@ -164,6 +169,7 @@ export class FlowmapSimulator {
         this.rtA.dispose();
         this.rtB.dispose();
         this.defaultTexture.dispose();
-        this.material.dispose();
+        this.materialAtoB.dispose();
+        this.materialBtoA.dispose();
     }
 }

@@ -87,9 +87,8 @@ export class CurlUvField {
         renderer.setRenderTarget(this.rt);
         quadMesh.material = this.material;
         quadMesh.render(renderer);
-        renderer.setRenderTarget(null);
-
         RendererUtils.restoreRendererState(renderer, rendererState);
+        renderer.setRenderTarget(null);
     }
 
     get textureNode() {

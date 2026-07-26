@@ -222,6 +222,7 @@ class FlowmapDemo extends BaseExperience {
         const height = this.canvas.parentElement?.offsetHeight || 1;
 
         this.simulator.setSize(width, height);
+        this.flowmapPass.setMotionTexture(this.simulator.texture);
         this.curlUvField.setSize(width / height, this.params.curlPixel);
         this.canvasPointer.updateRect();
         this.hasPointer = false;
