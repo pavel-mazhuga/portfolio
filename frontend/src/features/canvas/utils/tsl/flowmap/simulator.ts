@@ -157,7 +157,7 @@ export class FlowmapSimulator {
     }
 
     get texture() {
-        return (this.readIndex === 0 ? this.rtB : this.rtA).texture;
+        return (this.readIndex === 0 ? this.rtA : this.rtB).texture;
     }
 
     dispose() {
