@@ -3,14 +3,13 @@ import type { Plugin } from 'vite';
 const EXPERIMENT_DIR_RE = /[/\\]experiments[/\\]([^/\\]+)[/\\]/;
 
 /**
- * Каждое демо лаборатории — это `experiments/<slug>/Demo.ts`, поэтому по умолчанию все они
- * получают одно имя чанка (`Demo.<hash>.js`). Chrome хранит ровно один словарь сжатия на один
- * match-паттерн (в его базе `UNIQUE INDEX` по `frame_origin, top_frame_site, host, match,
- * match_dest`), так что три десятка несвязанных чанков дерутся за один слот `/_astro/Demo*.js`
- * и словарное сжатие почти никогда не срабатывает. Уникальное имя даёт каждому демо свой слот.
+ * Each lab demo is `experiments/<slug>/Demo.ts`, so by default they all get the same chunk
+ * name (`Demo.<hash>.js`). Chrome stores exactly one compression dictionary per match pattern
+ * (DB `UNIQUE INDEX` on `frame_origin, top_frame_site, host, match, match_dest`), so ~30
+ * unrelated chunks fight for one `/_astro/Demo*.js` slot and dictionary compression almost never hits. Unique names give each demo its own slot.
  *
- * Имя подменяется в `outputOptions`, а не через `vite.build.rollupOptions`, потому что Astro
- * задаёт `chunkFileNames` клиентской сборки сам и перетирает пользовательский конфиг.
+ * Rename happens in `outputOptions`, not `vite.build.rollupOptions`, because Astro sets
+ * client `chunkFileNames` itself and overwrites user config.
  */
 export const uniqueExperimentChunkNamesPlugin = (): Plugin => ({
     name: 'unique-experiment-chunk-names',
