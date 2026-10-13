@@ -30,4 +30,4 @@ runs:
         script: |
           cd ${{ inputs.target }}
           git checkout ${{ inputs.branch }}
-          git pull --force
+          git pull --force && git lfs prune
