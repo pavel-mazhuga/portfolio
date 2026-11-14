@@ -159,6 +159,11 @@ body {
     height: 48px;
 }
 
+// three-renderstats overlay sits above stats-gl
+.three-renderstats.three-renderstats--bottom-left {
+    bottom: 60px;
+}
+
 .clip-container {
     overflow: hidden;
     overflow: clip;
