@@ -31,10 +31,10 @@
         "api": "concurrently 'pnpm api-types' 'pnpm ts-zod'"
     },
     "dependencies": {
-        "@astrojs/node": "^11.0.2",
-        "@astrojs/sitemap": "^3.7.3",
+        "@astrojs/node": "11.1.13",
+        "@astrojs/sitemap": "3.7.5",
         "@types/three": "^0.185.1",
-        "astro": "^7.1.1",
+        "astro": "7.4.12",
         "classnames": "^2.5.1",
         "delegate": "^3.2.0",
         "gsap": "^3.15.0",
