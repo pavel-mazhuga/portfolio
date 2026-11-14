@@ -1,4 +1,6 @@
 import Stats from 'stats-gl';
+import type { WebGLRenderer } from 'three';
+import { beginFrame, collect, RendererStats, setup } from 'three-renderstats';
 import { type WebGPURendererParameters } from 'three/src/renderers/webgpu/WebGPURenderer.js';
 import {
     ACESFilmicToneMapping,
@@ -25,6 +27,7 @@ class BaseExperience {
     camera: PerspectiveCamera;
     scene: Scene;
     stats?: Stats;
+    renderStats?: RendererStats;
     clock = new Timer();
     prevTime = 0;
     delta = 0;
@@ -60,11 +63,41 @@ class BaseExperience {
             this.stats.domElement.classList.add('stats-gl');
             this.stats.init(this.renderer);
             canvas.parentElement?.appendChild(this.stats.dom);
+
+            setup(this.statsRenderer);
+            this.renderStats = new RendererStats({ container: canvas.parentElement ?? undefined });
         }
 
         this.initEvents();
         this.renderer.setAnimationLoop(() => {
-            this.renderChain = this.renderChain.then(() => Promise.resolve(this.render())).catch(() => {});
+            this.renderChain = this.renderChain
+                .then(() => {
+                    if (this.renderStats) {
+                        beginFrame(this.statsRenderer);
+                    }
+
+                    return Promise.resolve(this.render());
+                })
+                .then(() => this.updateRenderStats())
+                .catch(() => {});
+        });
+    }
+
+    private get statsRenderer() {
+        return this.renderer as unknown as WebGLRenderer;
+    }
+
+    private updateRenderStats() {
+        if (!this.renderStats || this.disposed) {
+            return;
+        }
+
+        const { render, memory } = this.renderer.info;
+
+        this.renderStats.updateFromSnapshot({
+            ...collect(this.statsRenderer, this.scene),
+            calls: render.drawCalls,
+            programs: memory.programs,
         });
     }
 
@@ -142,6 +175,9 @@ class BaseExperience {
             this.stats.dispose();
             this.stats = undefined;
         }
+
+        this.renderStats?.dispose();
+        this.renderStats = undefined;
 
         this.destroyTweakPane();
 
