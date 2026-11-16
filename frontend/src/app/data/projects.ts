@@ -14,6 +14,57 @@ const CHIPSA = {
 
 export const projects: IProject[] = [
     {
+        slug: 'viki-studio',
+        title: 'Viki Studio',
+        description: '',
+        video: [
+            {
+                src: '/static/videos/viki-studio_16x9_1024x_opt.hevc.mp4',
+                type: 'video/mp4;codecs="hvc1"',
+                media: '(max-width: 1024px) and (orientation: portrait)',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_1024x_opt.mp4',
+                type: 'video/mp4',
+                media: '(max-width: 1024px) and (orientation: portrait)',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_1024x_opt.hevc.mp4',
+                type: 'video/mp4;codecs="hvc1"',
+                media: '(max-width: 1024px)',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_1024x_opt.mp4',
+                type: 'video/mp4',
+                media: '(max-width: 1024px)',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_opt.hevc.mp4',
+                type: 'video/mp4;codecs="hvc1"',
+                media: '(orientation: portrait)',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_opt.mp4',
+                type: 'video/mp4',
+                media: '(orientation: portrait)',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_opt.hevc.mp4',
+                type: 'video/mp4;codecs="hvc1"',
+            },
+            {
+                src: '/static/videos/viki-studio_16x9_opt.mp4',
+                type: 'video/mp4',
+            },
+        ],
+        websiteUrl: 'https://viki-studio.com/',
+        releaseYear: 2026,
+        role: Role.FRONTEND,
+        collaborators: [CHIPSA],
+        technologies: ['Astro', 'WebGL (Three.js)'],
+        recognitions: [],
+    },
+    {
         slug: 'chillbase',
         title: 'Chillbase',
         description: '',
