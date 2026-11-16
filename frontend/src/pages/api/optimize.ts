@@ -1,10 +1,10 @@
-import type { APIRoute } from 'astro';
-import { API_HOST } from 'astro:env/client';
 import crypto from 'crypto';
 import { constants, promises as fs } from 'fs';
 import type { PathLike } from 'fs';
 import { cpus } from 'os';
 import path from 'path';
+import type { APIRoute } from 'astro';
+import { API_HOST } from 'astro:env/client';
 import sharp from 'sharp';
 
 const USE_AVIF = false;
@@ -55,7 +55,7 @@ const processImage = async (
     }
 };
 
-const sha = (x: crypto.BinaryLike) => crypto.createHash('sha256').update(x).digest('hex');
+const sha = (x: string) => crypto.createHash('sha256').update(x).digest('hex');
 
 const getCacheDir = (() => {
     const cacheDir = path.resolve('@/../.images_cache');
