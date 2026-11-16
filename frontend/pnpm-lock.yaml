@@ -175,6 +175,9 @@ importers:
       '@types/three':
         specifier: ^0.185.1
         version: 0.185.1
+      '@underglass/html-in-canvas-polyfill':
+        specifier: ^0.5.0
+        version: 0.5.0
       astro:
         specifier: 7.4.12
         version: 7.4.12(@types/node@26.0.1)(esbuild@0.28.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0)
@@ -2503,6 +2506,9 @@ packages:
     resolution: {integrity: sha512-oUGp+Rep/hqMhPunyinsALUwSlzHINSxitifPiSaeqoKOKD2OlR9NE3TaPqwsl4NlGslsOSUXI1JotWQzpYCPg==}
     engines: {node: '>=16.20.0'}
     hasBin: true
+
+  '@underglass/html-in-canvas-polyfill@0.5.0':
+    resolution: {integrity: sha512-xTbRrDngyETIdACBvcio762vGR8MTchIv5qybYjLYwZp7BuriazQlX9Vvl5CRwLiaUO5f2UaU6icBv9dXYewDg==}
 
   '@ungap/structured-clone@1.3.2':
     resolution: {integrity: sha512-5jsZFwgR5rTdKwidH9Qmat75RKwqfpKlWWB1frDkljN127mwqBu8K0PYo7/hFpF03IEJpfVPpCQDY/eDx3iHvA==}
@@ -8524,6 +8530,8 @@ snapshots:
       '@typescript/native-preview-linux-x64': 7.0.0-dev.20260707.2
       '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260707.2
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260707.2
+
+  '@underglass/html-in-canvas-polyfill@0.5.0': {}
 
   '@ungap/structured-clone@1.3.2': {}
 
