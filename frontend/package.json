@@ -47,6 +47,7 @@
         "stats-gl": "^4.2.3",
         "three": "^0.185.1",
         "three-custom-shader-material": "^6.4.0",
+        "three-renderstats": "github:pavel-mazhuga/three-renderstats#7ba4b947d4762f6aa41cbc38db9c34ab2495cf99",
         "tweakpane": "^4.0.5",
         "zod": "^4.4.3"
     },

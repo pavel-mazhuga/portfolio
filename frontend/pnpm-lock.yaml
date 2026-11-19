@@ -214,6 +214,9 @@ importers:
       three-custom-shader-material:
         specifier: ^6.4.0
         version: 6.4.0(react@19.2.0)(three@0.185.1)
+      three-renderstats:
+        specifier: github:pavel-mazhuga/three-renderstats#7ba4b947d4762f6aa41cbc38db9c34ab2495cf99
+        version: https://codeload.github.com/pavel-mazhuga/three-renderstats/tar.gz/7ba4b947d4762f6aa41cbc38db9c34ab2495cf99(three@0.185.1)
       tweakpane:
         specifier: ^4.0.5
         version: 4.0.5
@@ -5781,6 +5784,13 @@ packages:
         optional: true
       react:
         optional: true
+
+  three-renderstats@https://codeload.github.com/pavel-mazhuga/three-renderstats/tar.gz/7ba4b947d4762f6aa41cbc38db9c34ab2495cf99:
+    resolution: {gitHosted: true, integrity: sha512-RfYbJ/izhiBUSi8mS6YLvea55r60JM2FYMXwMu5iOEUm77CzaUCcwaNGinlNl30Ep9NOKewyUJ1XLGZj0Uwikg==, tarball: https://codeload.github.com/pavel-mazhuga/three-renderstats/tar.gz/7ba4b947d4762f6aa41cbc38db9c34ab2495cf99}
+    version: 0.1.0
+    engines: {node: '>=18'}
+    peerDependencies:
+      three: '>=0.160.0'
 
   three@0.185.1:
     resolution: {integrity: sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==}
@@ -12285,6 +12295,10 @@ snapshots:
       three: 0.185.1
     optionalDependencies:
       react: 19.2.0
+
+  three-renderstats@https://codeload.github.com/pavel-mazhuga/three-renderstats/tar.gz/7ba4b947d4762f6aa41cbc38db9c34ab2495cf99(three@0.185.1):
+    dependencies:
+      three: 0.185.1
 
   three@0.185.1: {}
 

@@ -1,6 +1,7 @@
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
+  three-renderstats@https://codeload.github.com/pavel-mazhuga/three-renderstats/tar.gz/7ba4b947d4762f6aa41cbc38db9c34ab2495cf99: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - '@astrojs/markdown-satteri@0.4.10'
@@ -12,4 +13,5 @@ onlyBuiltDependencies:
   - '@parcel/watcher'
   - esbuild
   - sharp
+  - three-renderstats
   - unrs-resolver
