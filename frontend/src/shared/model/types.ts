@@ -34,4 +34,5 @@ export type VideoShape = {
 
 export enum Role {
     FRONTEND = 'frontend',
+    FULLSTACK = 'fullstack',
 }
