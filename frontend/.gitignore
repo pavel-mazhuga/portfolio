@@ -30,3 +30,6 @@ pnpm-debug.log*
 playwright-report/
 test-results/
 public/static/videos/_*
+# video-flow-scrub asset pipeline
+scripts/video-flow/.work/
+scripts/video-flow/.venv/

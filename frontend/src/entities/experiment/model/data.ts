@@ -4,6 +4,16 @@ type ExperimentInput = Omit<IExperiment, 'preview' | 'sourceLink'>;
 
 const experimentData: ExperimentInput[] = [
     {
+        name: 'Video flow scrub',
+        slug: 'video-flow-scrub',
+        tags: ['webgl', 'shaders', 'webcodecs', 'video'],
+        seoDescription:
+            'Scroll-scrubbed video with optical-flow frame interpolation. WebCodecs .af decoding and a WebGL warp shader.',
+        tip: 'Scroll',
+        // prototype: reachable by URL, not listed in the lab grid (no preview yet)
+        active: false,
+    },
+    {
         name: 'Shadowed particles',
         slug: 'shadowed-particles',
         tags: ['webgpu', 'tsl', 'shaders', 'particles'],
