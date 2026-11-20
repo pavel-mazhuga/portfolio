@@ -1,0 +1,181 @@
+.experiment-canvas-wrapper.lg-root {
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: 100%;
+    touch-action: pan-y;
+
+    /* Prevent scrollbar show/hide from resizing canvas → full HTML paint + Kawase. */
+    scrollbar-gutter: stable;
+}
+
+/* Lab tip sits over glass and is outside the drawable page — never sampled. */
+.lg-root > .tip {
+    display: none;
+}
+
+.lg-root .lg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    /* Let the live DOM page below receive scroll, click, and text selection. */
+    pointer-events: none;
+}
+
+/* Polyfill half-res snapshot host — opacity:0 keeps paint; visibility:hidden blanks it. */
+.lg-root .lg-raster {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.lg-page {
+    position: relative;
+    width: 100%;
+    min-height: calc(100vh * 4.6);
+    color: #fff;
+    background:
+        radial-gradient(circle at 82% 8%, rgba(255, 122, 89, 0.95), rgba(255, 122, 89, 0) 36%),
+        radial-gradient(circle at 8% 16%, rgba(94, 176, 255, 0.9), rgba(94, 176, 255, 0) 34%),
+        radial-gradient(circle at 68% 22%, rgba(214, 242, 90, 0.9), rgba(214, 242, 90, 0) 32%),
+        radial-gradient(circle at 20% 46%, rgba(255, 90, 160, 0.75), rgba(255, 90, 160, 0) 40%),
+        radial-gradient(circle at 78% 62%, rgba(80, 220, 200, 0.8), rgba(80, 220, 200, 0) 38%),
+        radial-gradient(circle at 45% 82%, rgba(255, 190, 70, 0.7), rgba(255, 190, 70, 0) 36%),
+        linear-gradient(180deg, #241c33 0%, #4a2d4d 22%, #1a2338 48%, #123528 72%, #2a1840 100%);
+    font-family: Montserrat, sans-serif;
+}
+
+.lg-page--dom {
+    position: relative;
+    z-index: 0;
+    user-select: text;
+    pointer-events: auto;
+    -webkit-user-select: text;
+}
+
+/* Site-wide ::selection is rgba(255,255,255,0) — restore a visible highlight here. */
+.lg-page--dom ::selection {
+    background-color: rgb(255 255 255 / 35%);
+    color: #fff;
+}
+
+.lg-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 12vh 24px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.lg-section--stripes {
+    background:
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0 14px, rgba(0, 0, 0, 0.12) 14px 28px),
+        rgba(0, 0, 0, 0.18);
+}
+
+.lg-section--blocks {
+    background: rgba(94, 176, 255, 0.12);
+}
+
+.lg-kicker {
+    margin: 0 0 14px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    line-height: 1;
+    text-transform: uppercase;
+    opacity: 0.78;
+}
+
+.lg-title {
+    margin: 0;
+    font-size: clamp(64px, 12vw, 168px);
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 0.78;
+}
+
+.lg-cards {
+    display: flex;
+    gap: clamp(12px, 3vw, 28px);
+    justify-content: center;
+    align-items: stretch;
+    width: min(920px, 100%);
+    margin-top: clamp(28px, 6vh, 64px);
+}
+
+.lg-card {
+    flex: 1;
+    min-height: clamp(120px, 22vh, 220px);
+    border-radius: 18px;
+}
+
+.lg-card--coral {
+    background: rgba(255, 122, 89, 0.55);
+}
+
+.lg-card--lime {
+    background: rgba(214, 242, 90, 0.5);
+}
+
+.lg-card--sky {
+    background: rgba(94, 176, 255, 0.5);
+}
+
+.lg-bar {
+    position: fixed;
+    left: 50%;
+    z-index: 6;
+    top: 52%;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    transform: translate(-50%, -50%);
+}
+
+.lg-button {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    height: 40px;
+    text-transform: uppercase;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 38px;
+    margin: 0;
+    background: transparent;
+    color: #fff;
+    font-family: Montserrat, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    user-select: none;
+    transform-origin: center;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.lg-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+}
+
+.lg-button--css {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+        inset 0 0 12px rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(1.5px);
+}

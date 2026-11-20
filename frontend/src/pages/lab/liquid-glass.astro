@@ -1,0 +1,111 @@
+---
+// eslint-disable-next-line fsd/layer-import-restrictions
+import RootLayout from '@/app/layouts/RootLayout';
+import { experiments } from '@/entities/experiment';
+import { getCommonPageProps } from '@/shared/api/get-common-page-props';
+import type { AppBreadcrumbs } from '@/shared/model/types';
+import LabDetailPageView from '@/views/LabDetailPageView';
+
+const experiment = experiments.find((entry) => entry.slug === 'liquid-glass');
+
+if (!experiment) {
+    throw new Error('Experiment not found for slug: liquid-glass');
+}
+
+const htmlClass = 'lab-detail-page';
+const breadcrumbs: AppBreadcrumbs = [
+    {
+        text: 'Home',
+        href: '/',
+    },
+    {
+        text: 'Lab',
+        href: '/lab/',
+    },
+    {
+        text: experiment.name,
+        href: `/lab/${experiment.slug}/`,
+    },
+];
+const commonPageProps = await getCommonPageProps();
+const meta = {
+    ...commonPageProps.meta,
+    title: experiment.seoTitle ?? experiment.name,
+    description: experiment.seoDescription,
+};
+
+const sections = [
+    { id: 'hero', kicker: 'Liquid glass', title: ['Bend', 'the page'] },
+    { id: 'rim', kicker: 'Scroll', title: ['Watch the rim'] },
+    {
+        id: 'stripes',
+        kicker: 'Stripe field',
+        title: ['Hard edges'],
+        className: 'lg-section--stripes',
+    },
+    {
+        id: 'blocks',
+        kicker: 'Color blocks',
+        title: ['Soft panels'],
+        className: 'lg-section--blocks',
+        cards: ['coral', 'lime', 'sky'] as const,
+    },
+    { id: 'end', kicker: 'End', title: ['Keep going'] },
+];
+---
+
+<RootLayout htmlClass={htmlClass} meta={meta} breadcrumbs={breadcrumbs}>
+    <LabDetailPageView experiment={experiment}>
+        <div class="experiment-canvas-wrapper js-experiment-canvas-wrapper">
+            <canvas class="experiment-canvas js-experiment-canvas"></canvas>
+
+            <div class="lg-page lg-page--dom js-lg-page" drawable>
+                {
+                    sections.map((section) => (
+                        <section class:list={['lg-section', section.className]} data-section={section.id}>
+                            <p class="lg-kicker">{section.kicker}</p>
+                            <h2 class="lg-title">
+                                {section.title.map((line, i) => (
+                                    <>
+                                        {i > 0 && <br />}
+                                        {line}
+                                    </>
+                                ))}
+                            </h2>
+                            {section.cards && (
+                                <div class="lg-cards">
+                                    {section.cards.map((tone) => (
+                                        <div class={`lg-card lg-card--${tone}`} />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    ))
+                }
+            </div>
+
+            <div class="lg-bar js-lg-bar">
+                <button
+                    type="button"
+                    class="lg-button js-lg-button"
+                    data-label-off="Continue"
+                    data-label-on="Added"
+                    aria-pressed="false"
+                >
+                    Continue
+                </button>
+                <button
+                    type="button"
+                    class="lg-button js-lg-button"
+                    data-label-off="Skip"
+                    data-label-on="Skipped"
+                    aria-pressed="false"
+                >
+                    Skip
+                </button>
+            </div>
+
+            {experiment.tip && <div class="tip text-m">{experiment.tip}</div>}
+        </div>
+    </LabDetailPageView>
+</RootLayout>
